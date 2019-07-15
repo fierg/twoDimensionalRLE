@@ -6,6 +6,7 @@ A two dimensional RLE (run length encoding) implementation for one dimensional i
 - [ ] Implement matrix representation and compression approach
 - [ ] Create test data
 - [ ] Create automated tests to compare filesize
+- [ ] Evaluate the efficiency of possible implementations
 
 ### Usage
 - Clone Project
