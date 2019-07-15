@@ -11,11 +11,11 @@ fun runLengthEncodingBinary(text: String): ByteArray {
 }
 
 fun main() {
-    println(getMatrixFromString("test").toString())
+    println(getSquareMatrixFromString("testsliqSFBJLQHWliaUSFHQLJAHSVJ SQFAF").toString())
 
 }
 
-private fun getMatrixFromString(text: String): Matrix<String> {
+private fun getSquareMatrixFromString(text: String): Matrix<String> {
     val textBytes = text.toByteArray()
     val textBits = textBytes.map { it.toString(2) }.toMutableList()
 
@@ -31,3 +31,22 @@ private fun getMatrixFromString(text: String): Matrix<String> {
 
     return bitString.chunked(1).asIterable().toMatrix(base, base)
 }
+
+private fun getMatrixFromString(text: String): Matrix<String> {
+    val textBytes = text.toByteArray()
+    val textBits = textBytes.map { it.toString(2) }.toMutableList()
+
+    val inputSize = textBits.size.times(textBits.first().length)
+    val base = textBits.first().length
+
+    for (i in inputSize..base.toDouble().pow(2).toInt()) {
+        textBits.add("0")
+    }
+
+    var bitString = ""
+    textBits.forEach { bitString += it }
+
+    return bitString.chunked(1).asIterable().toMatrix(base, base)
+}
+
+
