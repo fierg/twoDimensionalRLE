@@ -10,37 +10,50 @@ import kotlin.math.ceil
 import kotlin.math.sqrt
 import kotlin.math.pow
 
-class BinaryRunLengthEncoder : AbstractEncoder {
+class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 2048
+    private val byteArraySize = 1024
+    private val occurrenceMap = mutableMapOf<Int, Int>()
 
     override fun encode(file: String) {
-        val stream = File(file).inputStream()
+        val inputFile = File(file)
+        val stream = inputFile.inputStream()
         val bytes = ByteArray(byteArraySize)
         var counter = 0
         val newFilename = "data/encoded/${getFilename(file)}"
-        val file = File(newFilename)
+        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename")
+        val fileStr = File(newFilename)
+        val fileBin = File(newFilename + "_bin")
 
-        if (file.exists()) {
-            file.delete()
+        if (fileStr.exists()) {
+            fileStr.delete()
+            fileBin.delete()
         }
-        file.createNewFile()
+        fileStr.createNewFile()
 
         stream.readAllBytes().forEach {
             bytes[counter++ % bytes.size] = it
             if (counter % bytes.size == 0) {
-                encodeBytesToFile(file, bytes)
+                encodeBytesToFileAsString(fileStr, bytes)
+                encodeBytesToFile(fileBin, bytes.toUByteArray())
             }
         }
         stream.close()
 
-        println("${file.length() / 1000000.toDouble() } MB File size")
+        println("Finished encoding. Encoded File has a file size of ${fileStr.length() / 1000000.toDouble()} MB")
+        println("${(fileStr.length() / inputFile.length().toDouble())} times the original size")
+        println("occurrence of repetition counts: ")
+        occurrenceMap.keys.sorted().forEach { println("$it ${occurrenceMap[it]}") }
     }
 
-    private fun encodeBytesToFile(file: File, bytes: ByteArray) {
+    private fun encodeBytesToFileAsString(file: File, bytes: ByteArray) {
         FileOutputStream(file, true).bufferedWriter().use { writer ->
-            writer.write(encodeBits(bytes.toBitSetList()))
+            writer.write(encodeBitsAsString(bytes.toBitSetList()))
         }
+    }
+
+    private fun encodeBytesToFile(file: File, bytes: UByteArray) {
+        file.appendBytes(encodeBitsAsString(bytes.toBitSetList()).toByteArray())
     }
 
     override fun decode(file: String) {
@@ -64,7 +77,7 @@ class BinaryRunLengthEncoder : AbstractEncoder {
         return bitString.chunked(1).asIterable().toMatrix(base, base)
     }
 
-    private fun encodeBits(listOfBits: List<BitSet>): String {
+    private fun encodeBitsAsString(listOfBits: List<BitSet>): String {
         val bitLength = 7
         val stringBuilder = StringBuilder()
         for (i in 0..bitLength) {
@@ -74,6 +87,7 @@ class BinaryRunLengthEncoder : AbstractEncoder {
                 if (bitSet.get(i) == lastBit) {
                     counter++
                 } else {
+                    occurrenceMap[counter] = occurrenceMap.getOrDefault(counter, 0) + 1
                     stringBuilder.append(counter)
                     lastBit = !lastBit
                     counter = 1
@@ -83,6 +97,27 @@ class BinaryRunLengthEncoder : AbstractEncoder {
         }
 
         return stringBuilder.toString()
+    }
+
+    private fun encodeBitsAsByteArray(listOfBits: List<BitSet>): UByteArray {
+        val bitLength = 7
+        var byteList = mutableListOf<UByte>()
+        for (i in 0..bitLength) {
+            var counter = 0
+            var lastBit = false
+            for (bitSet in listOfBits) {
+                if (bitSet.get(i) == lastBit) {
+                    counter++
+                } else {
+                    byteList.add(counter.toUByte())
+                    lastBit = !lastBit
+                    counter = 1
+                }
+            }
+            byteList.add(byteArraySize.toUByte())
+        }
+
+        return byteList.toUByteArray()
     }
 
     private fun getFilename(file: String): String {

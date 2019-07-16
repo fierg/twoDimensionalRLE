@@ -9,3 +9,12 @@ fun ByteArray.toBitSetList(): List<BitSet> {
     }
     return bitSetList
 }
+
+fun UByteArray.toBitSetList(): List<BitSet> {
+    var bitSetList = mutableListOf<BitSet>()
+    for (byte in this) {
+        bitSetList.add(byte.toBitSet())
+    }
+    return bitSetList
+}
+

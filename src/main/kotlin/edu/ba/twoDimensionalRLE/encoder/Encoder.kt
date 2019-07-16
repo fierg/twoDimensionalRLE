@@ -1,6 +1,6 @@
 package edu.ba.twoDimensionalRLE.encoder
 
-interface AbstractEncoder {
+interface Encoder {
     fun encode(file: String)
     fun decode(file: String)
 }

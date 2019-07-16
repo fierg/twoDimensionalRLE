@@ -12,3 +12,12 @@ fun Byte.toBitSet(): BitSet {
     }
     return bitSet
 }
+
+fun UByte.toBitSet(): BitSet {
+    val bitSet = BitSet(7)
+    for (i in 0..7) {
+        if (this and 2.toDouble().pow(i).toByte().toUByte() == 2.toDouble().pow(i).toByte().toUByte())
+            bitSet.set(i)
+    }
+    return bitSet
+}
