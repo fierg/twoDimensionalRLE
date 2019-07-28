@@ -5,12 +5,15 @@ import kotlin.experimental.and
 import kotlin.math.pow
 
 fun Byte.toBitSet(): BitSet {
-    val bitSet = BitSet(7)
+    val bitSet = BitSet(8)
     for (i in 0..7) {
         if (this and 2.toDouble().pow(i).toByte() == 2.toDouble().pow(i).toByte())
             bitSet.set(i)
     }
-    return bitSet
+    if (this.coerceAtLeast(0) == 0.toByte()){
+        bitSet.set(8)
+    }
+        return bitSet
 }
 
 fun UByte.toBitSet(): BitSet {

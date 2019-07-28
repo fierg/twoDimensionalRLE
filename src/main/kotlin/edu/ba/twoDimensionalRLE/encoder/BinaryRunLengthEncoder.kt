@@ -12,7 +12,7 @@ import kotlin.math.pow
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 1024
+    private val byteArraySize = 256
     private val occurrenceMap = mutableMapOf<Int, Int>()
 
     override fun encode(file: String) {
@@ -86,9 +86,13 @@ class BinaryRunLengthEncoder : Encoder {
             for (bitSet in listOfBits) {
                 if (bitSet.get(i) == lastBit) {
                     counter++
+//                    if (counter == 10){
+//                        stringBuilder.append("9 0 ")
+//                        counter = 1
+//                    }
                 } else {
                     occurrenceMap[counter] = occurrenceMap.getOrDefault(counter, 0) + 1
-                    stringBuilder.append(counter)
+                    stringBuilder.append("$counter ")
                     lastBit = !lastBit
                     counter = 1
                 }
