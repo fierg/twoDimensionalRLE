@@ -12,7 +12,7 @@ import kotlin.math.pow
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 256
+    private val byteArraySize = 128
     private val occurrenceMap = mutableMapOf<Int, Int>()
 
     override fun encode(file: String) {
@@ -35,7 +35,7 @@ class BinaryRunLengthEncoder : Encoder {
             bytes[counter++ % bytes.size] = it
             if (counter % bytes.size == 0) {
                 encodeBytesToFileAsString(fileStr, bytes)
-                encodeBytesToFile(fileBin, bytes.toUByteArray())
+                encodeRawBytesToFile(fileBin, bytes)
             }
         }
         stream.close()
@@ -51,6 +51,13 @@ class BinaryRunLengthEncoder : Encoder {
             writer.write(encodeBitsAsString(bytes.toBitSetList()))
         }
     }
+
+    private fun encodeRawBytesToFile(file: File, bytes: ByteArray) {
+        FileOutputStream(file, true).bufferedWriter().use { writer ->
+            writer.write(printBitString(bytes.toBitSetList()))
+        }
+    }
+
 
     private fun encodeBytesToFile(file: File, bytes: UByteArray) {
         file.appendBytes(encodeBitsAsString(bytes.toBitSetList()).toByteArray())
@@ -80,16 +87,16 @@ class BinaryRunLengthEncoder : Encoder {
     private fun encodeBitsAsString(listOfBits: List<BitSet>): String {
         val bitLength = 7
         val stringBuilder = StringBuilder()
-        for (i in 0..bitLength) {
+        for (i in bitLength downTo 0) {
             var counter = 0
             var lastBit = false
             for (bitSet in listOfBits) {
                 if (bitSet.get(i) == lastBit) {
                     counter++
-//                    if (counter == 10){
-//                        stringBuilder.append("9 0 ")
-//                        counter = 1
-//                    }
+                    if (counter == 10) {
+                        stringBuilder.append("9 0 ")
+                        counter = 1
+                    }
                 } else {
                     occurrenceMap[counter] = occurrenceMap.getOrDefault(counter, 0) + 1
                     stringBuilder.append("$counter ")
@@ -103,10 +110,27 @@ class BinaryRunLengthEncoder : Encoder {
         return stringBuilder.toString()
     }
 
+    private fun printBitString(listOfBits: List<BitSet>): String {
+        val bitLength = 7
+        val stringBuilder = StringBuilder()
+        for (i in bitLength downTo 0) {
+            for (bitSet in listOfBits) {
+                if (bitSet.get(i)) {
+                    stringBuilder.append("1")
+                } else {
+                    stringBuilder.append("0")
+                }
+            }
+            stringBuilder.append("\n")
+        }
+
+        return stringBuilder.toString()
+    }
+
     private fun encodeBitsAsByteArray(listOfBits: List<BitSet>): UByteArray {
         val bitLength = 7
         var byteList = mutableListOf<UByte>()
-        for (i in 0..bitLength) {
+        for (i in bitLength downTo 0) {
             var counter = 0
             var lastBit = false
             for (bitSet in listOfBits) {
