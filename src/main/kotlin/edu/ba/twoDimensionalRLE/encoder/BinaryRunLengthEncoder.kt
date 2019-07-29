@@ -157,9 +157,3 @@ class BinaryRunLengthEncoder : Encoder {
         }
     }
 }
-
-fun main() {
-    val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-    binaryRunLengthEncoder.encode("data/t8.shakespeare.txt")
-
-}
