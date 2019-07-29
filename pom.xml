@@ -89,7 +89,6 @@
                 <configuration>
                     <parallel>methods</parallel>
                     <threadCount>2</threadCount>
-                    <outputDirectory>${basedir}/site/report</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>

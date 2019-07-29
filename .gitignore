@@ -2,3 +2,4 @@
 *.iml
 /target/*
 /doc/thesis/tex/DBLPSearch_dokumentation/*
+/data/encoded/*
