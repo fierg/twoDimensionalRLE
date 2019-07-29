@@ -1,5 +1,6 @@
 package edu.ba.twoDimensionalRLE.encoder
 
+import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
@@ -12,8 +13,8 @@ import kotlin.math.pow
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 128
-    private val occurrenceMap = mutableMapOf<Int, Int>()
+    private val byteArraySize = 64
+    private val analyzer = Analyzer()
 
     override fun encode(file: String) {
         val inputFile = File(file)
@@ -40,10 +41,9 @@ class BinaryRunLengthEncoder : Encoder {
         }
         stream.close()
 
-        println("Finished encoding. Encoded File has a file size of ${fileStr.length() / 1000000.toDouble()} MB")
-        println("${(fileStr.length() / inputFile.length().toDouble())} times the original size")
-        println("occurrence of repetition counts: ")
-        occurrenceMap.keys.sorted().forEach { println("$it ${occurrenceMap[it]}") }
+        println("Finished encoding.")
+        analyzer.printFileComparison(inputFile, fileStr)
+        analyzer.printOccurrenceMap()
     }
 
     private fun encodeBytesToFileAsString(file: File, bytes: ByteArray) {
@@ -98,7 +98,7 @@ class BinaryRunLengthEncoder : Encoder {
                         counter = 1
                     }
                 } else {
-                    occurrenceMap[counter] = occurrenceMap.getOrDefault(counter, 0) + 1
+                    analyzer.occurrenceMap[counter] = analyzer.occurrenceMap.getOrDefault(counter, 0) + 1
                     stringBuilder.append("$counter ")
                     lastBit = !lastBit
                     counter = 1
