@@ -11,6 +11,7 @@
 
     <name>twoDimensionalRLE</name>
 
+
     <reporting>
         <plugins>
             <plugin>
@@ -27,6 +28,7 @@
         <kotlin.version>1.3.41</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>5.5.1</junit.version>
+        <maven.compiler.release>12</maven.compiler.release>
     </properties>
 
     <dependencies>
@@ -61,6 +63,15 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>12</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>${kotlin.version}</version>
@@ -93,10 +104,6 @@
                         <version>3.0.0-M3</version>
                     </dependency>
                 </dependencies>
-                <configuration>
-                    <parallel>methods</parallel>
-                    <threadCount>2</threadCount>
-                </configuration>
                 <executions>
                     <execution>
                         <id>test-reports</id>

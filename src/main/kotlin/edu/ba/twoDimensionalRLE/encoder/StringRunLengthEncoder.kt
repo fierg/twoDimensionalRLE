@@ -24,7 +24,7 @@ class StringRunLengthEncoder : Encoder {
     private fun runLengthDecodingString(line: String): String {
         val sb = StringBuilder()
         line.split(" ").chunked(2).forEach {
-            for (i in 0..it[0].toInt()) {
+            for (i in 0 until it[0].toInt()) {
                 sb.append(it[1])
             }
         }

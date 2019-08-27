@@ -88,7 +88,7 @@ class BinaryRunLengthEncoder : Encoder {
 
     override fun decode(file: String) {
         val inputFile = File(file)
-        val outputFile = File(file + "_decoded")
+        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
         var sb: StringBuilder
 
         if (outputFile.exists()) outputFile.delete()
