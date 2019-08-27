@@ -14,7 +14,7 @@ import kotlin.math.pow
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 32
+    private val byteArraySize = 256
     private val analyzer = Analyzer()
 
     override fun encode(file: String) {
@@ -27,14 +27,14 @@ class BinaryRunLengthEncoder : Encoder {
         val fileEncoded = File(newFilename)
         val fileBinStr = File(newFilename + "_bin_str")
         val fileBinRLEStr = File(newFilename + "_bin_rle_str")
-        val fileBinRLEnumber = File(newFilename + "_bin_rle_nr")
+        val fileBinRLEbitEncoded = File(newFilename + "_bin_rle_nr")
 
         if (fileEncoded.exists()) {
             fileEncoded.delete()
             fileBinStr.delete()
             fileBinRLEStr.delete()
+            fileBinRLEbitEncoded.delete()
         }
-        fileEncoded.createNewFile()
 
         stream.readAllBytes().forEach {
             bytes[counter++ % bytes.size] = it
@@ -45,14 +45,15 @@ class BinaryRunLengthEncoder : Encoder {
         }
         stream.close()
         println("Finished encoding as raw bit string and as rle bit string.")
-        analyzer.printFileComparison(inputFile, fileEncoded)
+        analyzer.printFileComparison(inputFile, fileBinRLEStr)
         analyzer.printOccurrenceMap()
 
         println("Starting to encode the rle encoded bit string as 4 bit each (base 15)")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
-            encodeRLEtoNumberValue(line, fileBinRLEnumber)
+            encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
         println("Finished encoding as rle encoded numerical value.")
+        analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
 
 
     }
@@ -86,7 +87,27 @@ class BinaryRunLengthEncoder : Encoder {
     }
 
     override fun decode(file: String) {
-        TODO("not implemented")
+        val inputFile = File(file)
+        val outputFile = File(file + "_decoded")
+        var sb: StringBuilder
+
+        if (outputFile.exists()) outputFile.delete()
+
+        FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
+            inputFile.inputStream().bufferedReader().forEachLine { line ->
+                sb = StringBuilder()
+                line.chars().forEach {
+                    sb.append(it.shr(4))
+                    sb.append(" ")
+                    sb.append(it.and(15))
+                    sb.append(" ")
+
+                }
+                writer.write(sb.toString())
+                writer.newLine()
+            }
+
+        }
     }
 
     private fun getSquareMatrixFromString(text: String): Matrix<String> {
