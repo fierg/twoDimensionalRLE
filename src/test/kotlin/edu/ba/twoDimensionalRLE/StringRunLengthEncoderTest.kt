@@ -1,13 +1,27 @@
 package edu.ba.twoDimensionalRLE
 
-import edu.ba.twoDimensionalRLE.encoder.runLengthEncodingString
+import edu.ba.twoDimensionalRLE.encoder.StringRunLengthEncoder
 import org.junit.Test
 
 class StringRunLengthEncoderTest {
 
+    private val strRLE = StringRunLengthEncoder()
+
     @Test
     fun assertEquality() {
-        assert(runLengthEncodingString("TTESSST") == "2T1E3S1T")
-        assert(runLengthEncodingString("WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW") == "12W1B12W3B24W1B14W")
+        assert(strRLE.runLengthEncodingString("TTESSST") == "2 T 1 E 3 S 1 T")
+        assert(strRLE.runLengthEncodingString("WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW") == "12 W 1 B 12 W 3 B 24 W 1 B 14 W")
     }
+
+    @Test
+    fun encodeStringRLE() {
+        strRLE.encode("data/RLE_TEST_FILE.txt")
+    }
+
+    @Test
+    fun decodeStringRLE() {
+        strRLE.decode("data/encoded/RLE_TEST_FILE_rle.txt")
+    }
+
+
 }

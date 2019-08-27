@@ -8,6 +8,6 @@ class BinaryRLETest {
     @Test
     fun encodeFile(){
         val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-        binaryRunLengthEncoder.encode("data/t8.shakespeare.txt")
+        binaryRunLengthEncoder.encode("data/t8.shakespeare.txgit t")
     }
 }
