@@ -12,7 +12,7 @@ class Analyzer {
     }
 
     fun printOccurrenceMap() {
-        println("Occurrence of repetition counts: ")
+        println("Repetition counts: ")
         occurrenceMap.keys.sorted().forEach { println("$it ${occurrenceMap[it]}") }
     }
 }

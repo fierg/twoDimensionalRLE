@@ -13,7 +13,7 @@ import kotlin.math.pow
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 64
+    private val byteArraySize = 32
     private val analyzer = Analyzer()
 
     override fun encode(file: String) {
@@ -23,26 +23,31 @@ class BinaryRunLengthEncoder : Encoder {
         var counter = 0
         val newFilename = "data/encoded/${getFilename(file)}"
         println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename")
-        val fileStr = File(newFilename)
-        val fileBin = File(newFilename + "_bin")
+        val fileEncoded = File(newFilename)
+        val fileBinStr = File(newFilename + "_bin")
+        val fileBinRLEStr = File(newFilename + "_bin_rle")
 
-        if (fileStr.exists()) {
-            fileStr.delete()
-            fileBin.delete()
+        if (fileEncoded.exists()) {
+            fileEncoded.delete()
+            fileBinStr.delete()
+            fileBinRLEStr.delete()
         }
-        fileStr.createNewFile()
+        fileEncoded.createNewFile()
 
         stream.readAllBytes().forEach {
             bytes[counter++ % bytes.size] = it
             if (counter % bytes.size == 0) {
-                encodeBytesToFileAsString(fileStr, bytes)
-                encodeRawBytesToFile(fileBin, bytes)
+                encodeBytesToFileAsString(fileBinRLEStr, bytes)
+                encodeRawBytesToFile(fileBinStr, bytes)
+//                encodeBytesToFileAsBits(fileEncoded, bytes)
             }
         }
+
+//        reencodeBitStringToChars(fileBinStr)
         stream.close()
 
         println("Finished encoding.")
-        analyzer.printFileComparison(inputFile, fileStr)
+        analyzer.printFileComparison(inputFile, fileEncoded)
         analyzer.printOccurrenceMap()
     }
 
@@ -93,8 +98,8 @@ class BinaryRunLengthEncoder : Encoder {
             for (bitSet in listOfBits) {
                 if (bitSet.get(i) == lastBit) {
                     counter++
-                    if (counter == 10) {
-                        stringBuilder.append("9 0 ")
+                    if (counter == 16) {
+                        stringBuilder.append("15 0 ")
                         counter = 1
                     }
                 } else {
