@@ -1,0 +1,83 @@
+%%% svnver package
+%%% --------------------------------------------------------------------------------------------------------------
+%%% allows to print svn $Id:$ strings in TeX sources
+%%% use \svnversion{$Id:$} as template in your source code (probably each .tex-file), 
+%%% svn will replace Id with the version if you have set the svn:keywords properties to include Id
+%%% (see svn help propset for help on this, svn propset svn:keywords "Id HeadURL" main.tex will do it for main.tex)
+%%% USAGE:
+%%% use \svnversion{$Id:$} as template in your source code (probably each .tex-file), 
+%%% you can either use svnfoot to have a running foot or \printsvnversion to print the version explicitly
+%%%
+%%% Option svnon must be declared if \printsvnversion should produce output
+%%% Option svnfoot: prints svn version comment and page number
+%%% --------------------------------------------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesPackage{svnver}[2005/02/23 svn version - Roland Bless]
+
+\newif\if@svn\@svnfalse
+
+%%% Option svnfoot: prints svn version comment and page number
+\DeclareOption{svnfoot}{\@svntrue\AtBeginDocument{%
+   \def\@oddfoot{\printsvnversion\hfil}%
+   \def\@evenfoot{\hfil\printsvnversion}}%
+}
+
+%%% svnon must be declared if \printsvnversion should produce output
+\DeclareOption{svnon}{\@svntrue}
+\DeclareOption{svnoff}{\@svnfalse}
+
+\ProcessOptions
+
+\let\@plainsvnversion\empty
+\let\@plainsvnrev\empty
+\newcommand{\svnversion}[1]{\renewcommand{\@plainsvnversion}{#1}%
+ \expandafter\stripone\@plainsvnversion%
+ \expandafter\striptwo\partone\stop}
+\newcommand{\svnrev}[1]{\renewcommand{\@plainsvnrev}{#1}%
+ \expandafter\striprevone\@plainsvnrev%
+ \expandafter\striprevtwo\partrevone\stop}
+\newcommand{\@emptysvnversionstr}{-- please use $\backslash$svnversion after $\backslash$chapter --}
+\newcommand{\@emptysvnrevstr}{unknown revision}
+\newcommand{\@svnversion}{\@emptysvnversionstr}
+\newcommand{\@svnrev}{\@emptysvnrevstr}
+\newcommand{\@resetsvnversion}{\let\@svnversion\@emptysvnversionstr}
+\newcommand{\@resetsvnrev}{\let\@svnrev\@emptysvnrevstr}
+
+\def\stripone $#1${\def\partone{#1}}
+\def\striptwo Id: #1 #2 #3 #4 #5\stop{\renewcommand\@svnversion{\texttt{V #2\ #3\ #4\ #1\ #5}}}
+\def\striprevone $#1${\def\partrevone{#1}}
+\def\striprevtwo Rev: #1 \stop{\renewcommand\@svnrev{#1}}
+
+\if@svn
+\newcommand{\printsvnversion}{{\fontsize{6}{6}\selectfont\@svnversion}}
+\else
+\newcommand{\printsvnversion}{}
+\fi
+
+\if@svn
+\newcommand{\printsvnrev}{\@svnrev}
+\else
+\newcommand{\printsvnrev}{}
+\fi
+
+
+%\def\ps@svnplain{%
+%  \let\@mkboth\@gobbletwo%
+%   \def\@evenhead{}\def\@oddhead{}%
+%  \def\@oddfoot{\printsvnversion\hfil}%
+%  \def\@evenfoot{\hfil\printsvnversion}
+%   \let\chaptermark\@gobble
+%   \let\sectionmark\@gobble
+%   \let\subsectionmark\@gobble}
+
+%\let\saveoldchapter\chapter
+%\renewcommand\chapter{\@resetsvnversion
+%  \thispagestyle{svnplain}
+%  \global\@topnum\z@
+%  \@afterindentfalse
+%  \secdef\@chapter\@schapter
+%}
+
+
+\endinput
+%%% end of file `svnver.sty`

@@ -1,0 +1,151 @@
+\documentclass{wissdoc}
+% Autor: Roland Bless 1996-2009, bless <at> kit.edu
+% ----------------------------------------------------------------
+% Diplomarbeit - Hauptdokument
+% ----------------------------------------------------------------
+%%
+%% $Id: thesis.tex 65 2012-05-10 10:32:11Z bless $
+%%
+%
+% Zum Erstellen zweiseitiger PDFs (für Buchdruck) in der Datei "wissdoc.cls" folgende Zeile abändern:
+%
+% \LoadClass[a4paper,12pt,oneside]{book} % diese Klasse basiert auf ``book''
+% in
+%\LoadClass[a4paper,12pt,titlepage]{book} % diese Klasse basiert auf ``book''
+%
+%
+% wissdoc Optionen: draft, relaxed, pdf --> siehe wissdoc.cls
+% ------------------------------------------------------------------
+% Weitere packages: (Dokumentation dazu durch "latex <package>.dtx")
+\usepackage[numbers,sort&compress]{natbib}
+% \usepackage{varioref}
+% \usepackage{verbatim}
+% \usepackage{float}    %z.B. \floatstyle{ruled}\restylefloat{figure}
+% \usepackage{subfigure}
+% \usepackage{fancybox} % für schattierte,ovale Boxen etc.
+% \usepackage{tabularx} % automatische Spaltenbreite
+% \usepackage{supertab} % mehrseitige Tabellen
+% \usepackage[svnon,svnfoot]{svnver} % SVN Versionsinformation 
+%% ---------------- end of usepackages -------------
+
+%\svnversion{$Id: thesis.tex 65 2012-05-10 10:32:11Z bless $} % In case that you want to include version information in the footer
+
+%% Informationen für die PDF-Datei
+\hypersetup{
+ pdfauthor={N.N.},
+ pdftitle={Not set}
+ pdfsubject={Not set},
+ pdfkeywords={Not set}
+}
+
+% Macros, nicht unbedingt notwendig
+\input{macros}
+
+% Print URLs not in Typewriter Font
+\def\UrlFont{\rm}
+
+\newcommand{\blankpage}{% Leerseite ohne Seitennummer, nächste Seite rechts
+ \clearpage{\pagestyle{empty}\cleardoublepage}
+}
+
+%% Einstellungen für das gesamte Dokument
+
+% Trennhilfen
+% Wichtig! 
+% Im ngerman-paket sind zusätzlich folgende Trennhinweise enthalten:
+% "- = zusätzliche Trennstelle
+% "| = Vermeidung von Ligaturen und mögliche Trennung (bsp: Schaf"|fell)
+% "~ = Bindestrich an dem keine Trennung erlaubt ist (bsp: bergauf und "~ab)
+% "= = Bindestrich bei dem Worte vor und dahinter getrennt werden dürfen
+% "" = Trennstelle ohne Erzeugung eines Trennstrichs (bsp: und/""oder)
+
+% Trennhinweise fuer Woerter hier beschreiben
+\hyphenation{
+% Pro-to-koll-in-stan-zen
+}
+
+% Index-Datei öffnen
+\ifnotdraft{\makeindex}
+
+\begin{document}
+
+\frontmatter
+\pagenumbering{roman}
+\ifnotdraft{
+ \include{src/titelseite}
+ %\blankpage % Leerseite auf Titelrückseite
+ \include{src/abstract}
+}
+%
+%% *************** Hier geht's ab ****************
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Verzeichnisse
+%% ++++++++++++++++++++++++++++++++++++++++++
+\ifnotdraft{
+{\parskip 0pt\tableofcontents} % toc bitte einzeilig
+%\blankpage
+\listoffigures
+%\blankpage
+\listoftables
+%\blankpage
+}
+
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Hauptteil
+%% ++++++++++++++++++++++++++++++++++++++++++
+\graphicspath{{img/}}
+
+\mainmatter
+\pagenumbering{arabic}
+\include{src/einleitung}  % Einleitung
+\include{src/grundlagen}  % Grundlagen
+\include{src/analyse}     % Analyse
+\include{src/entwurf}     % Entwurf
+\include{src/implemen}    % Implementierung
+\include{src/eval}        % Evaluation
+\include{src/fazit}   	  % Diskussion und Ausblick
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Anhang
+%% ++++++++++++++++++++++++++++++++++++++++++
+
+\appendix
+%\include{anhang_a}
+%\include{anhang_b}
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Literatur
+%% ++++++++++++++++++++++++++++++++++++++++++
+%  mit dem Befehl \nocite werden auch nicht 
+%  zitierte Referenzen abgedruckt
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+%%
+\nocite{*} % nur angeben, wenn auch nicht im Text zitierte Quellen 
+           % erscheinen sollen
+\bibliographystyle{itmabbrv} % mit abgekürzten Vornamen der Autoren
+%\bibliographystyle{gerplain} % abbrvnat unsrtnat
+% spezielle Zitierstile: Labels mit vier Buchstaben und Jahreszahl
+%\bibliographystyle{itmalpha}  % ausgeschriebene Vornamen der Autoren
+\bibliography{thesis}
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Index
+%% ++++++++++++++++++++++++++++++++++++++++++
+\ifnotdraft{
+\cleardoublepage
+\phantomsection
+\printindex            % Index, Stichwortverzeichnis
+}
+
+ %
+ % Die folgende Erklärung ist für Diplomarbeiten Pflicht
+ % (siehe Prüfungsordnung), für Studienarbeiten nicht notwendig
+ \include{src/erklaerung}
+ \blankpage % Leerseite auf Erklärungsrückseite
+ 
+\end{document}
+%% end of file
