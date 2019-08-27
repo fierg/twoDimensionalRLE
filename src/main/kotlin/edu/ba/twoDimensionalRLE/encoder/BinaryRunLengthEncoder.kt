@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.encoder
 
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
+import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
@@ -24,8 +25,9 @@ class BinaryRunLengthEncoder : Encoder {
         val newFilename = "data/encoded/${getFilename(file)}"
         println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename")
         val fileEncoded = File(newFilename)
-        val fileBinStr = File(newFilename + "_bin")
-        val fileBinRLEStr = File(newFilename + "_bin_rle")
+        val fileBinStr = File(newFilename + "_bin_str")
+        val fileBinRLEStr = File(newFilename + "_bin_rle_str")
+        val fileBinRLEnumber = File(newFilename + "_bin_rle_nr")
 
         if (fileEncoded.exists()) {
             fileEncoded.delete()
@@ -39,16 +41,31 @@ class BinaryRunLengthEncoder : Encoder {
             if (counter % bytes.size == 0) {
                 encodeBytesToFileAsString(fileBinRLEStr, bytes)
                 encodeRawBytesToFile(fileBinStr, bytes)
-//                encodeBytesToFileAsBits(fileEncoded, bytes)
             }
         }
-
-//        reencodeBitStringToChars(fileBinStr)
         stream.close()
-
-        println("Finished encoding.")
+        println("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileEncoded)
         analyzer.printOccurrenceMap()
+
+        println("Starting to encode the rle encoded bit string as 4 bit each (base 15)")
+        fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
+            encodeRLEtoNumberValue(line, fileBinRLEnumber)
+        }
+        println("Finished encoding as rle encoded numerical value.")
+
+
+    }
+
+    private fun encodeRLEtoNumberValue(line: String?, file: File) {
+        FileOutputStream(file, true).bufferedWriter().use { writer ->
+            var outChar: Char
+            line!!.trim().split(" ").chunked(2).forEach { lineChunk ->
+                outChar = lineChunk.reduceToSingleChar()
+                writer.append(outChar)
+            }
+            writer.append("\n")
+        }
     }
 
     private fun encodeBytesToFileAsString(file: File, bytes: ByteArray) {
