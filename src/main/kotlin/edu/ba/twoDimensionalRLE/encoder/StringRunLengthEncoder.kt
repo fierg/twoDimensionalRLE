@@ -23,9 +23,11 @@ class StringRunLengthEncoder : Encoder {
 
     private fun runLengthDecodingString(line: String): String {
         val sb = StringBuilder()
-        line.split(" ").chunked(2).forEach {
-            for (i in 0 until it[0].toInt()) {
-                sb.append(it[1])
+        if (line.isBlank()) return "\n"
+        val regex = Regex("((\\d+) (.))")
+        regex.findAll(line).iterator().forEach { group ->
+            for (i in 0 until group.groups[2]!!.value.toInt()) {
+                sb.append(group.groups!![3]!!.value)
             }
         }
         return sb.toString()

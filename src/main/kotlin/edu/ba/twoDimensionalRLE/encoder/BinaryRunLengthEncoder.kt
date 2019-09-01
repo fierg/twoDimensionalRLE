@@ -44,6 +44,13 @@ class BinaryRunLengthEncoder : Encoder {
                 encodeRawBytesToFile(fileBinStr, bytes)
             }
         }
+        if (counter % bytes.size != 0) {
+            bytes.slice(IntRange(0, counter % bytes.size))
+            encodeBytesToFileAsString(fileBinRLEStr, bytes)
+            encodeRawBytesToFile(fileBinStr, bytes)
+        }
+
+
         stream.close()
         println("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
