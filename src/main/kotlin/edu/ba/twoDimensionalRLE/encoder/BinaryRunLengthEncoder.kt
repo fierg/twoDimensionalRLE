@@ -7,10 +7,11 @@ import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.sqrt
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 class BinaryRunLengthEncoder : Encoder {
 
@@ -59,13 +60,13 @@ class BinaryRunLengthEncoder : Encoder {
     }
 
     private fun encodeRLEtoNumberValue(line: String?, file: File) {
-        FileOutputStream(file, true).bufferedWriter().use { writer ->
+        FileOutputStream(file, true).use { writer ->
             var outChar: Char
             line!!.trim().split(" ").chunked(2).forEach { lineChunk ->
                 outChar = lineChunk.reduceToSingleChar()
-                writer.append(outChar)
+                writer.write(outChar.toInt())
             }
-            writer.append("\n")
+            writer.write(0xFF)
         }
     }
 
@@ -89,22 +90,32 @@ class BinaryRunLengthEncoder : Encoder {
     override fun decode(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
-        var sb: StringBuilder
 
         if (outputFile.exists()) outputFile.delete()
 
         FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
-            inputFile.inputStream().bufferedReader().forEachLine { line ->
-                sb = StringBuilder()
-                line.chars().forEach {
-                    sb.append(it.shr(4))
-                    sb.append(" ")
-                    sb.append(it.and(15))
-                    sb.append(" ")
 
+            val inputStream = inputFile.inputStream()
+            var byteQueue = LinkedList<Byte>()
+            var outputSb: StringBuilder
+
+            inputStream.buffered().readAllBytes().iterator().forEach { byte ->
+                if (byte == 0xff.toByte()) {
+                    outputSb = StringBuilder()
+
+                    byteQueue.stream().forEach {
+                        outputSb.append(it.toUByte().toInt().shr(4))
+                        outputSb.append(" ")
+                        outputSb.append(it.toUByte().toInt().and(15))
+                        outputSb.append(" ")
+                    }
+                    writer.write(outputSb.toString())
+                    writer.newLine()
+                    byteQueue = LinkedList()
+
+                } else {
+                    byteQueue.add(byte)
                 }
-                writer.write(sb.toString())
-                writer.newLine()
             }
 
         }
@@ -197,6 +208,16 @@ class BinaryRunLengthEncoder : Encoder {
             return regex.find(file)!!.groupValues[1]
         } else {
             throw IllegalArgumentException("Given Filename doesn't match default file location and cant be parsed.")
+        }
+    }
+
+    private fun readUpToNull(inputStream: InputStream): String {
+        return buildString {
+            while (true) {
+                val ch = inputStream.read().toChar()
+                if (ch == '\u0000') break
+                append(ch)
+            }
         }
     }
 }

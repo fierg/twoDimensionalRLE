@@ -14,12 +14,12 @@ import org.junit.jupiter.api.TestMethodOrder
     @Test
     @Order(1)
     fun encodeFile() {
-        binaryRunLengthEncoder.encode("data/t8.shakespeare.txt")
+        binaryRunLengthEncoder.encode("data/RLE_TEST_FILE.txt")
     }
 
     @Test
     @Order(2)
     fun decodeFile() {
-        binaryRunLengthEncoder.decode("data/encoded/t8.shakespeare.txt_bin_rle_nr")
+        binaryRunLengthEncoder.decode("data/encoded/RLE_TEST_FILE.txt_bin_rle_nr")
     }
 }
