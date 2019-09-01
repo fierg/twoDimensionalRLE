@@ -1,19 +1,21 @@
 package edu.ba.twoDimensionalRLE.encoder
 
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
+import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.sqrt
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 class BinaryRunLengthEncoder : Encoder {
 
-    private val byteArraySize = 64
+    private val byteArraySize = 256
     private val analyzer = Analyzer()
 
     override fun encode(file: String) {
@@ -23,27 +25,56 @@ class BinaryRunLengthEncoder : Encoder {
         var counter = 0
         val newFilename = "data/encoded/${getFilename(file)}"
         println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename")
-        val fileStr = File(newFilename)
-        val fileBin = File(newFilename + "_bin")
+        val fileEncoded = File(newFilename)
+        val fileBinStr = File(newFilename + "_bin_str")
+        val fileBinRLEStr = File(newFilename + "_bin_rle_str")
+        val fileBinRLEbitEncoded = File(newFilename + "_bin_rle_nr")
 
-        if (fileStr.exists()) {
-            fileStr.delete()
-            fileBin.delete()
+        if (fileEncoded.exists()) {
+            fileEncoded.delete()
+            fileBinStr.delete()
+            fileBinRLEStr.delete()
+            fileBinRLEbitEncoded.delete()
         }
-        fileStr.createNewFile()
 
         stream.readAllBytes().forEach {
             bytes[counter++ % bytes.size] = it
             if (counter % bytes.size == 0) {
-                encodeBytesToFileAsString(fileStr, bytes)
-                encodeRawBytesToFile(fileBin, bytes)
+                encodeBytesToFileAsString(fileBinRLEStr, bytes)
+                encodeRawBytesToFile(fileBinStr, bytes)
             }
         }
-        stream.close()
+        if (counter % bytes.size != 0) {
+            bytes.slice(IntRange(0, counter % bytes.size))
+            encodeBytesToFileAsString(fileBinRLEStr, bytes)
+            encodeRawBytesToFile(fileBinStr, bytes)
+        }
 
-        println("Finished encoding.")
-        analyzer.printFileComparison(inputFile, fileStr)
+
+        stream.close()
+        println("Finished encoding as raw bit string and as rle bit string.")
+        analyzer.printFileComparison(inputFile, fileBinRLEStr)
         analyzer.printOccurrenceMap()
+
+        println("Starting to encode the rle encoded bit string as 4 bit each (base 15)")
+        fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
+            encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
+        }
+        println("Finished encoding as rle encoded numerical value.")
+        analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
+
+
+    }
+
+    private fun encodeRLEtoNumberValue(line: String?, file: File) {
+        FileOutputStream(file, true).use { writer ->
+            var outChar: Char
+            line!!.trim().split(" ").chunked(2).forEach { lineChunk ->
+                outChar = lineChunk.reduceToSingleChar()
+                writer.write(outChar.toInt())
+            }
+            writer.write(0xFF)
+        }
     }
 
     private fun encodeBytesToFileAsString(file: File, bytes: ByteArray) {
@@ -64,7 +95,37 @@ class BinaryRunLengthEncoder : Encoder {
     }
 
     override fun decode(file: String) {
-        TODO("not implemented")
+        val inputFile = File(file)
+        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
+
+        if (outputFile.exists()) outputFile.delete()
+
+        FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
+
+            val inputStream = inputFile.inputStream()
+            var byteQueue = LinkedList<Byte>()
+            var outputSb: StringBuilder
+
+            inputStream.buffered().readAllBytes().iterator().forEach { byte ->
+                if (byte == 0xff.toByte()) {
+                    outputSb = StringBuilder()
+
+                    byteQueue.stream().forEach {
+                        outputSb.append(it.toUByte().toInt().shr(4))
+                        outputSb.append(" ")
+                        outputSb.append(it.toUByte().toInt().and(15))
+                        outputSb.append(" ")
+                    }
+                    writer.write(outputSb.toString())
+                    writer.newLine()
+                    byteQueue = LinkedList()
+
+                } else {
+                    byteQueue.add(byte)
+                }
+            }
+
+        }
     }
 
     private fun getSquareMatrixFromString(text: String): Matrix<String> {
@@ -93,8 +154,8 @@ class BinaryRunLengthEncoder : Encoder {
             for (bitSet in listOfBits) {
                 if (bitSet.get(i) == lastBit) {
                     counter++
-                    if (counter == 10) {
-                        stringBuilder.append("9 0 ")
+                    if (counter == 16) {
+                        stringBuilder.append("15 0 ")
                         counter = 1
                     }
                 } else {
@@ -154,6 +215,16 @@ class BinaryRunLengthEncoder : Encoder {
             return regex.find(file)!!.groupValues[1]
         } else {
             throw IllegalArgumentException("Given Filename doesn't match default file location and cant be parsed.")
+        }
+    }
+
+    private fun readUpToNull(inputStream: InputStream): String {
+        return buildString {
+            while (true) {
+                val ch = inputStream.read().toChar()
+                if (ch == '\u0000') break
+                append(ch)
+            }
         }
     }
 }

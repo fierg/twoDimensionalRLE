@@ -23,9 +23,11 @@ class StringRunLengthEncoder : Encoder {
 
     private fun runLengthDecodingString(line: String): String {
         val sb = StringBuilder()
-        line.split(" ").chunked(2).forEach {
-            for (i in 0..it[0].toInt()) {
-                sb.append(it[1])
+        if (line.isBlank()) return "\n"
+        val regex = Regex("((\\d+) (.))")
+        regex.findAll(line).iterator().forEach { group ->
+            for (i in 0 until group.groups[2]!!.value.toInt()) {
+                sb.append(group.groups!![3]!!.value)
             }
         }
         return sb.toString()
@@ -34,7 +36,13 @@ class StringRunLengthEncoder : Encoder {
     override fun encode(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/encoded/${inputFile.nameWithoutExtension}_rle.txt")
-        if (outputFile.exists()) outputFile.delete()
+
+        if (outputFile.exists()) {
+            outputFile.delete()
+        } else {
+            File("data/encoded").mkdir()
+            File("data/decoded").mkdir()
+        }
         val sb = StringBuilder()
 
         FileInputStream(inputFile).bufferedReader().use { reader ->
