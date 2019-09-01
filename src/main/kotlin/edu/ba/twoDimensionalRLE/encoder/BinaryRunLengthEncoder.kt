@@ -56,7 +56,7 @@ class BinaryRunLengthEncoder : Encoder {
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
         analyzer.printOccurrenceMap()
 
-        println("Starting to encode the rle encoded bit string as 4 bit each (base 15)")
+        println("Starting to encode the rle encoded bit string as 4 bit each (base 16)")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -109,13 +109,23 @@ class BinaryRunLengthEncoder : Encoder {
             inputStream.buffered().readAllBytes().iterator().forEach { byte ->
                 if (byte == 0xff.toByte()) {
                     outputSb = StringBuilder()
-
                     byteQueue.stream().forEach {
-                        outputSb.append(it.toUByte().toInt().shr(4))
-                        outputSb.append(" ")
-                        outputSb.append(it.toUByte().toInt().and(15))
-                        outputSb.append(" ")
+                        val uByteInt = it.toUByte().toInt()
+                        if (uByteInt == 0) {
+                            outputSb.append("0")
+                        } else {
+                            if (uByteInt.shl(4) == 0) {
+                                outputSb.append(uByteInt.shr(4))
+                            } else {
+                                outputSb.append(uByteInt.shr(4))
+                                outputSb.append(" ")
+                                outputSb.append(uByteInt.and(15))
+                                outputSb.append(" ")
+                            }
+
+                        }
                     }
+
                     writer.write(outputSb.toString())
                     writer.newLine()
                     byteQueue = LinkedList()

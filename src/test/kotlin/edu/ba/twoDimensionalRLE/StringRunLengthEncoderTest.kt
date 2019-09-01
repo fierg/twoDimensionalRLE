@@ -32,13 +32,13 @@ class StringRunLengthEncoderTest {
 
     @Test
     @Order(4)
-    fun decodeStringRLE_short() {
+    fun decodeStringRLE_long() {
         strRLE.decode("data/encoded/t8.shakespeare_rle.txt")
     }
 
     @Test
     @Order(5)
-    fun decodeStringRLE_long() {
+    fun decodeStringRLE_short() {
         strRLE.decode("data/encoded/testFile_small2_rle.txt")
     }
 
