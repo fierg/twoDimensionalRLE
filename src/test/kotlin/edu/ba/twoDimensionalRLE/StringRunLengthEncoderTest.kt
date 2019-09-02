@@ -9,7 +9,7 @@ class StringRunLengthEncoderTest {
     companion object {
         private const val fileToEncodeSmall = "testFile_small2.txt"
         private const val fileToEncode = "t8.shakespeare.txt"
-        private const val fileEncoded = "t8.shakespeare_rle.txt"
+        private const val fileEncoded = "t8.shakespeare_rle.bin"
 
     }
 
@@ -51,13 +51,13 @@ class StringRunLengthEncoderTest {
     @Test
     @Order(5)
     fun decodeStringRLE_long() {
-        strRLE.decode("data/encoded/t8.shakespeare_rle.txt")
+        strRLE.decode("data/encoded/t8.shakespeare_rle.bin")
     }
 
     @Test
     @Order(6)
     fun decodeStringRLE_short() {
-        strRLE.decode("data/encoded/testFile_small2_rle.txt")
+        strRLE.decode("data/encoded/testFile_small2_rle.bin")
     }
 
 

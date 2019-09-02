@@ -88,11 +88,10 @@ class BinaryRunLengthEncoder : Encoder {
     @ExperimentalUnsignedTypes
     override fun decode(file: String) {
         val inputFile = File(file)
-        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
+        val tempFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
+        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded_rle.txt")
 
-        if (outputFile.exists()) outputFile.delete()
-
-        FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
+        FileOutputStream(tempFile, true).bufferedWriter().use { writer ->
 
             val inputStream = inputFile.inputStream()
             var byteQueue = LinkedList<Byte>()
@@ -117,7 +116,6 @@ class BinaryRunLengthEncoder : Encoder {
 
                         }
                     }
-
                     writer.write(outputSb.toString())
                     writer.newLine()
                     byteQueue = LinkedList()
@@ -128,6 +126,20 @@ class BinaryRunLengthEncoder : Encoder {
             }
 
         }
+
+        FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
+            tempFile.inputStream().bufferedReader().lines().forEach {line ->
+                var lastBit = 0
+                val sb = StringBuilder()
+                line.trim().split(" ").forEach {
+                    for (i in 0 until it.toInt()) sb.append(lastBit)
+                    lastBit = if (lastBit == 0) 1 else 0
+                }
+                sb.append("\n")
+                writer.write(sb.toString())
+            }
+        }
+
     }
 
     private fun getSquareMatrixFromString(text: String): Matrix<String> {
