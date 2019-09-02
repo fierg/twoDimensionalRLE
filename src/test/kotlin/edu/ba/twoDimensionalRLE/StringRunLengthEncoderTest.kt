@@ -9,8 +9,10 @@ class StringRunLengthEncoderTest {
     companion object {
         private const val fileToEncodeSmall = "testFile_small2.txt"
         private const val fileToEncode = "t8.shakespeare.txt"
-        private const val fileEncoded = "t8.shakespeare_rle.bin"
 
+
+        private const val encodeFolder = "data/encoded/rle"
+        private const val decodeFolder = "data/decoded/rle"
     }
 
     private val strRLE = StringRunLengthEncoder()
@@ -18,15 +20,12 @@ class StringRunLengthEncoderTest {
     @Test
     @Order(1)
     fun cleanup() {
-        if (File("data/encoded/${fileEncoded}").exists()) {
-            File("data/encoded").deleteRecursively()
-            File("data/decoded").deleteRecursively()
-            File("data/encoded").mkdir()
-            File("data/decoded").mkdir()
-        } else {
-            File("data/encoded").mkdir()
-            File("data/decoded").mkdir()
+        if (File("$encodeFolder/${fileToEncode}.rle").exists()) {
+            File(encodeFolder).deleteRecursively()
+            File(decodeFolder).deleteRecursively()
         }
+        File(encodeFolder).mkdirs()
+        File(decodeFolder).mkdirs()
     }
 
     @Test
@@ -39,25 +38,25 @@ class StringRunLengthEncoderTest {
     @Test
     @Order(3)
     fun encodeStringRLE_short() {
-        strRLE.encode("data/$fileToEncodeSmall")
+        strRLE.encode("data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle")
     }
 
     @Test
     @Order(4)
     fun encodeStringRLE_long() {
-        strRLE.encode("data/$fileToEncode")
+        strRLE.encode("data/$fileToEncode", "$encodeFolder/$fileToEncode.rle")
     }
 
     @Test
     @Order(5)
     fun decodeStringRLE_long() {
-        strRLE.decode("data/encoded/t8.shakespeare_rle.bin")
+        strRLE.decode("$encodeFolder/${fileToEncode}.rle", "$decodeFolder/$fileToEncode")
     }
 
     @Test
     @Order(6)
     fun decodeStringRLE_short() {
-        strRLE.decode("data/encoded/testFile_small2_rle.bin")
+        strRLE.decode("$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall")
     }
 
 

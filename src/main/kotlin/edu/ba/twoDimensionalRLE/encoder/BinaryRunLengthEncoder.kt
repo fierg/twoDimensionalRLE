@@ -18,23 +18,22 @@ class BinaryRunLengthEncoder : Encoder {
     private val byteArraySize = 256
     private val analyzer = Analyzer()
 
-    override fun encode(file: String) {
+    override fun encode(file: String, outputFile: String) {
         val inputFile = File(file)
         val stream = inputFile.inputStream()
         val bytes = ByteArray(byteArraySize)
         var counter = 0
-        val newFilename = "data/encoded/${getFilename(file)}"
-        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename ...")
-        val fileBinStr = File(newFilename + "_bin_str")
-        val fileBinRLEStr = File(newFilename + "_bin_rle_str")
-        val fileBinRLEbitEncoded = File(newFilename + "_bin_rle_nr")
+        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
+        val fileBinStr = File(outputFile + "_bin_str")
+        val fileBinRLEStr = File(outputFile + "_str")
+        val fileBinRLEbitEncoded = File(outputFile + "_nr")
 
         stream.readAllBytes().forEach { byte ->
             analyzer.byteOccurrenceMap[byte] = analyzer.byteOccurrenceMap.getOrDefault(byte, 0) + 1
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
                 encodeBytesToFileAsString(fileBinRLEStr, bytes)
-                encodeRawBytesToFile(fileBinStr, bytes)
+//                encodeRawBytesToFile(fileBinStr, bytes)
             }
         }
         if (counter % bytes.size != 0) {
@@ -50,7 +49,7 @@ class BinaryRunLengthEncoder : Encoder {
         analyzer.printOccurrenceMap()
         analyzer.printByteOccurrence()
         analyzer.createByteMapping()
-        
+
 
         println("\nStarting to encode the rle encoded bit string as 4 bit each (base 16)...")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
@@ -86,10 +85,10 @@ class BinaryRunLengthEncoder : Encoder {
     }
 
     @ExperimentalUnsignedTypes
-    override fun decode(file: String) {
+    override fun decode(file: String, outputFile: String) {
         val inputFile = File(file)
-        val tempFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
-        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded_rle.txt")
+        val tempFile = File("${outputFile}_tmp")
+        val outputFile = File(outputFile)
 
         FileOutputStream(tempFile, true).bufferedWriter().use { writer ->
 
@@ -128,7 +127,7 @@ class BinaryRunLengthEncoder : Encoder {
         }
 
         FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
-            tempFile.inputStream().bufferedReader().lines().forEach {line ->
+            tempFile.inputStream().bufferedReader().lines().forEach { line ->
                 var lastBit = 0
                 val sb = StringBuilder()
                 line.trim().split(" ").forEach {

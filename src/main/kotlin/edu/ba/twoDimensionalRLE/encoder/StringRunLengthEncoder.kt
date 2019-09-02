@@ -54,9 +54,10 @@ class StringRunLengthEncoder : Encoder {
         FileOutputStream(outputFile, true).bufferedWriter().use { writer -> writer.write(sb.toString()) }
     }
 
-    override fun encode(file: String) {
+    override fun encode(file: String, outputFile: String) {
         val inputFile = File(file)
-        val outputFile = File("data/encoded/${inputFile.nameWithoutExtension}_rle.bin")
+        val outputFile = File(outputFile)
+        outputFile.createNewFile()
         var lastSeenByte = 0.toByte()
         var counter = 0
 
@@ -82,9 +83,9 @@ class StringRunLengthEncoder : Encoder {
         }
     }
 
-    override fun decode(file: String) {
+    override fun decode(file: String, outputFile: String) {
         val inputFile = File(file)
-        val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}.txt")
+        val outputFile = File(outputFile)
 
         FileOutputStream(outputFile, true).buffered().use { writer ->
             var counter = 0
@@ -107,6 +108,7 @@ class StringRunLengthEncoder : Encoder {
     }
 
     private fun writeAsTwoByte(lastSeenByte: Byte, count: Int): ByteArray {
+        require(count <= maxLength) { "Count exceeded max count length. if this occurs more often, consider increasing the max length property. (experimental)" }
         val byteArray = ByteArray(2)
         byteArray[0] = count.toByte()
         byteArray[1] = lastSeenByte
