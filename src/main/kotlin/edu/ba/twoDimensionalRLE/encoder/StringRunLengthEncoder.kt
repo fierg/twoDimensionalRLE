@@ -6,6 +6,7 @@ import java.io.FileOutputStream
 import kotlin.text.StringBuilder
 
 class StringRunLengthEncoder : Encoder {
+
     override fun decode(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}.txt")
@@ -37,12 +38,6 @@ class StringRunLengthEncoder : Encoder {
         val inputFile = File(file)
         val outputFile = File("data/encoded/${inputFile.nameWithoutExtension}_rle.txt")
 
-        if (outputFile.exists()) {
-            outputFile.delete()
-        } else {
-            File("data/encoded").mkdir()
-            File("data/decoded").mkdir()
-        }
         val sb = StringBuilder()
 
         FileInputStream(inputFile).bufferedReader().use { reader ->

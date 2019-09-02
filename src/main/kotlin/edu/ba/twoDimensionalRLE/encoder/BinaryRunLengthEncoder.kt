@@ -24,21 +24,14 @@ class BinaryRunLengthEncoder : Encoder {
         val bytes = ByteArray(byteArraySize)
         var counter = 0
         val newFilename = "data/encoded/${getFilename(file)}"
-        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename")
-        val fileEncoded = File(newFilename)
+        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $newFilename ...")
         val fileBinStr = File(newFilename + "_bin_str")
         val fileBinRLEStr = File(newFilename + "_bin_rle_str")
         val fileBinRLEbitEncoded = File(newFilename + "_bin_rle_nr")
 
-        if (fileEncoded.exists()) {
-            fileEncoded.delete()
-            fileBinStr.delete()
-            fileBinRLEStr.delete()
-            fileBinRLEbitEncoded.delete()
-        }
-
-        stream.readAllBytes().forEach {
-            bytes[counter++ % bytes.size] = it
+        stream.readAllBytes().forEach { byte ->
+            analyzer.byteOccurrenceMap[byte] = analyzer.byteOccurrenceMap.getOrDefault(byte, 0) + 1
+            bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
                 encodeBytesToFileAsString(fileBinRLEStr, bytes)
                 encodeRawBytesToFile(fileBinStr, bytes)
@@ -55,8 +48,11 @@ class BinaryRunLengthEncoder : Encoder {
         println("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
         analyzer.printOccurrenceMap()
+        analyzer.printByteOccurrence()
+        analyzer.createByteMapping()
+        
 
-        println("Starting to encode the rle encoded bit string as 4 bit each (base 16)")
+        println("\nStarting to encode the rle encoded bit string as 4 bit each (base 16)...")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -89,11 +85,7 @@ class BinaryRunLengthEncoder : Encoder {
         }
     }
 
-
-    private fun encodeBytesToFile(file: File, bytes: UByteArray) {
-        file.appendBytes(encodeBitsAsString(bytes.toBitSetList()).toByteArray())
-    }
-
+    @ExperimentalUnsignedTypes
     override fun decode(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}_decoded.txt")
@@ -198,9 +190,10 @@ class BinaryRunLengthEncoder : Encoder {
         return stringBuilder.toString()
     }
 
+    @ExperimentalUnsignedTypes
     private fun encodeBitsAsByteArray(listOfBits: List<BitSet>): UByteArray {
         val bitLength = 7
-        var byteList = mutableListOf<UByte>()
+        val byteList = mutableListOf<UByte>()
         for (i in bitLength downTo 0) {
             var counter = 0
             var lastBit = false
