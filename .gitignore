@@ -12,3 +12,4 @@
 *.out
 *.toc
 *.gz
+*.synctex.gz
