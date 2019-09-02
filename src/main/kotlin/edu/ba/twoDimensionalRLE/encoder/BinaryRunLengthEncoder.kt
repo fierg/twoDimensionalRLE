@@ -33,13 +33,19 @@ class BinaryRunLengthEncoder : Encoder {
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
                 encodeBytesToFileAsString(fileBinRLEStr, bytes)
-//                encodeRawBytesToFile(fileBinStr, bytes)
+                encodeRawBytesToFile(fileBinStr, bytes)
             }
         }
         if (counter % bytes.size != 0) {
-            bytes.slice(IntRange(0, counter % bytes.size))
-            encodeBytesToFileAsString(fileBinRLEStr, bytes)
-            encodeRawBytesToFile(fileBinStr, bytes)
+            val indexLeft = (counter % bytes.size)
+            var index = 0
+            val bytesLeft = ByteArray(indexLeft)
+
+            bytes.slice(IntRange(0, (counter % bytes.size) - 1)).forEach {
+                bytesLeft[index++] = it
+            }
+            encodeBytesToFileAsString(fileBinRLEStr, bytesLeft)
+            encodeRawBytesToFile(fileBinStr, bytesLeft)
         }
 
 
