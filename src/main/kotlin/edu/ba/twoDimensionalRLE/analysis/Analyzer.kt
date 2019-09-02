@@ -14,21 +14,26 @@ class Analyzer {
 
     fun printOccurrenceMap() {
         println("Repetition counts: ")
-        occurrenceMap.keys.sorted().forEach { println("$it ${occurrenceMap[it]}") }
+        occurrenceMap.keys.sorted().forEach {
+            println("$it ${occurrenceMap[it]}")
+        }
     }
 
     fun printByteOccurrence() {
         byteOccurrenceMap.values.sortedDescending().forEach {
-            byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap().forEach { (byte, int) -> println("byte $byte occurred $int times in the original stream") }
+            byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap().iterator()
+                .forEach { (byte, int) -> println("byte $byte occurred $int times in the original stream") }
         }
     }
 
-    fun createByteMapping() {
-        val resultMap = mutableMapOf<Byte,Byte>()
+    fun createByteMapping(): MutableMap<Byte, Byte> {
+        val resultMap = mutableMapOf<Byte, Byte>()
         var counter = 0
         byteOccurrenceMap.values.sortedDescending().forEach {
-            byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap().forEach { byte -> resultMap[byte.key] = counter++.toByte() }
+            byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap()
+                .forEach { byte -> resultMap[byte.key] = counter++.toByte() }
         }
-        resultMap.forEach { (inByte, outByte) -> println("mapping entry: <${inByte} -- ${outByte}>") }
+//        resultMap.forEach { (inByte, outByte) -> println("mapping entry: <${inByte} -- ${outByte}>") }
+        return resultMap
     }
 }

@@ -26,14 +26,16 @@ class BinaryRunLengthEncoder : Encoder {
         println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
         val fileBinStr = File(outputFile + "_bin_str")
         val fileBinRLEStr = File(outputFile + "_str")
+        val fileBinMapped = File(outputFile + "_str_mapped")
         val fileBinRLEbitEncoded = File(outputFile + "_nr")
 
         stream.readAllBytes().forEach { byte ->
             analyzer.byteOccurrenceMap[byte] = analyzer.byteOccurrenceMap.getOrDefault(byte, 0) + 1
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
-                encodeBytesToFileAsString(fileBinRLEStr, bytes)
+                encodeBytesAsStringToFile(fileBinRLEStr, bytes)
                 encodeRawBytesToFile(fileBinStr, bytes)
+                encodeMappedBytesToFile(fileBinMapped, bytes)
             }
         }
         if (counter % bytes.size != 0) {
@@ -44,8 +46,10 @@ class BinaryRunLengthEncoder : Encoder {
             bytes.slice(IntRange(0, (counter % bytes.size) - 1)).forEach {
                 bytesLeft[index++] = it
             }
-            encodeBytesToFileAsString(fileBinRLEStr, bytesLeft)
+            encodeBytesAsStringToFile(fileBinRLEStr, bytesLeft)
             encodeRawBytesToFile(fileBinStr, bytesLeft)
+            encodeMappedBytesToFile(fileBinMapped, bytesLeft)
+
         }
 
 
@@ -78,7 +82,7 @@ class BinaryRunLengthEncoder : Encoder {
         }
     }
 
-    private fun encodeBytesToFileAsString(file: File, bytes: ByteArray) {
+    private fun encodeBytesAsStringToFile(file: File, bytes: ByteArray) {
         FileOutputStream(file, true).bufferedWriter().use { writer ->
             writer.write(encodeBitsAsString(bytes.toBitSetList()))
         }
@@ -87,6 +91,18 @@ class BinaryRunLengthEncoder : Encoder {
     private fun encodeRawBytesToFile(file: File, bytes: ByteArray) {
         FileOutputStream(file, true).bufferedWriter().use { writer ->
             writer.write(printBitString(bytes.toBitSetList()))
+        }
+    }
+
+    private fun encodeMappedBytesToFile(file: File, bytes: ByteArray) {
+        FileOutputStream(file, true).bufferedWriter().use { writer ->
+            val mapping = analyzer.createByteMapping()
+            val mappedBytes = ByteArray(bytes.size)
+            var index = 0
+            bytes.forEach { byte ->
+                mappedBytes[index++] = mapping[byte] ?: throw NullPointerException(byte.toInt().toString())
+            }
+            writer.write(printBitString(mappedBytes.toBitSetList()))
         }
     }
 
@@ -132,15 +148,36 @@ class BinaryRunLengthEncoder : Encoder {
 
         }
 
+        println("parsed internal encoding to numerical run length encoding on binary data.")
+        println("decoding back to original byte String...")
+
         FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
             tempFile.inputStream().bufferedReader().lines().forEach { line ->
                 var lastBit = 0
                 val sb = StringBuilder()
+                val counterList = mutableListOf<Int>()
+                var readZero = false
                 line.trim().split(" ").forEach {
-                    for (i in 0 until it.toInt()) sb.append(lastBit)
-                    lastBit = if (lastBit == 0) 1 else 0
+
+                    //TODO fix
+                    if (!readZero) {
+                        counterList.add(it.toInt())
+                    } else {
+                        if (it.toInt() != 0) {
+                            counterList[counterList.size] = counterList.last() + it.toInt()
+                            readZero = false
+                        } else {
+                            readZero = true
+                        }
+                    }
                 }
-                sb.append("\n")
+                for (i in counterList) {
+                    for (j in 0 until i){
+                        sb.append(lastBit)
+                    }
+                    lastBit = if (lastBit == 0) 1 else 0
+                    sb.append("\n")
+                }
                 writer.write(sb.toString())
             }
         }
