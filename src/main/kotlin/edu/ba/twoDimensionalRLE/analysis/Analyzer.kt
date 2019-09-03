@@ -14,13 +14,13 @@ class Analyzer {
 
     fun printOccurrenceMap() {
         println("Repetition counts: ")
-        occurrenceMap.keys.sorted().forEach {
+        occurrenceMap.keys.distinct().sorted().forEach {
             println("$it ${occurrenceMap[it]}")
         }
     }
 
     fun printByteOccurrence() {
-        byteOccurrenceMap.values.sortedDescending().forEach {
+        byteOccurrenceMap.values.distinct().sortedDescending().forEach {
             byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap().iterator()
                 .forEach { (byte, int) -> println("byte $byte occurred $int times in the original stream") }
         }
@@ -29,11 +29,12 @@ class Analyzer {
     fun createByteMapping(): MutableMap<Byte, Byte> {
         val resultMap = mutableMapOf<Byte, Byte>()
         var counter = 0
-        byteOccurrenceMap.values.sortedDescending().forEach {
-            byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap()
-                .forEach { byte -> resultMap[byte.key] = counter++.toByte() }
+        byteOccurrenceMap.values.distinct().sortedDescending().forEach {
+            byteOccurrenceMap.filter { entry -> entry.value == it }.forEach { byte ->
+                    resultMap[byte.key] = counter++.toByte()
+//                    println("mapping entry: <${byte} -- ${counter++.toByte()}>")
+                }
         }
-//        resultMap.forEach { (inByte, outByte) -> println("mapping entry: <${inByte} -- ${outByte}>") }
         return resultMap
     }
 }

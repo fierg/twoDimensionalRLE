@@ -157,7 +157,14 @@ class BinaryRunLengthEncoder : Encoder {
                 val sb = StringBuilder()
                 val counterList = mutableListOf<Int>()
                 var readZero = false
-                line.trim().split(" ").forEach {
+                var lineTokens = line.trim().split(" ")
+
+                if (lineTokens.first().toInt() == 0) {
+                    lineTokens = lineTokens.drop(1)
+                    lastBit = 1
+                }
+
+                lineTokens.forEach {
 
                     //TODO fix
                     if (!readZero) {
@@ -172,12 +179,12 @@ class BinaryRunLengthEncoder : Encoder {
                     }
                 }
                 for (i in counterList) {
-                    for (j in 0 until i){
+                    for (j in 0 until i) {
                         sb.append(lastBit)
                     }
                     lastBit = if (lastBit == 0) 1 else 0
-                    sb.append("\n")
                 }
+                sb.append("\n")
                 writer.write(sb.toString())
             }
         }
@@ -221,6 +228,7 @@ class BinaryRunLengthEncoder : Encoder {
                     counter = 1
                 }
             }
+            stringBuilder.append(counter)
             stringBuilder.append("\n")
         }
 
