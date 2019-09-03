@@ -29,7 +29,7 @@ class BinaryRunLengthEncoder : Encoder {
         val fileBinMapped = File(outputFile + "_str_mapped")
         val fileBinRLEbitEncoded = File(outputFile + "_nr")
 
-        stream.readAllBytes().forEach { byte ->
+        stream.readBytes().forEach { byte ->
             analyzer.byteOccurrenceMap[byte] = analyzer.byteOccurrenceMap.getOrDefault(byte, 0) + 1
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
@@ -118,7 +118,7 @@ class BinaryRunLengthEncoder : Encoder {
             var byteQueue = LinkedList<Byte>()
             var outputSb: StringBuilder
 
-            inputStream.buffered().readAllBytes().iterator().forEach { byte ->
+            inputStream.buffered().readBytes().forEach { byte ->
                 if (byte == 0xff.toByte()) {
                     outputSb = StringBuilder()
                     byteQueue.stream().forEach {

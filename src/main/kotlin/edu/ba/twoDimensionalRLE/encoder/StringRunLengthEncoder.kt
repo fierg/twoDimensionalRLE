@@ -62,7 +62,7 @@ class StringRunLengthEncoder : Encoder {
         var counter = 0
 
         FileOutputStream(outputFile, true).buffered().use { writer ->
-            FileInputStream(inputFile).buffered().readAllBytes().forEach { byte ->
+            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
                 if (lastSeenByte == byte) {
                     if (++counter == maxLength) {
                         writer.write(writeAsTwoByte(lastSeenByte, counter))
@@ -91,7 +91,7 @@ class StringRunLengthEncoder : Encoder {
             var counter = 0
             var char: Char
             var count = 0
-            FileInputStream(inputFile).buffered().readAllBytes().forEach { byte ->
+            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
                 if (++counter % 2 == 0) {
                     char = byte.toChar()
                     for (i in 0 until count) {
