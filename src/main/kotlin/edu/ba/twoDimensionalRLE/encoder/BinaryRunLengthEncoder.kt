@@ -29,8 +29,9 @@ class BinaryRunLengthEncoder : Encoder {
         val fileBinMapped = File(outputFile + "_str_mapped")
         val fileBinRLEbitEncoded = File(outputFile + "_nr")
 
+        analyzer.analyzeFile(inputFile)
+
         stream.readBytes().forEach { byte ->
-            analyzer.byteOccurrenceMap[byte] = analyzer.byteOccurrenceMap.getOrDefault(byte, 0) + 1
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
                 encodeBytesAsStringToFile(fileBinRLEStr, bytes)
@@ -56,10 +57,6 @@ class BinaryRunLengthEncoder : Encoder {
         stream.close()
         println("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
-        analyzer.printOccurrenceMap()
-        analyzer.printByteOccurrence()
-        analyzer.createByteMapping()
-
 
         println("\nStarting to encode the rle encoded bit string as 4 bit each (base 16)...")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
@@ -96,7 +93,7 @@ class BinaryRunLengthEncoder : Encoder {
 
     private fun encodeMappedBytesToFile(file: File, bytes: ByteArray) {
         FileOutputStream(file, true).bufferedWriter().use { writer ->
-            val mapping = analyzer.createByteMapping()
+            val mapping = analyzer.getByteMapping()
             val mappedBytes = ByteArray(bytes.size)
             var index = 0
             bytes.forEach { byte ->
@@ -222,7 +219,7 @@ class BinaryRunLengthEncoder : Encoder {
                         counter = 1
                     }
                 } else {
-                    analyzer.occurrenceMap[counter] = analyzer.occurrenceMap.getOrDefault(counter, 0) + 1
+                    analyzer.incrementEncodingOccMap(counter)
                     stringBuilder.append("$counter ")
                     lastBit = !lastBit
                     counter = 1
