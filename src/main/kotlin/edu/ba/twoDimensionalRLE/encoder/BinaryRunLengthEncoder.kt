@@ -1,5 +1,6 @@
 package edu.ba.twoDimensionalRLE.encoder
 
+import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
@@ -15,15 +16,22 @@ import kotlin.math.sqrt
 
 class BinaryRunLengthEncoder : Encoder {
 
+    private var log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
+    
+    constructor() {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
 
     override fun encode(file: String, outputFile: String) {
         val inputFile = File(file)
         val stream = inputFile.inputStream()
         val bytes = ByteArray(byteArraySize)
         var counter = 0
-        println("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
+        log.info("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
         val fileBinStr = File(outputFile + "_bin_str")
         val fileBinRLEStr = File(outputFile + "_str")
         val fileBinMapped = File(outputFile + "_str_mapped")
@@ -55,14 +63,14 @@ class BinaryRunLengthEncoder : Encoder {
 
 
         stream.close()
-        println("Finished encoding as raw bit string and as rle bit string.")
+        log.info("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
 
-        println("\nStarting to encode the rle encoded bit string as 4 bit each (base 16)...")
+        log.info("### Starting to encode the rle encoded bit string as 4 bit each (base 16)... ###")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
-        println("Finished encoding as rle encoded numerical value.")
+        log.info("Finished encoding as rle encoded numerical value.")
         analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
 
 
@@ -145,8 +153,8 @@ class BinaryRunLengthEncoder : Encoder {
 
         }
 
-        println("parsed internal encoding to numerical run length encoding on binary data.")
-        println("decoding back to original byte String...")
+        log.info("parsed internal encoding to numerical run length encoding on binary data.")
+        log.info("decoding back to original byte String...")
 
         FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
             tempFile.inputStream().bufferedReader().lines().forEach { line ->
