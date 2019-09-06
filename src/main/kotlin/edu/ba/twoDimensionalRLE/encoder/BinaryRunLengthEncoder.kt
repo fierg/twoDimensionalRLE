@@ -19,7 +19,7 @@ class BinaryRunLengthEncoder : Encoder {
     private var log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
-    
+
     constructor() {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
@@ -72,9 +72,55 @@ class BinaryRunLengthEncoder : Encoder {
         }
         log.info("Finished encoding as rle encoded numerical value.")
         analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
-
-
     }
+
+    fun encodeMapped(file: String, outputFile: String) {
+        val analyzer = Analyzer()
+        val inputFile = File(file)
+        val stream = inputFile.inputStream()
+        val bytes = ByteArray(byteArraySize)
+        var counter = 0
+        log.info("Encoding $file with chunks of size $byteArraySize bytes, remapping the input stream according to its occurrence, encoded file will be under $outputFile ...")
+        val fileBinRLEStr = File(outputFile + "_str")
+        val fileBinMapped = File(outputFile + "_str_mapped")
+        val fileBinRLEbitEncoded = File(outputFile + "_nr")
+
+        analyzer.analyzeFile(inputFile)
+        val mapping = analyzer.getByteMapping()
+
+        stream.readBytes().forEach { byte ->
+
+            bytes[counter++ % bytes.size] = mapping[byte]!!
+            if (counter % bytes.size == 0) {
+                encodeBytesAsStringToFile(fileBinRLEStr, bytes)
+                encodeRawBytesToFile(fileBinMapped, bytes)
+            }
+        }
+        if (counter % bytes.size != 0) {
+            val indexLeft = (counter % bytes.size)
+            var index = 0
+            val bytesLeft = ByteArray(indexLeft)
+
+            bytes.slice(IntRange(0, (counter % bytes.size) - 1)).forEach {
+                bytesLeft[index++] = it
+            }
+            encodeBytesAsStringToFile(fileBinRLEStr, bytesLeft)
+            encodeRawBytesToFile(fileBinMapped, bytes)
+        }
+
+
+        stream.close()
+        log.info("Finished encoding as raw bit string and as rle bit string.")
+        analyzer.printFileComparison(inputFile, fileBinRLEStr)
+
+        log.info("### Starting to encode the rle encoded bit string as 4 bit each (base 16)... ###")
+        fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
+            encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
+        }
+        log.info("Finished encoding as rle encoded numerical value.")
+        analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
+    }
+
 
     private fun encodeRLEtoNumberValue(line: String?, file: File) {
         FileOutputStream(file, true).use { writer ->
@@ -105,7 +151,7 @@ class BinaryRunLengthEncoder : Encoder {
             val mappedBytes = ByteArray(bytes.size)
             var index = 0
             bytes.forEach { byte ->
-                mappedBytes[index++] = mapping[byte] ?: throw NullPointerException(byte.toInt().toString())
+                mappedBytes[index++] = mapping[byte] ?: throw NullPointerException("byte ${byte.toInt().toString()} not found in byte mapping!")
             }
             writer.write(printBitString(mappedBytes.toBitSetList()))
         }

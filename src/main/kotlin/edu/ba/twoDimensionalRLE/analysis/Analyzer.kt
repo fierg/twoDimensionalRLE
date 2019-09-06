@@ -22,7 +22,7 @@ class Analyzer {
     }
 
     fun printOccurrenceMap() {
-        log.info("Repetition counts: ")
+        log.debug("Repetition counts: ")
         encodingOccurrenceMap.keys.distinct().sorted().forEach {
             log.info("$it ${encodingOccurrenceMap[it]}")
         }
@@ -31,7 +31,7 @@ class Analyzer {
     fun printByteOccurrence() {
         byteOccurrenceMap.values.distinct().sortedDescending().forEach {
             byteOccurrenceMap.filter { entry -> entry.value == it }.toSortedMap().forEach { (byte, int) ->
-                log.info("byte $byte occurred $int times in the original stream")
+                log.debug("byte $byte occurred $int times in the original stream")
             }
         }
     }
