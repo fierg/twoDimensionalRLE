@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*
 import java.io.File
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class StringRunLengthEncoderTest {
+class StringRLETest {
     companion object {
         private const val fileToEncodeSmall = "testFile_small2.txt"
         private const val fileToEncode = "t8.shakespeare.txt"

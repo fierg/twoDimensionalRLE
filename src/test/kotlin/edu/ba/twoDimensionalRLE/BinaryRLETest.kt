@@ -4,6 +4,7 @@ import edu.ba.twoDimensionalRLE.encoder.BinaryRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
 
+@ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BinaryRLETest {
 
@@ -20,7 +21,7 @@ class BinaryRLETest {
     @Test
     @Order(1)
     fun cleanup() {
-        if (File("$encodeFolder").exists()) {
+        if (File(encodeFolder).exists()) {
             File(encodeFolder).deleteRecursively()
             File(decodeFolder).deleteRecursively()
         }
@@ -51,5 +52,22 @@ class BinaryRLETest {
     @Order(5)
     fun decodeFile() {
         binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
+    }
+
+    @Test
+    @Order(6)
+    fun encodeFileMapped_small() {
+        binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
+    }
+    @Test
+    @Order(7)
+    fun encodeFileMapped() {
+        binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp")
+    }
+
+    @Test
+    @Order(8)
+    fun decodeFileMapped() {
+        binaryRunLengthEncoder.decodeMapped("$encodeFolder/$fileToEncode.mp_nr", "$decodeFolder/${fileToEncode}.mp")
     }
 }
