@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE.encoder
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
+import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.Matrix
@@ -10,41 +11,44 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.*
+import java.util.stream.Collectors
+import kotlin.collections.Map.Entry
+import kotlin.experimental.or
 import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class BinaryRunLengthEncoder : Encoder {
+class BinaryRunLengthEncoder() : Encoder {
 
-    private var log = Log.kotlinInstance()
+    private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
 
-    constructor() {
+    init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
     }
 
-    override fun encode(file: String, outputFile: String) {
-        val inputFile = File(file)
+    override fun encode(inputFile: String, outputFile: String) {
+        val inputFile = File(inputFile)
         val stream = inputFile.inputStream()
         val bytes = ByteArray(byteArraySize)
         var counter = 0
-        log.info("Encoding $file with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
+        log.info("Encoding $inputFile with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
         val fileBinStr = File(outputFile + "_bin_str")
         val fileBinRLEStr = File(outputFile + "_str")
         val fileBinMapped = File(outputFile + "_str_mapped")
         val fileBinRLEbitEncoded = File(outputFile + "_nr")
 
-        analyzer.analyzeFile(inputFile)
+//        analyzer.analyzeFile(inputFile)
 
         stream.readBytes().forEach { byte ->
             bytes[counter++ % bytes.size] = byte
             if (counter % bytes.size == 0) {
                 encodeBytesAsStringToFile(fileBinRLEStr, bytes)
                 encodeRawBytesToFile(fileBinStr, bytes)
-                encodeMappedBytesToFile(fileBinMapped, bytes)
+//                encodeMappedBytesToFile(fileBinMapped, bytes)
             }
         }
         if (counter % bytes.size != 0) {
@@ -57,7 +61,7 @@ class BinaryRunLengthEncoder : Encoder {
             }
             encodeBytesAsStringToFile(fileBinRLEStr, bytesLeft)
             encodeRawBytesToFile(fileBinStr, bytesLeft)
-            encodeMappedBytesToFile(fileBinMapped, bytesLeft)
+//            encodeMappedBytesToFile(fileBinMapped, bytesLeft)
 
         }
 
@@ -74,7 +78,7 @@ class BinaryRunLengthEncoder : Encoder {
         analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
     }
 
-    fun encodeMapped(file: String, outputFile: String) {
+    fun encodeMapped(file: String, outputFile: String): Map<Byte, Byte> {
         val analyzer = Analyzer()
         val inputFile = File(file)
         val stream = inputFile.inputStream()
@@ -89,7 +93,6 @@ class BinaryRunLengthEncoder : Encoder {
         val mapping = analyzer.getByteMapping()
 
         stream.readBytes().forEach { byte ->
-
             bytes[counter++ % bytes.size] = mapping[byte]!!
             if (counter % bytes.size == 0) {
                 encodeBytesAsStringToFile(fileBinRLEStr, bytes)
@@ -105,7 +108,7 @@ class BinaryRunLengthEncoder : Encoder {
                 bytesLeft[index++] = it
             }
             encodeBytesAsStringToFile(fileBinRLEStr, bytesLeft)
-            encodeRawBytesToFile(fileBinMapped, bytes)
+            encodeRawBytesToFile(fileBinMapped, bytesLeft)
         }
 
 
@@ -119,6 +122,8 @@ class BinaryRunLengthEncoder : Encoder {
         }
         log.info("Finished encoding as rle encoded numerical value.")
         analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
+
+        return mapping
     }
 
 
@@ -151,25 +156,136 @@ class BinaryRunLengthEncoder : Encoder {
             val mappedBytes = ByteArray(bytes.size)
             var index = 0
             bytes.forEach { byte ->
-                mappedBytes[index++] = mapping[byte] ?: throw NullPointerException("byte ${byte.toInt().toString()} not found in byte mapping!")
+                mappedBytes[index++] = mapping[byte]
+                    ?: throw NullPointerException("byte ${byte.toInt().toString()} not found in byte mapping!")
             }
             writer.write(printBitString(mappedBytes.toBitSetList()))
         }
     }
 
-    @ExperimentalUnsignedTypes
-    override fun decode(file: String, outputFile: String) {
-        val inputFile = File(file)
-        val tempFile = File("${outputFile}_tmp")
+    fun decodeMapped(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>?) {
+        val inputFile = File(inputFile)
+        val tempRLEFile = File("${outputFile}_rle_tmp")
+        val tempBinFile = File("${outputFile}_bin_tmp")
         val outputFile = File(outputFile)
 
-        FileOutputStream(tempFile, true).bufferedWriter().use { writer ->
-
-            val inputStream = inputFile.inputStream()
+        FileOutputStream(tempRLEFile).bufferedWriter().use { writer ->
             var byteQueue = LinkedList<Byte>()
             var outputSb: StringBuilder
 
-            inputStream.buffered().readBytes().forEach { byte ->
+            inputFile.inputStream().buffered().readBytes().forEach { byte ->
+                if (byte == 0xff.toByte()) {
+                    outputSb = StringBuilder()
+                    byteQueue.stream().forEach {
+                        val uByteInt = it.toUByte().toInt()
+                        if (uByteInt == 0) {
+                            outputSb.append("0")
+                        } else {
+                            if (uByteInt.shl(4) == 0) {
+                                outputSb.append(uByteInt.shr(4))
+                            } else {
+                                outputSb.append(uByteInt.shr(4))
+                                outputSb.append(" ")
+                                outputSb.append(uByteInt.and(15))
+                                outputSb.append(" ")
+                            }
+
+                        }
+                    }
+                    writer.write(outputSb.toString())
+                    writer.newLine()
+                    byteQueue = LinkedList()
+
+                } else {
+                    byteQueue.add(byte)
+                }
+            }
+        }
+
+        log.info("parsed internal encoding to numerical run length encoding on mapped binary data.")
+        log.info("decoding back to mapped byte String...")
+
+        val chunks = mutableListOf<ByteArray>()
+        var currentChunkBytes = ByteArray(byteArraySize)
+        var lineCounter = 0
+        var linePositionCounter = 0
+        var lastSeenLinePosCounter = 0
+        FileOutputStream(tempBinFile).bufferedWriter().use { writer ->
+            tempRLEFile.inputStream().bufferedReader().lines().forEach { line ->
+
+                if (lineCounter != 0 && lineCounter % 8 == 0) {
+                    chunks.add(currentChunkBytes)
+                    currentChunkBytes = ByteArray(byteArraySize)
+                }
+
+                var lastBit = 0
+                val sb = StringBuilder()
+                val counterList = mutableListOf<Int>()
+                var readZero = false
+                var lineTokens = line.trim().split(" ")
+
+                if (lineTokens.first().toInt() == 0) {
+                    lineTokens = lineTokens.drop(1)
+                    lastBit = 1
+                }
+
+                lineTokens.forEach {
+                    if (!readZero) {
+                        counterList.add(it.toInt())
+                    } else {
+                        if (it.toInt() != 0) {
+                            counterList[counterList.size] = counterList.last() + it.toInt()
+                            readZero = false
+                        } else {
+                            readZero = true
+                        }
+                    }
+                }
+                for (i in counterList) {
+                    for (j in 0 until i) {
+                        if (lastBit == 1) {
+                            currentChunkBytes[linePositionCounter] =
+                                currentChunkBytes[linePositionCounter].or((2.pow(7 - (lineCounter % 8))).toByte())
+                        }
+                        linePositionCounter++
+                        sb.append(lastBit)
+                    }
+                    lastBit = if (lastBit == 0) 1 else 0
+                }
+                lineCounter++
+                lastSeenLinePosCounter = linePositionCounter
+                linePositionCounter = 0
+                sb.append("\n")
+                writer.write(sb.toString())
+            }
+            currentChunkBytes = currentChunkBytes.dropLast(byteArraySize - lastSeenLinePosCounter).toByteArray()
+            chunks.add(currentChunkBytes)
+        }
+
+        log.info("parsed numerical run length encoding on mapped binary data.")
+        log.info("reverting binary shift and started to encode to original byte stream...")
+
+        FileOutputStream(outputFile).buffered().use { writer ->
+            chunks.forEach { byteArray ->
+                writer.write(remapByteArray(byteArray, mapping))
+            }
+        }
+
+        log.info("finished remapping & decoding original byte stream.")
+    }
+
+    @ExperimentalUnsignedTypes
+    override fun decode(inputFile: String, outputFile: String) {
+        val inputFile = File(inputFile)
+        val tempRLEFile = File("${outputFile}_rle_tmp")
+        val tempBinFile = File("${outputFile}_bin_tmp")
+        val outputFile = File(outputFile)
+
+        FileOutputStream(tempRLEFile).bufferedWriter().use { writer ->
+            var byteQueue = LinkedList<Byte>()
+            var outputSb: StringBuilder
+
+            inputFile.inputStream().buffered().readBytes().forEach { byte ->
                 if (byte == 0xff.toByte()) {
                     outputSb = StringBuilder()
                     byteQueue.stream().forEach {
@@ -202,8 +318,19 @@ class BinaryRunLengthEncoder : Encoder {
         log.info("parsed internal encoding to numerical run length encoding on binary data.")
         log.info("decoding back to original byte String...")
 
-        FileOutputStream(outputFile, true).bufferedWriter().use { writer ->
-            tempFile.inputStream().bufferedReader().lines().forEach { line ->
+        val chunks = mutableListOf<ByteArray>()
+        var currentChunkBytes = ByteArray(byteArraySize)
+        var lineCounter = 0
+        var linePositionCounter = 0
+        var lastSeenLinePosCounter = 0
+        FileOutputStream(tempBinFile).bufferedWriter().use { writer ->
+            tempRLEFile.inputStream().bufferedReader().lines().forEach { line ->
+
+                if (lineCounter != 0 && lineCounter % 8 == 0) {
+                    chunks.add(currentChunkBytes)
+                    currentChunkBytes = ByteArray(byteArraySize)
+                }
+
                 var lastBit = 0
                 val sb = StringBuilder()
                 val counterList = mutableListOf<Int>()
@@ -216,8 +343,6 @@ class BinaryRunLengthEncoder : Encoder {
                 }
 
                 lineTokens.forEach {
-
-                    //TODO fix
                     if (!readZero) {
                         counterList.add(it.toInt())
                     } else {
@@ -231,15 +356,35 @@ class BinaryRunLengthEncoder : Encoder {
                 }
                 for (i in counterList) {
                     for (j in 0 until i) {
+                        if (lastBit == 1) {
+                            currentChunkBytes[linePositionCounter] =
+                                currentChunkBytes[linePositionCounter].or((2.pow(7 - (lineCounter % 8))).toByte())
+                        }
+                        linePositionCounter++
                         sb.append(lastBit)
                     }
                     lastBit = if (lastBit == 0) 1 else 0
                 }
+                lineCounter++
+                lastSeenLinePosCounter = linePositionCounter
+                linePositionCounter = 0
                 sb.append("\n")
                 writer.write(sb.toString())
             }
+            currentChunkBytes = currentChunkBytes.dropLast(byteArraySize - lastSeenLinePosCounter).toByteArray()
+            chunks.add(currentChunkBytes)
         }
 
+        log.info("parsed numerical run length encoding on binary data.")
+        log.info("reverting binary shift and started to encode to original byte stream...")
+
+        FileOutputStream(outputFile).buffered().use { writer ->
+            chunks.forEach { byteArray ->
+                writer.write(byteArray)
+            }
+        }
+
+        log.info("finished decoding original byte stream.")
     }
 
     private fun getSquareMatrixFromString(text: String): Matrix<String> {
@@ -330,7 +475,7 @@ class BinaryRunLengthEncoder : Encoder {
         if (file.matches(regex)) {
             return regex.find(file)!!.groupValues[1]
         } else {
-            throw IllegalArgumentException("Given Filename doesn't match default file location and cant be parsed.")
+            throw IllegalArgumentException("Given Filename doesn't match default file location and can't be parsed.")
         }
     }
 
@@ -343,4 +488,18 @@ class BinaryRunLengthEncoder : Encoder {
             }
         }
     }
+
+    private fun remapByteArray(bytes: ByteArray, mapping: Map<Byte, Byte>?): ByteArray {
+        val result = ByteArray(bytes.size)
+        var index = 0
+        val inverseMapping =
+            mapping!!.entries.stream().collect(Collectors.toMap(Entry<Byte, Byte>::value, Entry<Byte, Byte>::key))
+
+        bytes.forEach { byte ->
+            result[index++] = inverseMapping[byte]!!
+        }
+        return result
+    }
 }
+
+

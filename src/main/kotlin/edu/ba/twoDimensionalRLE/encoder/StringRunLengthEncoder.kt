@@ -1,12 +1,21 @@
 package edu.ba.twoDimensionalRLE.encoder
 
 
+import de.jupf.staticlog.Log
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import kotlin.text.StringBuilder
 
 class StringRunLengthEncoder : Encoder {
+
+    private val log = Log.kotlinInstance()
+
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
 
     companion object {
         private const val maxLength = 255
@@ -55,6 +64,7 @@ class StringRunLengthEncoder : Encoder {
     }
 
     override fun encode(file: String, outputFile: String) {
+        log.info("Starting to encode file $file with regular RLE. Output file will be at $outputFile")
         val inputFile = File(file)
         val outputFile = File(outputFile)
         outputFile.createNewFile()

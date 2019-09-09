@@ -8,6 +8,8 @@ import java.io.File
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BinaryRLETest {
 
+    private var mapping: Map<Byte, Byte>? = null
+
     companion object {
         private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
         private const val fileToEncodeSmall = "testFile_small2.txt"
@@ -35,39 +37,43 @@ class BinaryRLETest {
     fun encodeFile_small() {
         binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle")
     }
-
-    @Test
-    @Order(3)
-    fun encodeFile() {
-        binaryRunLengthEncoder.encode("data/${fileToEncode}", "$encodeFolder/$fileToEncode.bin_rle")
-    }
+//
+//    @Test
+//    @Order(3)
+//    fun encodeFile() {
+//        binaryRunLengthEncoder.encode("data/${fileToEncode}", "$encodeFolder/$fileToEncode.bin_rle")
+//    }
 
     @Test
     @Order(4)
     fun decodeFile_small() {
-        binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncodeSmall}.bin_rle_nr", "$decodeFolder/$fileToEncodeSmall")
+        binaryRunLengthEncoder.decode(
+            "$encodeFolder/${fileToEncodeSmall}.bin_rle_nr",
+            "$decodeFolder/$fileToEncodeSmall"
+        )
     }
 
-    @Test
-    @Order(5)
-    fun decodeFile() {
-        binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
-    }
+//    @Test
+//    @Order(5)
+//    fun decodeFile() {
+//        binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
+//    }
 
-    @Test
-    @Order(6)
-    fun encodeFileMapped_small() {
-        binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
-    }
+//    @Test
+//    @Order(6)
+//    fun encodeFileMapped_small() {
+//        binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
+//    }
+
     @Test
     @Order(7)
     fun encodeFileMapped() {
-        binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp")
-    }
+        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp")
+        binaryRunLengthEncoder.decodeMapped(
+            "$encodeFolder/$fileToEncode.mp_nr",
+            "$decodeFolder/${fileToEncode}.mp",
+            mapping
+        )
 
-    @Test
-    @Order(8)
-    fun decodeFileMapped() {
-        binaryRunLengthEncoder.decodeMapped("$encodeFolder/$fileToEncode.mp_nr", "$decodeFolder/${fileToEncode}.mp")
     }
 }

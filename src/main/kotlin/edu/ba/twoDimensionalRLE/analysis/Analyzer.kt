@@ -3,18 +3,17 @@ package edu.ba.twoDimensionalRLE.analysis
 import de.jupf.staticlog.Log
 import java.io.File
 
-class Analyzer {
+class Analyzer() {
     private var log = Log.kotlinInstance()
+    private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
+    private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
+    private var byteMapping = mutableMapOf<Byte, Byte>()
 
-    constructor() {
+    init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
     }
-
-    private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
-    private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
-    private var byteMapping = mutableMapOf<Byte, Byte>()
 
     fun printFileComparison(source: File, target: File) {
         log.info("Encoded File has a file size of ${target.length() / 1000000.toDouble()} MB")
@@ -42,7 +41,7 @@ class Analyzer {
 
         byteOccurrenceMap.values.distinct().sortedDescending().forEach { key ->
             byteOccurrenceMap.filter { it.value == key }.keys.sorted().forEach { byte ->
-                log.info("mapping entry: <${byte} -- ${counter.toByte()}>")
+                log.debug("mapping entry: <${byte} -- ${counter.toByte()}>")
                 resultMap[byte] = counter++.toByte()
             }
         }
