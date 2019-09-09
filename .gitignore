@@ -3,3 +3,12 @@
 /target/*
 /doc/thesis/tex/DBLPSearch_dokumentation/*
 /data/encoded/*
+*.aux
+*.idx
+*.pdf
+*.log
+*.lof
+*.lot
+*.out
+*.toc
+*.gz

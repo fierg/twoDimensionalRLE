@@ -1,12 +1,27 @@
 package edu.ba.twoDimensionalRLE.encoder
 
+
+import de.jupf.staticlog.Log
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import kotlin.text.StringBuilder
 
 class StringRunLengthEncoder : Encoder {
-    override fun decode(file: String) {
+
+    private val log = Log.kotlinInstance()
+
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
+
+    companion object {
+        private const val maxLength = 255
+    }
+
+    fun decodeReadable(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/decoded/${inputFile.nameWithoutExtension}.txt")
         if (outputFile.exists()) outputFile.delete()
@@ -33,16 +48,10 @@ class StringRunLengthEncoder : Encoder {
         return sb.toString()
     }
 
-    override fun encode(file: String) {
+    fun encodeReadabe(file: String) {
         val inputFile = File(file)
         val outputFile = File("data/encoded/${inputFile.nameWithoutExtension}_rle.txt")
 
-        if (outputFile.exists()) {
-            outputFile.delete()
-        } else {
-            File("data/encoded").mkdir()
-            File("data/decoded").mkdir()
-        }
         val sb = StringBuilder()
 
         FileInputStream(inputFile).bufferedReader().use { reader ->
@@ -52,6 +61,68 @@ class StringRunLengthEncoder : Encoder {
             }
         }
         FileOutputStream(outputFile, true).bufferedWriter().use { writer -> writer.write(sb.toString()) }
+    }
+
+    override fun encode(file: String, outputFile: String) {
+        log.info("Starting to encode file $file with regular RLE. Output file will be at $outputFile")
+        val inputFile = File(file)
+        val outputFile = File(outputFile)
+        outputFile.createNewFile()
+        var lastSeenByte = 0.toByte()
+        var counter = 0
+
+        FileOutputStream(outputFile, true).buffered().use { writer ->
+            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
+                if (lastSeenByte == byte) {
+                    if (++counter == maxLength) {
+                        writer.write(writeAsTwoByte(lastSeenByte, counter))
+                        counter = 0
+                    }
+                } else {
+                    if (counter > 0) {
+                        writer.write(writeAsTwoByte(lastSeenByte, counter))
+                        counter = 1
+                        lastSeenByte = byte
+                    } else {
+                        counter++
+                        lastSeenByte = byte
+                    }
+                }
+            }
+            writer.write(writeAsTwoByte(lastSeenByte, counter))
+        }
+    }
+
+    override fun decode(file: String, outputFile: String) {
+        val inputFile = File(file)
+        val outputFile = File(outputFile)
+
+        FileOutputStream(outputFile, true).buffered().use { writer ->
+            var counter = 0
+            var char: Char
+            var count = 0
+            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
+                if (++counter % 2 == 0) {
+                    char = byte.toChar()
+                    for (i in 0 until count) {
+                        writer.write(char.toInt())
+                    }
+                    counter = 0
+                } else {
+                    count = byte.toUByte().toInt()
+                }
+
+
+            }
+        }
+    }
+
+    private fun writeAsTwoByte(lastSeenByte: Byte, count: Int): ByteArray {
+        require(count <= maxLength) { "Count exceeded max count length. if this occurs more often, consider increasing the max length property. (experimental)" }
+        val byteArray = ByteArray(2)
+        byteArray[0] = count.toByte()
+        byteArray[1] = lastSeenByte
+        return byteArray
     }
 
     private tailrec fun runLengthEncodingStringRec(text: String, prev: String = ""): String {
