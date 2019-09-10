@@ -5,7 +5,10 @@
 \chapter{Introduction}
 \label{ch:Introduction}
 %% ==============================
-Die Einleitung besteht aus der Motivation, der Problemstellung, der Zielsetzung und einem erster Überblick über den Aufbau der Arbeit.
+Die Einleitung besteht aus der Motivation, der Problemstellung, der Zielsetzung und einem erster Überblick über den Aufbau der Arbeit. \\
+TODO: \\
+- explain compression ratio \\
+- define unit of compression to quantify question and results \\
 
 %% ==============================
 \section{Motivation}
@@ -19,16 +22,15 @@ a string with a run, usually denoted by $\sigma \ i$, where $\sigma$ is an alpha
 \section{Problem statement}
 %% ==============================
 \label{ch:Introduction:sec:Problem statement}
-Some strings like aaaabbbb archive a very good compression rate because the string only has two different characters and they repeat at least twice. Therefore it can be compressed to $a^4b^4$ so from 8 byte down to 4 bytes if you encode it properly. On the other hand, if the input is highly mixed characters with few or no repetitions at all like abababab, the run length encoding of the string is $a^1b^1a^1b^1a^1b^1a^1b^1a^1b^1$ which needs at least 16 bytes.\\
 
-So the inherent problem with run length encoding is oviusly the possible explosion in size, due to missing repetitions in the input string. Expanding the string to twice the orifinal size is not realy a good compression so one has to make sure the input data is fitted for rle as compression scheme. One goal is to minimize the increase in size in the worst case scenario.\\
-
+Some strings like aaaabbbb archive a very good compression rate because the string only has two different characters and they repeat at least twice. Therefore it can be compressed to $a^4b^4$ so from 8 byte down to 4 bytes if you encode it properly. On the other hand, if the input is highly mixed characters with few or no repetitions at all like abababab, the run length encoding of the string is $a^1b^1a^1b^1a^1b^1a^1b^1a^1b^1$ which needs at least 16 bytes. \par
+So the inherent problem with run length encoding is oviusly the possible explosion in size, due to missing repetitions in the input string. Expanding the string to twice the orifinal size is not realy a good compression so one has to make sure the input data is fitted for rle as compression scheme. One goal is to minimize the increase in size in the worst case scenario. \par
 Also it should improve the compression ratio on data suited for run length encoding and perform better than the originaly proposed rle.
 
 %% ==============================
-\section{Zielsetzung}
+\section{Main Objective}
 %% ==============================
-\label{ch:Introduction:sec:Zielsetzung}
+\label{ch:Introduction:sec:Main Objective}
 
 Was ist das Ziel der Arbeit. Wie soll das Problem gelöst werden?
 
@@ -36,9 +38,7 @@ Was ist das Ziel der Arbeit. Wie soll das Problem gelöst werden?
 - gleiche oder ähnliche decoding zeit ?\\
 - ansatz beschreiben\\
 
-
-
-
+The main objectives that derives from the problem statement is to archive an improved compression ratio
 
 %% ==============================
 \section{Gliederung/Aufbau der Arbeit}
