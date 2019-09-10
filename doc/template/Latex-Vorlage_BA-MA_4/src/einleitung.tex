@@ -2,36 +2,33 @@
 %% $Id: einleitung.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Einleitung}
-\label{ch:Einleitung}
+\chapter{Introduction}
+\label{ch:Introduction}
 %% ==============================
 Die Einleitung besteht aus der Motivation, der Problemstellung, der Zielsetzung und einem erster Überblick über den Aufbau der Arbeit.
 
 %% ==============================
 \section{Motivation}
 %% ==============================
-\label{ch:Einleitung:sec:Motivation}
+\label{ch:Introduction:sec:Motivation}
 
-Warum ist das zu bearbeitende Themengebiet spannend und relevant?
-
-- bezug auf historie von RLE\\
-- heutige verwendung fax (mit huffman coding)\\
-- schnelles decoding gut für client server arch\\
+In the last decades, digital data transfer became available everywhere and to everyone. This rise of digital data urges the need for data compression techniques or improvements on existing ones. Run-length encoding (abbreviated as rle) is simple coding schemes that performs lossless data compression. rle compression simply represents the consecutive, identical symbols of
+a string with a run, usually denoted by $\sigma \ i$, where $\sigma$ is an alphabet symbol and $i$ is its number of repetitions. To give an example, the string aaaabbaaabbbba can be compressed into rle format as  $ a^{4}b^{2}a^{3}b^{4}a^{1}$ . Its simplicity and efficiency make run-length encoding is still used in several areas like fax transmission, where rle compression is combined with other techniques into Modified Huffman Coding \cite{fax-rle}. Most fax documents are typically simple texts on a white background, rle compression is particularly suitable for fax and often achieves good compression ratios. Another appliance of rle is optical character recognition, in which the inputs are usually images of large scales of identically valued pixels. Other applications appear in bioinformatics, where rle compression is employed to speed up the comparison of two biological sequences.
 
 %% ==============================
-\section{Problemstellung}
+\section{Problem statement}
 %% ==============================
-\label{ch:Einleitung:sec:Problemstellung}
+\label{ch:Introduction:sec:Problem statement}
+Some strings like aaaabbbb archive a very good compression rate because the string only has two different characters and they repeat at least twice. Therefore it can be compressed to $a^4b^4$ so from 8 byte down to 4 bytes if you encode it properly. On the other hand, if the input is highly mixed characters with few or no repetitions at all like abababab, the run length encoding of the string is $a^1b^1a^1b^1a^1b^1a^1b^1a^1b^1$ which needs at least 16 bytes.\\
 
-Welches Problem/welche Probleme können in diesem Themengebiet identifiziert werden?
+So the inherent problem with run length encoding is oviusly the possible explosion in size, due to missing repetitions in the input string. Expanding the string to twice the orifinal size is not realy a good compression so one has to make sure the input data is fitted for rle as compression scheme. One goal is to minimize the increase in size in the worst case scenario.\\
 
-- verbesserung der ursprünglichen impementation\\
-- optimierung des decodings\\
+Also it should improve the compression ratio on data suited for run length encoding and perform better than the originaly proposed rle.
 
 %% ==============================
 \section{Zielsetzung}
 %% ==============================
-\label{ch:Einleitung:sec:Zielsetzung}
+\label{ch:Introduction:sec:Zielsetzung}
 
 Was ist das Ziel der Arbeit. Wie soll das Problem gelöst werden?
 
@@ -40,10 +37,13 @@ Was ist das Ziel der Arbeit. Wie soll das Problem gelöst werden?
 - ansatz beschreiben\\
 
 
+
+
+
 %% ==============================
 \section{Gliederung/Aufbau der Arbeit}
 %% ==============================
-\label{ch:Einleitung:sec:Gliederung}
+\label{ch:Intoduction:sec:Gliederung}
 
 Was enthalten die weiteren Kapitel? Wie ist die Arbeit aufgebaut? Welche Methodik wird verfolgt?
 

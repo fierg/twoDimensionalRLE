@@ -32,8 +32,8 @@
 
 %% Informationen für die PDF-Datei
 \hypersetup{
- pdfauthor={N.N.},
- pdftitle={Not set}
+ pdfauthor={Sven Fiergolla},
+ pdftitle={Improvements on RLE by preprocessing}
  pdfsubject={Not set},
  pdfkeywords={Not set}
 }
@@ -73,7 +73,7 @@
 \pagenumbering{roman}
 \ifnotdraft{
  \include{src/titelseite}
- %\blankpage % Leerseite auf Titelrückseite
+ \blankpage % Leerseite auf Titelrückseite
  \include{src/abstract}
 }
 %
@@ -126,10 +126,11 @@
 %%
 \nocite{*} % nur angeben, wenn auch nicht im Text zitierte Quellen 
            % erscheinen sollen
-\bibliographystyle{itmabbrv} % mit abgekürzten Vornamen der Autoren
-%\bibliographystyle{gerplain} % abbrvnat unsrtnat
+%\bibliographystyle{itmabbrv} % mit abgekürzten Vornamen der Autoren
+\bibliographystyle{gerplain} % abbrvnat unsrtnat
 % spezielle Zitierstile: Labels mit vier Buchstaben und Jahreszahl
 %\bibliographystyle{itmalpha}  % ausgeschriebene Vornamen der Autoren
+
 \bibliography{thesis}
 
 %% ++++++++++++++++++++++++++++++++++++++++++
