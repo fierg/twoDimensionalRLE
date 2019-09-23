@@ -5,9 +5,16 @@ A two dimensional RLE (run length encoding) implementation for one dimensional i
 
 - [x] Implement RLE for bitString
 - [x] Implement matrix representation and compression approach
-- [ ] Create more and different test data
-- [x] Create automated tests to compare filesize
-- [ ] Evaluate the efficiency of possible implementations
+- [x] Create more and different test data ([galgary corpus](http://www.data-compression.info/Corpora/CalgaryCorpus/index.html))
+- [x] Create automated tests
+- [ ] Evaluate the efficiency of possible chunk sizes, different mapping approaches etc..
+- [ ] Evaluate and compare filesizes of each approach 
+- [ ] Implement Burrows-Wheeler Transformation
+- [ ] Finish ba outline 
+
+- tex citations?
+- scope of basic theory?
+
 
 ### Usage
 - Clone Project

@@ -9,6 +9,8 @@ In diesem Kapitel erfolgt die ausführliche Beschreibung des eigenen
 Lösungsansatzes. Dabei sollten Lösungsalternativen diskutiert und
 Entwurfsentscheidungen dargelegt werden.
 
+To archive the main obejctive a few ideas to improve run lenthg encoding where found. The first real difference is the conception of reading the data in chunks and thee encode it vertically, meaning all the most significant bits in one chunk, then all second most significant bits and so on. The second change was to switch between the encoding of runs of characters \/ bytes to count runs of ones and zeros so basically the same mechanism but on bit level.
+
 %% ==============================
 \section{Abschnitt 1}
 %% ==============================
