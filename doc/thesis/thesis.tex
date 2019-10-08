@@ -18,6 +18,7 @@
 % ------------------------------------------------------------------
 % Weitere packages: (Dokumentation dazu durch "latex <package>.dtx")
 \usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
 % \usepackage{varioref}
 % \usepackage{verbatim}
 % \usepackage{float}    %z.B. \floatstyle{ruled}\restylefloat{figure}
@@ -84,6 +85,7 @@
 \ifnotdraft{
 {\parskip 0pt\tableofcontents} % toc bitte einzeilig
 %\blankpage
+
 \listoffigures
 %\blankpage
 \listoftables
@@ -124,10 +126,10 @@
 \phantomsection
 \addcontentsline{toc}{chapter}{\bibname}
 %%
-\nocite{*} % nur angeben, wenn auch nicht im Text zitierte Quellen 
+%%\nocite{*} % nur angeben, wenn auch nicht im Text zitierte Quellen 
            % erscheinen sollen
 %\bibliographystyle{itmabbrv} % mit abgekürzten Vornamen der Autoren
-\bibliographystyle{gerplain} % abbrvnat unsrtnat
+\bibliographystyle{plain} % abbrvnat unsrtnat
 % spezielle Zitierstile: Labels mit vier Buchstaben und Jahreszahl
 %\bibliographystyle{itmalpha}  % ausgeschriebene Vornamen der Autoren
 
