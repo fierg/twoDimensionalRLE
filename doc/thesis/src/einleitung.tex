@@ -1,0 +1,55 @@
+%% Einleitung.tex
+%% $Id: einleitung.tex 61 2012-05-03 13:58:03Z bless $
+%%
+
+\chapter{Introduction}
+\label{ch:Introduction}
+%% ==============================
+Die Einleitung besteht aus der Motivation, der Problemstellung, der Zielsetzung und einem erster Überblick über den Aufbau der Arbeit. \\
+TODO: \\
+- explain compression ratio \\
+- define unit of compression to quantify question and results \\
+
+%% ==============================
+\section{Motivation}
+%% ==============================
+\label{ch:Introduction:sec:Motivation}
+
+In the last decades, digital data transfer became available everywhere and to everyone. This rise of digital data urges the need for data compression techniques or improvements on existing ones. Run-length encoding (abbreviated as rle) is simple coding schemes that performs lossless data compression. rle compression simply represents the consecutive, identical symbols of
+a string with a run, usually denoted by $\sigma \ i$, where $\sigma$ is an alphabet symbol and $i$ is its number of repetitions. To give an example, the string aaaabbaaabbbba can be compressed into rle format as  $ a^{4}b^{2}a^{3}b^{4}a^{1}$ . Its simplicity and efficiency make run-length encoding is still used in several areas like fax transmission, where rle compression is combined with other techniques into Modified Huffman Coding \cite{fax-rle}. Most fax documents are typically simple texts on a white background, rle compression is particularly suitable for fax and often achieves good compression ratios. Another appliance of rle is optical character recognition, in which the inputs are usually images of large scales of identically valued pixels. Other applications appear in bioinformatics, where rle compression is employed to speed up the comparison of two biological sequences.
+
+%% ==============================
+\section{Problem statement}
+%% ==============================
+\label{ch:Introduction:sec:Problem statement}
+
+Some strings like aaaabbbb archive a very good compression rate because the string only has two different characters and they repeat at least twice. Therefore it can be compressed to $a^4b^4$ so from 8 byte down to 4 bytes if you encode it properly. On the other hand, if the input is highly mixed characters with few or no repetitions at all like abababab, the run length encoding of the string is $a^1b^1a^1b^1a^1b^1a^1b^1a^1b^1$ which needs at least 16 bytes. \par
+So the inherent problem with run length encoding is oviusly the possible explosion in size, due to missing repetitions in the input string. Expanding the string to twice the orifinal size is not realy a good compression so one has to make sure the input data is fitted for rle as compression scheme. One goal is to minimize the increase in size in the worst case scenario. \par
+Also it should improve the compression ratio on data suited for run length encoding and perform better than the originaly proposed rle.
+
+%% ==============================
+\section{Main Objective}
+%% ==============================
+\label{ch:Introduction:sec:Main Objective}
+
+Was ist das Ziel der Arbeit. Wie soll das Problem gelöst werden?
+
+- bessere kompressionsrate im vergleich zu konventionellem RLE\\
+- gleiche oder ähnliche decoding zeit ?\\
+- ansatz beschreiben\\
+
+The main objectives that derives from the problem statement is to archive an improved compression ratio compared to regular run length encoding. To unify the measurements, the compression ratio is calculated by encoding all files listed in the Galgary Corpus and then normalize the results. \par
+Since most improvements like permutations on the input, for example a revertable Burros-Wheeler transformation to increase the number of consecutive Symbols or a different way of reading the bytestream take quite some time, encoding speed will increase. A secod objective might be to keep decoding speed close to the original run legth encoding.
+
+%% ==============================
+\section{Gliederung/Aufbau der Arbeit}
+%% ==============================
+\label{ch:Intoduction:sec:Gliederung}
+
+Was enthalten die weiteren Kapitel? Wie ist die Arbeit aufgebaut? Welche Methodik wird verfolgt?
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "thesis"
+%%% End: 

@@ -5,10 +5,13 @@
 /data/encoded/*
 *.aux
 *.idx
-*.pdf
 *.log
 *.lof
 *.lot
 *.out
 *.toc
 *.gz
+*.synctex.gz
+*.bbl
+*.blg
+*.cls
