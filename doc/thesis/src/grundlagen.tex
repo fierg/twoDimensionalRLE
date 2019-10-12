@@ -2,52 +2,85 @@
 %% $Id: grundlagen.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Basic principles of compression}
-\label{ch:Basic principles of compression}
+\chapter{Principles of compression}
+\label{ch:Principles of compression}
 %% ==============================
 
-To understand compression one first hast to understand some basic pricipels of information theory like Entropy and different approaches to compress different types of data with different encoding and entropy. I will also show the key differences between probability coding and dictionary coding and a few comments on lossy compression.
+To understand compression, one first has to understand some basic principles of information theory like Entropy and different approaches to compress different types of data with different encoding and entropy. I will also show the key differences between probability coding and dictionary coding and a few comments on lossy compression.
 
 %% ==============================
-
 \section{Compression and Encoding fundamentals}
 %% ==============================
-\label{ch:Basic principles of compression:sec:Compression}
-
+\label{ch:Principles of compression:sec:Compression}
+TBD\\
 ...
-\subsection{Entropy and Unit of Compression}
+
+\subsection{Information Theory and Entropy}
+\par{
+As Shannon described his analysis about the English language \cite{entropy}, he used the term Entropy closely aligned with its Definition in classical physics, where it is defined as the disorder of a system. Specifically speaking, it is assumed that a system has a set of states it can be in and it exists a probability distribution over those states. Shannon then defines the Entropy as:
+\[
+H(S) = \sum_{s \in S} p(s) \: log_{2} \: \frac{1}{p(s)}
+\]
+where $S$ describes all possible States, $p(s)$ is the likelihood of $s \in S$. So generally speaking it means that evenly distributed probabilities imply a higher Entropy and vice versa.}
+
+\par{
+In addition to that, Shannon defined the term self information $i(s)$ as:
+\[
+i(S) = log_{2} \: \frac{1}{p(s)}
+\]
+indicating that the higher the probability of a state, less information can be contained. As an example, the statement \enquote{The criminal is smaller than 2 meters.} is very likely but doesn't contain much information, whereas the statement \enquote{The criminal is larger than 2 meters.} is not very likely but contains lots of information. With these definitions in mind, we can analyze some properties for the English language from an information theory perspective of view.
+}
+\subsection{General Analysis}
+\par{
+To evaluate the efficiency of a specific compression technique, we have to determine how much information the raw data contains. In this case for textual compression at first, we are talking about the English language.
+
+}
+
+
+- upscale analysis for UTF-8 encoded data not 96 ASCII Chars\\
+- comment reference\\
+
 \subsection{Probability Coding}
-\subsection{Dictionary coding}
+\par{
+The general idea behind Probability Coding is to analyze probabilities for messages and the encode them in bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the Analyzer module by the algorithm and will be discussed later on (chap: design, chap: impl). Probability coding compression can be discerned into fixed unique coding, which will represent each message with a bit string with the amount of bits being an integer, for example Huffman coding as type of prefix coding. In contrast to Huffman coding there are also arithmetic codes which can represent a message with a floating point number of bits in the corresponding bit string. By doing so they can \enquote{fuse} messages together and need less space to represent a set of messages.
+}
+...
+
+
+\subsection{Dictionary Coding}
+...
 \subsection{Irreversible Compression}
+\par{
+Irreversible Compression or also called \enquote{Lossy Compression} is a type of compression which looses information in the compression process and is therefore not completely reversible, hence the name. There are a lot of use cases for these type of compression algorithm, mostly used for images, video and audio files. These files typically contain information almost not perceptible for an average human like really small color differences between two pixels of an image or very high frequencies in an audio file. By using approximations to tore the information and accept the loss of some information while retaining most of it, lossy image compression algorithms can get twice the compression performance compared to lossless algorithms. Due to the fact that most lossy compression techniques are not suited for text compression which is the main use case for this work, we wont elaborate any further on this topic.
+}
 
 
 %% ==============================
 \section{Run Length Encoding}
 %% ==============================
-\label{ch:Grundlagen:sec:Run Length Encoding}
+\label{ch:Principles of compression:sec:Run Length Encoding}
 
 ...
 
 %% ==============================
 \section{Huffman Coding}
 %% ==============================
-\label{ch:Grundlagen:sec:Huffman Coding}
+\label{ch:Principles of compression:sec:Huffman Coding}
 
 ...
 
 %% ==============================
 \section{State of the Art}
 %% ==============================
-\label{ch:Grundlagen:sec:SOTA}
+\label{ch:Principles of compression:sec:SOTA}
 Die Literaturrecherche soll so vollständig wie möglich sein und bereits existierende relevante Ansätze (Verwandte Arbeiten / State of the Art / Stand der Technik) beschreiben bzw. kurz vorstellen.
 Es soll aufgezeigt werden, wo diese Ansätze Defizite aufweisen oder nicht anwendbar sind, z.B. weil sie von anderen Umgebungen oder Voraussetzungen ausgehen.
 
 Je nach Art der Abschlussarbeit kann es auch sinnvoll sein, diesen Abschnitt in die Einleitung zu integrieren oder als eigenes Kapitel aufzuführen.
 
-Beispiel, wie mit LaTeX zitiert werden kann: \cite{TB98,JSAC96,qosr}
 
 
-State of the art compression
+State of the art compression\\
 - techniques\\
 - use cases\\
 

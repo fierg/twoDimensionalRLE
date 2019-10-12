@@ -15,7 +15,7 @@ TODO: \\
 %% ==============================
 \label{ch:Introduction:sec:Motivation}
 
-In the last decades, digital data transfer became available everywhere and to everyone. This rise of digital data urges the need for data compression techniques or improvements on existing ones. Run-length encoding (abbreviated as rle) is simple coding schemes that performs lossless data compression. rle compression simply represents the consecutive, identical symbols of
+In the last decades, digital data transfer became available everywhere and to everyone. This rise of digital data urges the need for data compression techniques or improvements on existing ones. Run-length encoding \cite{rle-patent} (abbreviated as rle) is simple coding schemes that performs lossless data compression. rle compression simply represents the consecutive, identical symbols of
 a string with a run, usually denoted by $\sigma \ i$, where $\sigma$ is an alphabet symbol and $i$ is its number of repetitions. To give an example, the string aaaabbaaabbbba can be compressed into rle format as  $ a^{4}b^{2}a^{3}b^{4}a^{1}$ . Its simplicity and efficiency make run-length encoding is still used in several areas like fax transmission, where rle compression is combined with other techniques into Modified Huffman Coding \cite{fax-rle}. Most fax documents are typically simple texts on a white background, rle compression is particularly suitable for fax and often achieves good compression ratios. Another appliance of rle is optical character recognition, in which the inputs are usually images of large scales of identically valued pixels. Other applications appear in bioinformatics, where rle compression is employed to speed up the comparison of two biological sequences.
 
 %% ==============================
@@ -42,12 +42,15 @@ The main objectives that derives from the problem statement is to archive an imp
 Since most improvements like permutations on the input, for example a revertable Burros-Wheeler transformation to increase the number of consecutive Symbols or a different way of reading the bytestream take quite some time, encoding speed will increase. A secod objective might be to keep decoding speed close to the original run legth encoding.
 
 %% ==============================
-\section{Gliederung/Aufbau der Arbeit}
+\section{Structure of this work}
 %% ==============================
-\label{ch:Intoduction:sec:Gliederung}
+\label{ch:Intoduction:sec:Structure}
 
 Was enthalten die weiteren Kapitel? Wie ist die Arbeit aufgebaut? Welche Methodik wird verfolgt?
 
+- describe following structure\\
+- use references\\
+- try to keep idea of a recurrent theme\\
 
 %%% Local Variables: 
 %%% mode: latex
