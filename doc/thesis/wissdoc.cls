@@ -20,7 +20,7 @@
 \LoadClass[a4paper,12pt,oneside]{book} % diese Klasse basiert auf ``book''
 \usepackage[T1]{fontenc}      % T1-encoded fonts: auch Wörter mit Umlauten trennen
 \usepackage[utf8]{inputenc}   % Eingabe nach UTF-8
-\usepackage[ngerman]{babel}
+%\usepackage[ngerman]{babel}
 %\usepackage{ae}               % almost european, virtueller T1-Font
 \usepackage[final]{graphicx}  % um Graphiken einzubinden
 \usepackage{makeidx}          % wir wollen auch einen Index
