@@ -1,7 +1,9 @@
-package edu.ba.twoDimensionalRLE.encoder
+package edu.ba.twoDimensionalRLE.encoder.RLE
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
+import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
@@ -31,11 +33,11 @@ class BinaryRunLengthEncoder() : Encoder {
     }
 
     override fun encode(inputFile: String, outputFile: String) {
-        val inputFile = File(inputFile)
-        val stream = inputFile.inputStream()
+        val input = File(inputFile)
+        val stream = input.inputStream()
         val bytes = ByteArray(byteArraySize)
         var counter = 0
-        log.info("Encoding $inputFile with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
+        log.info("Encoding $input with chunks of size $byteArraySize bytes, encoded file will be under $outputFile ...")
         val fileBinStr = File(outputFile + "_bin_str")
         val fileBinRLEStr = File(outputFile + "_str")
         val fileBinMapped = File(outputFile + "_str_mapped")
@@ -68,14 +70,14 @@ class BinaryRunLengthEncoder() : Encoder {
 
         stream.close()
         log.info("Finished encoding as raw bit string and as rle bit string.")
-        analyzer.printFileComparison(inputFile, fileBinRLEStr)
+        analyzer.printFileComparison(input, fileBinRLEStr)
 
         log.info("### Starting to encode the rle encoded bit string as 4 bit each (base 16)... ###")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
         log.info("Finished encoding as rle encoded numerical value.")
-        analyzer.printFileComparison(inputFile, fileBinRLEbitEncoded)
+        analyzer.printFileComparison(input, fileBinRLEbitEncoded)
     }
 
     fun encodeMapped(file: String, outputFile: String): Map<Byte, Byte> {
@@ -163,17 +165,18 @@ class BinaryRunLengthEncoder() : Encoder {
         }
     }
 
+    @ExperimentalUnsignedTypes
     fun decodeMapped(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>?) {
-        val inputFile = File(inputFile)
+        val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
-        val outputFile = File(outputFile)
+        val output = File(outputFile)
 
         FileOutputStream(tempRLEFile).bufferedWriter().use { writer ->
             var byteQueue = LinkedList<Byte>()
             var outputSb: StringBuilder
 
-            inputFile.inputStream().buffered().readBytes().forEach { byte ->
+            input.inputStream().buffered().readBytes().forEach { byte ->
                 if (byte == 0xff.toByte()) {
                     outputSb = StringBuilder()
                     byteQueue.stream().forEach {
@@ -265,7 +268,7 @@ class BinaryRunLengthEncoder() : Encoder {
         log.info("parsed numerical run length encoding on mapped binary data.")
         log.info("reverting binary shift and started to encode to original byte stream...")
 
-        FileOutputStream(outputFile).buffered().use { writer ->
+        FileOutputStream(output).buffered().use { writer ->
             chunks.forEach { byteArray ->
                 writer.write(remapByteArray(byteArray, mapping))
             }
@@ -276,16 +279,16 @@ class BinaryRunLengthEncoder() : Encoder {
 
     @ExperimentalUnsignedTypes
     override fun decode(inputFile: String, outputFile: String) {
-        val inputFile = File(inputFile)
+        val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
-        val outputFile = File(outputFile)
+        val output = File(outputFile)
 
         FileOutputStream(tempRLEFile).bufferedWriter().use { writer ->
             var byteQueue = LinkedList<Byte>()
             var outputSb: StringBuilder
 
-            inputFile.inputStream().buffered().readBytes().forEach { byte ->
+            input.inputStream().buffered().readBytes().forEach { byte ->
                 if (byte == 0xff.toByte()) {
                     outputSb = StringBuilder()
                     byteQueue.stream().forEach {
@@ -378,7 +381,7 @@ class BinaryRunLengthEncoder() : Encoder {
         log.info("parsed numerical run length encoding on binary data.")
         log.info("reverting binary shift and started to encode to original byte stream...")
 
-        FileOutputStream(outputFile).buffered().use { writer ->
+        FileOutputStream(output).buffered().use { writer ->
             chunks.forEach { byteArray ->
                 writer.write(byteArray)
             }
@@ -471,7 +474,7 @@ class BinaryRunLengthEncoder() : Encoder {
     }
 
     private fun getFilename(file: String): String {
-        val regex = Regex(".+\\/(.+)")
+        val regex = Regex(".+/(.+)")
         if (file.matches(regex)) {
             return regex.find(file)!!.groupValues[1]
         } else {

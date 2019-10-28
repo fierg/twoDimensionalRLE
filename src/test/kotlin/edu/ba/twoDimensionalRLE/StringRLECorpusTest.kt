@@ -1,7 +1,7 @@
 package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
-import edu.ba.twoDimensionalRLE.encoder.StringRunLengthEncoder
+import edu.ba.twoDimensionalRLE.encoder.RLE.StringRunLengthEncoder
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
