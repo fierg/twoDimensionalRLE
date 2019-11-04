@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.encoder.RLE
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
@@ -20,7 +21,7 @@ import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class BinaryRunLengthEncoder() : Encoder {
+class BinaryRunLengthEncoder() : Encoder, RangedEncoder {
 
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
@@ -30,6 +31,14 @@ class BinaryRunLengthEncoder() : Encoder {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+    }
+
+    override fun encode(inputFile: String, outputFile: String, range: IntRange) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun decode(inputFile: String, outputFile: String, range: IntRange) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun encode(inputFile: String, outputFile: String) {

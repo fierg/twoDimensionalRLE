@@ -16,6 +16,7 @@ fun Byte.toBitSet(): BitSet {
         return bitSet
 }
 
+@ExperimentalUnsignedTypes
 fun UByte.toBitSet(): BitSet {
     val bitSet = BitSet(7)
     for (i in 0..7) {

@@ -1,12 +1,14 @@
 package edu.ba.twoDimensionalRLE.encoder.huffman
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or
 
-class HuffmanEncoder {
+class HuffmanEncoder : Encoder, RangedEncoder{
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val bitSize = 8
@@ -17,7 +19,20 @@ class HuffmanEncoder {
         }
     }
 
-    fun decode(inputFile: String, outputFile: String) {
+
+    override fun decode(inputFile: String, outputFile: String, range: IntRange) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun encode(inputFile: String, outputFile: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun encode(inputFile: String, outputFile: String, range: IntRange) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun decode(inputFile: String, outputFile: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
