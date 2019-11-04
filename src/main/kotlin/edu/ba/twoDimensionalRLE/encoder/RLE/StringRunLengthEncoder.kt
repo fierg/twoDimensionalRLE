@@ -1,7 +1,8 @@
-package edu.ba.twoDimensionalRLE.encoder
+package edu.ba.twoDimensionalRLE.encoder.RLE
 
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.encoder.Encoder
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

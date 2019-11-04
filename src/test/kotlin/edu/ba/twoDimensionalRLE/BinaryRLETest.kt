@@ -1,6 +1,6 @@
 package edu.ba.twoDimensionalRLE
 
-import edu.ba.twoDimensionalRLE.encoder.BinaryRunLengthEncoder
+import edu.ba.twoDimensionalRLE.encoder.RLE.BinaryRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
 
@@ -8,11 +8,9 @@ import java.io.File
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BinaryRLETest {
 
-    private var mapping: Map<Byte, Byte>? = null
-
     companion object {
         private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-        private const val fileToEncodeSmall = "testFile_small2.txt"
+        private const val fileToEncodeSmall = "testFile_small.txt"
         private const val fileToEncode = "t8.shakespeare.txt"
 
         private const val encodeFolder = "data/encoded/bin_rle"

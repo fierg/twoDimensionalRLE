@@ -3,6 +3,7 @@
 /target/*
 /doc/thesis/tex/DBLPSearch_dokumentation/*
 /data/encoded/*
+/data/decoded/*
 *.aux
 *.idx
 *.log
