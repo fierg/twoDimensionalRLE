@@ -1,6 +1,6 @@
 package edu.ba.twoDimensionalRLE
 
-import edu.ba.twoDimensionalRLE.encoder.RLE.StringRunLengthEncoder
+import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
 

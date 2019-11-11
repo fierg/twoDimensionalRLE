@@ -1,10 +1,9 @@
-package edu.ba.twoDimensionalRLE.encoder.RLE
+package edu.ba.twoDimensionalRLE.encoder.rle
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
-import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
@@ -21,7 +20,7 @@ import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class BinaryRunLengthEncoder() : Encoder, RangedEncoder {
+class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
