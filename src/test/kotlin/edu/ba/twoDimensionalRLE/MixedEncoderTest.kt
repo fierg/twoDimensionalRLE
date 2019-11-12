@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE
 
 import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class MixedEncoderTest {
 
@@ -17,6 +18,16 @@ class MixedEncoderTest {
 
     @Test
     fun encodeFile() {
-        encoder.encodeInternal("data/${fileToEncode}","${encodeFolder}/${fileToEncode}")
+        encoder.encodeInternal("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+    }
+
+    @Test
+    fun stuff() {
+        val bitSet = BitSet()
+        bitSet.set(0, false)
+        bitSet.set(1, false)
+        bitSet.set(3, false)
+        bitSet.set(4)
+        bitSet
     }
 }

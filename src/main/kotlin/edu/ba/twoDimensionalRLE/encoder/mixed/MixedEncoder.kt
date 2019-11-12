@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.encoder.mixed
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTrasformation
 import java.io.File
@@ -11,9 +12,10 @@ class MixedEncoder : Encoder {
 
 
     private val log = Log.kotlinInstance()
-    private val byteArraySize = 256
-    private var chunks = mutableListOf<DataChunk>()
+    private val byteArraySize = 254
     private val btw = BurrowsWheelerTrasformation()
+    private val analyzer = Analyzer()
+    private val huffmanEncoder = HuffmanEncoder()
 
     init {
         log.newFormat {
@@ -30,12 +32,11 @@ class MixedEncoder : Encoder {
     }
 
     fun encodeInternal(inputFile: String, outputFile: String) {
-        val anayzer = Analyzer()
-        anayzer.analyzeFile(File(inputFile))
-        anayzer.addBWTSymbolsToMapping()
-        val mapping = anayzer.getByteMapping()
+        analyzer.analyzeFile(File(inputFile))
+        analyzer.addBWTSymbolsToMapping()
 
-        chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
+        val mapping = analyzer.getByteMapping()
+        val chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val mappedChunks = mutableListOf<DataChunk>()
 
@@ -48,7 +49,9 @@ class MixedEncoder : Encoder {
             mappedChunks.add(it.applyByteMapping(mapping))
         }
 
-        mappedChunks
+        mappedChunks.forEach {
+            huffmanEncoder.encodeLine(it.bytes, 0)
+        }
 
     }
 }

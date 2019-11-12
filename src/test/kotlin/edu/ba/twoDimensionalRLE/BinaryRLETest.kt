@@ -39,7 +39,7 @@ class BinaryRLETest {
 //    @Test
 //    @Order(3)
 //    fun encodeFile() {
-//        binaryRunLengthEncoder.encode("data/${fileToEncode}", "$encodeFolder/$fileToEncode.bin_rle")
+//        binaryRunLengthEncoder.encodeChunk("data/${fileToEncode}", "$encodeFolder/$fileToEncode.bin_rle")
 //    }
 
     @Test
@@ -54,7 +54,7 @@ class BinaryRLETest {
 //    @Test
 //    @Order(5)
 //    fun decodeFile() {
-//        binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
+//        binaryRunLengthEncoder.decodeChunk("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
 //    }
 
 //    @Test

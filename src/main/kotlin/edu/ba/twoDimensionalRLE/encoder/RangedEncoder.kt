@@ -1,6 +1,8 @@
 package edu.ba.twoDimensionalRLE.encoder
 
+import edu.ba.twoDimensionalRLE.model.DataChunk
+
 interface RangedEncoder : Encoder {
-    fun encode(inputFile: String, outputFile: String, range: IntRange)
-    fun decode(inputFile: String, outputFile: String, range: IntRange)
+    fun encodeChunk(chunk: DataChunk, range: IntRange): DataChunk
+    fun decodeChunk(chunk: DataChunk, range: IntRange): DataChunk
 }

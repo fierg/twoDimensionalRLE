@@ -65,7 +65,7 @@ class StringRunLengthEncoder : Encoder {
     }
 
     override fun encode(file: String, outputFile: String) {
-        log.info("Starting to encode file $file with regular rle. Output file will be at $outputFile")
+        log.info("Starting to encodeChunk file $file with regular rle. Output file will be at $outputFile")
         val inputFile = File(file)
         val outputFile = File(outputFile)
         outputFile.createNewFile()

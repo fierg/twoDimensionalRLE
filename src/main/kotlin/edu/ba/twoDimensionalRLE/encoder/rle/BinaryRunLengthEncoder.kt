@@ -7,6 +7,7 @@ import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
+import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
 import java.io.File
@@ -25,6 +26,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
+    private val bitSize = 8
 
     init {
         log.newFormat {
@@ -32,11 +34,54 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
     }
 
-    override fun encode(inputFile: String, outputFile: String, range: IntRange) {
+    override fun encodeChunk(chunk: DataChunk, range: IntRange): DataChunk {
+        for (index in range){
+            val currentLine = chunk.getLineFromChunk(index, bitSize)
+
+
+        }
+
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun decode(inputFile: String, outputFile: String, range: IntRange) {
+    fun encodeLineOfChunk(line: ByteArray, bitSize: Int, maxCounter: Int){
+        /*
+        val bitLength = 7
+        val stringBuilder = StringBuilder()
+        for (i in bitLength downTo 0) {
+            var counter = 0
+            var lastBit = false
+            for (bitSet in listOfBits) {
+                if (bitSet.get(i) == lastBit) {
+                    counter++
+                    if (counter == 16) {
+                        stringBuilder.append("15 0 ")
+                        counter = 1
+                    }
+                } else {
+                    analyzer.incrementEncodingOccMap(counter)
+                    stringBuilder.append("$counter ")
+                    lastBit = !lastBit
+                    counter = 1
+                }
+            }
+            stringBuilder.append(counter)
+            stringBuilder.append("\n")
+        }
+
+        // return stringBuilder.toString()
+
+        FileOutputStream(file, true).use { writer ->
+            var outChar: Char
+            line!!.trim().split(" ").chunked(2).forEach { lineChunk ->
+                outChar = lineChunk.reduceToSingleChar()
+                writer.write(outChar.toInt())
+            }
+            writer.write(0xFF)
+        }*/
+    }
+
+    override fun decodeChunk(chunk: DataChunk, range: IntRange): DataChunk {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -80,7 +125,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(input, fileBinRLEStr)
 
-        log.info("### Starting to encode the rle encoded bit string as 4 bit each (base 16)... ###")
+        log.info("### Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)... ###")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -126,7 +171,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(inputFile, fileBinRLEStr)
 
-        log.info("### Starting to encode the rle encoded bit string as 4 bit each (base 16)... ###")
+        log.info("### Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)... ###")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -274,7 +319,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
 
         log.info("parsed numerical run length encoding on mapped binary data.")
-        log.info("reverting binary shift and started to encode to original byte stream...")
+        log.info("reverting binary shift and started to encodeChunk to original byte stream...")
 
         FileOutputStream(output).buffered().use { writer ->
             chunks.forEach { byteArray ->
@@ -387,7 +432,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
 
         log.info("parsed numerical run length encoding on binary data.")
-        log.info("reverting binary shift and started to encode to original byte stream...")
+        log.info("reverting binary shift and started to encodeChunk to original byte stream...")
 
         FileOutputStream(output).buffered().use { writer ->
             chunks.forEach { byteArray ->

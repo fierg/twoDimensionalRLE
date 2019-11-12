@@ -15,6 +15,14 @@ class Analyzer() {
         }
     }
 
+    fun printMappingToFile(outputFile: File) {
+        val result = mutableListOf<Byte>()
+        byteMapping.mapKeys { entry: Map.Entry<Byte, Byte> ->
+            result.add(entry.key)
+        }
+        outputFile.outputStream().write(result.toByteArray())
+    }
+
     fun addBWTSymbolsToMapping() {
         val currentMax = byteMapping.values.max()
 
