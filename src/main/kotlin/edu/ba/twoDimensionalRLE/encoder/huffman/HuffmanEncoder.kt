@@ -4,8 +4,10 @@ package edu.ba.twoDimensionalRLE.encoder.huffman
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
+import edu.ba.twoDimensionalRLE.extensions.toBytePair
 import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.toBitSet
+import edu.ba.twoDimensionalRLE.extensions.toShiftedLeftByte
+import edu.ba.twoDimensionalRLE.extensions.toShiftedRightByte
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import java.util.*
 import kotlin.experimental.and
@@ -14,7 +16,6 @@ import kotlin.experimental.or
 class HuffmanEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
-
     private val bitSize = 8
 
 
@@ -52,20 +53,68 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     fun encodeLine(bytes: ByteArray, line: Int) {
         assert(bitSize > line)
         val noOfChars = bytes.size / bitSize
-        val chars = ByteArray(noOfChars)
+        val currentLineAsByteArray = ByteArray(noOfChars)
         var byteCounter = 0
         bytes.forEachIndexed { index, byte ->
             if (index != 0 && index % bitSize == 0)
                 byteCounter++
             if (byte.and(2.pow(line).toByte()) == 2.pow(line).toByte())
-                chars[byteCounter] = chars[byteCounter].or(2.pow(index % bitSize).toByte())
+                currentLineAsByteArray[byteCounter] = currentLineAsByteArray[byteCounter].or(2.pow(index % bitSize).toByte())
         }
 
         val ints = IntArray(noOfChars)
-        chars.forEachIndexed { index, byte -> ints[index] = byte.toInt() }
+        currentLineAsByteArray.forEachIndexed { index, byte -> ints[index] = byte.toInt() }
 
-        val huffmanMapping = getMappingFromStrBuffer(buildTree(ints))
-        //TODO encode mapped chars
+        val huffmanTree = buildTree(ints)
+        printCodes(huffmanTree, StringBuffer())
+        val huffmanMapping = getMappingFromStrBuffer(huffmanTree)
+
+        return writeEncoded(currentLineAsByteArray, huffmanMapping)
+    }
+
+    private fun writeEncoded(bytes: ByteArray, huffmanMapping: MutableMap<Byte, String>) {
+        var currentBitPosition = 0
+        var currentBytePosition = 0
+
+        val result = ByteArray(32)
+
+        bytes.forEach { byte ->
+            val mappedByte = huffmanMapping[byte]!!.toBytePair()
+
+            var currentByteVal = result.getOrElse(currentBytePosition) { 0.toByte() }
+            val orderPosition = bitSize - 1 - (currentBitPosition % bitSize)
+            val gapSize = orderPosition - (currentBitPosition % bitSize)
+
+
+            if (gapSize >= mappedByte.second) {
+                // huffman code fits into current byte
+
+                val shiftSize = orderPosition + 1 - mappedByte.second
+                currentByteVal = currentByteVal.or(mappedByte.first.toShiftedLeftByte(shiftSize))
+                result[currentBytePosition] = currentByteVal
+
+                currentBitPosition += mappedByte.second
+                currentBytePosition = currentBitPosition / bitSize
+            } else {
+                //it doesn't
+                val secondHalfSize = mappedByte.second - gapSize
+
+                currentByteVal = currentByteVal.or(mappedByte.first.toShiftedRightByte(secondHalfSize))
+                result[currentBytePosition] = currentByteVal
+
+                currentBitPosition += gapSize
+                currentBytePosition = currentBitPosition / bitSize
+                val shiftSize = bitSize - secondHalfSize
+
+                currentByteVal = result.getOrElse(currentBytePosition) { 0.toByte() }
+                currentByteVal = currentByteVal.or(mappedByte.first.toShiftedLeftByte(shiftSize))
+                result[currentBytePosition] = currentByteVal
+
+                currentBitPosition += secondHalfSize
+                currentBytePosition = currentBitPosition / bitSize
+            }
+        }
+        result
     }
 
     private fun buildTree(charFreqs: IntArray): HuffmanTree {
@@ -84,6 +133,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
         return trees.poll()
     }
+
     fun printCodes(tree: HuffmanTree, prefix: StringBuffer) {
         when (tree) {
             is HuffmanLeaf -> log.debug("${tree.value}\t${tree.freq}\t$prefix")
@@ -100,7 +150,11 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    private fun getMappingFromStrBuffer(tree: HuffmanTree, prefix: StringBuffer, mapping: MutableMap<Byte, String>): MutableMap<Byte, String> {
+    private fun getMappingFromStrBuffer(
+        tree: HuffmanTree,
+        prefix: StringBuffer,
+        mapping: MutableMap<Byte, String>
+    ): MutableMap<Byte, String> {
         when (tree) {
             is HuffmanLeaf -> mapping[tree.value.toByte()] = prefix.toString()
             is HuffmanNode -> {
@@ -117,35 +171,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return mapping
     }
 
-    fun getMappingFromStrBuffer(tree: HuffmanTree): MutableMap<Byte, String> {
+    private fun getMappingFromStrBuffer(tree: HuffmanTree): MutableMap<Byte, String> {
         return getMappingFromStrBuffer(tree, StringBuffer(), mutableMapOf<Byte, String>())
-    }
-
-    private fun getMappingFromTree(tree: HuffmanTree, index: Int, prefixBitSet: BitSet, mapping: MutableMap<Byte, BitSet>): MutableMap<Byte, BitSet> {
-        val prefixBitSet = prefixBitSet
-        val mapping = mapping
-        var index = index
-
-
-        when (tree) {
-            is HuffmanLeaf -> mapping[tree.value.toByte()] = prefixBitSet
-            is HuffmanNode -> {
-                //traverse left
-                prefixBitSet.set(index++, false)
-                getMappingFromTree(tree.left, index, prefixBitSet, mapping)
-                prefixBitSet.clear(prefixBitSet.length())
-                index--
-                //traverse right
-                prefixBitSet.set(index++, true)
-                getMappingFromTree(tree.right, index, prefixBitSet, mapping)
-                prefixBitSet.clear(prefixBitSet.length())
-            }
-        }
-
-        return mapping
-    }
-
-    private fun getMappingFromTree(tree: HuffmanTree): MutableMap<Byte, BitSet> {
-        return getMappingFromTree(tree, 0 , BitSet(), mutableMapOf())
     }
 }

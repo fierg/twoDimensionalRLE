@@ -50,7 +50,7 @@ class MixedEncoder : Encoder {
         }
 
         mappedChunks.forEach {
-            huffmanEncoder.encodeLine(it.bytes, 0)
+            huffmanEncoder.encodeLine(it.bytes, 3)
         }
 
     }

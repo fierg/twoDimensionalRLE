@@ -20,14 +20,4 @@ class MixedEncoderTest {
     fun encodeFile() {
         encoder.encodeInternal("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
     }
-
-    @Test
-    fun stuff() {
-        val bitSet = BitSet()
-        bitSet.set(0, false)
-        bitSet.set(1, false)
-        bitSet.set(3, false)
-        bitSet.set(4)
-        bitSet
-    }
 }
