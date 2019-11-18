@@ -4,6 +4,7 @@ import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
+import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTrasformation
 import java.io.File
@@ -16,6 +17,7 @@ class MixedEncoder : Encoder {
     private val btw = BurrowsWheelerTrasformation()
     private val analyzer = Analyzer()
     private val huffmanEncoder = HuffmanEncoder()
+    private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
 
     init {
         log.newFormat {
@@ -39,18 +41,27 @@ class MixedEncoder : Encoder {
         val chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val mappedChunks = mutableListOf<DataChunk>()
+        val encodedChunks = mutableListOf<DataChunk>()
 
-
+        log.info("Performing burrows wheeler transformation on all chunks...")
         chunks.forEach {
             transformedChunks.add(btw.transformDataChunk(it))
         }
 
+        log.info("Performing byte mapping to lower values on all chunks...")
         transformedChunks.forEach {
             mappedChunks.add(it.applyByteMapping(mapping))
         }
 
+        log.info("Encoding all chunks...")
         mappedChunks.forEach {
-            huffmanEncoder.encodeLine(it.bytes, 3)
+            val encodedChunk = binaryRunLengthEncoder.encodeChunk(it, IntRange(5, 8))
+            /*
+            encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 4)
+            encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 3)
+            encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 2)
+            encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 1)
+            */
         }
 
     }

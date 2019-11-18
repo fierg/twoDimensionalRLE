@@ -4,17 +4,16 @@ package edu.ba.twoDimensionalRLE.encoder.huffman
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
-import edu.ba.twoDimensionalRLE.extensions.toBytePair
-import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.toShiftedLeftByte
-import edu.ba.twoDimensionalRLE.extensions.toShiftedRightByte
+import edu.ba.twoDimensionalRLE.extensions.*
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.experimental.and
 import kotlin.experimental.or
 
 class HuffmanEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
+    private val mapping = mutableMapOf<Byte, StringBuffer>()
     private val byteArraySize = 256
     private val bitSize = 8
 
@@ -50,7 +49,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
 
-    fun encodeLine(bytes: ByteArray, line: Int) {
+    fun encodeLine(bytes: ByteArray, line: Int): ByteArray {
         assert(bitSize > line)
         val noOfChars = bytes.size / bitSize
         val currentLineAsByteArray = ByteArray(noOfChars)
@@ -67,9 +66,19 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
         val huffmanTree = buildTree(ints)
         printCodes(huffmanTree, StringBuffer())
-        val huffmanMapping = getMappingFromStrBuffer(huffmanTree)
 
-        return writeEncoded(currentLineAsByteArray, huffmanMapping)
+        //TODO fix mapping
+        val huffmanMapping = mapping
+
+        return writeEncodedAsStringBuffer(currentLineAsByteArray, huffmanMapping)
+    }
+
+    private fun writeEncodedAsStringBuffer(bytes: ByteArray, mapping: Map<Byte, StringBuffer>): ByteArray {
+        val result = StringBuffer()
+        bytes.forEach {
+            result.append(mapping[it])
+        }
+        return result.toBitSet().toByteArray()
     }
 
     private fun writeEncoded(bytes: ByteArray, huffmanMapping: MutableMap<Byte, String>) {
@@ -121,7 +130,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         val trees = PriorityQueue<HuffmanTree>()
 
         charFreqs.forEachIndexed { index, freq ->
-            if (freq > 0) trees.offer(HuffmanLeaf(freq, index.toChar()))
+            if (freq > 0) trees.offer(HuffmanLeaf(freq, index.toByte()))
         }
 
         assert(trees.size > 0)
@@ -136,7 +145,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
     fun printCodes(tree: HuffmanTree, prefix: StringBuffer) {
         when (tree) {
-            is HuffmanLeaf -> log.debug("${tree.value}\t${tree.freq}\t$prefix")
+            is HuffmanLeaf ->  {
+                log.debug("${tree.value.toChar()} / ${tree.value}\t${tree.freq}\t$prefix")
+                mapping[tree.value] = StringBuffer(prefix.toString())
+            }
             is HuffmanNode -> {
                 //traverse left
                 prefix.append('0')
@@ -150,28 +162,4 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    private fun getMappingFromStrBuffer(
-        tree: HuffmanTree,
-        prefix: StringBuffer,
-        mapping: MutableMap<Byte, String>
-    ): MutableMap<Byte, String> {
-        when (tree) {
-            is HuffmanLeaf -> mapping[tree.value.toByte()] = prefix.toString()
-            is HuffmanNode -> {
-                //traverse left
-                prefix.append('0')
-                getMappingFromStrBuffer(tree.left, prefix, mapping)
-                prefix.deleteCharAt(prefix.lastIndex)
-                //traverse right
-                prefix.append('1')
-                getMappingFromStrBuffer(tree.right, prefix, mapping)
-                prefix.deleteCharAt(prefix.lastIndex)
-            }
-        }
-        return mapping
-    }
-
-    private fun getMappingFromStrBuffer(tree: HuffmanTree): MutableMap<Byte, String> {
-        return getMappingFromStrBuffer(tree, StringBuffer(), mutableMapOf<Byte, String>())
-    }
 }

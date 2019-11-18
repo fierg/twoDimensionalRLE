@@ -6,6 +6,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
+import edu.ba.twoDimensionalRLE.extensions.toBitSet
 import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.model.Matrix
@@ -35,58 +36,53 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     }
 
     override fun encodeChunk(chunk: DataChunk, range: IntRange): DataChunk {
-        for (index in range){
+        for (index in range) {
             val currentLine = chunk.getLineFromChunk(index, bitSize)
-
-
+            chunk.encodedLines[index] = encodeLineOfChunk(currentLine, bitSize, 4)
         }
-
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return chunk
     }
 
-    fun encodeLineOfChunk(line: ByteArray, bitSize: Int, maxCounter: Int){
-        /*
-        val bitLength = 7
-        val stringBuilder = StringBuilder()
-        for (i in bitLength downTo 0) {
-            var counter = 0
-            var lastBit = false
-            for (bitSet in listOfBits) {
-                if (bitSet.get(i) == lastBit) {
+    private fun encodeLineOfChunk(line: ByteArray, bitSize: Int, bitsPerNumber: Int): ByteArray {
+        val maxCounter = 2.pow(bitsPerNumber) - 1
+        val encodedLine = encodeLineToBinRle(line, bitSize, maxCounter)
+        val buffer = encodeToBinaryStringBuffer(encodedLine, bitsPerNumber)
+        return buffer.toBitSet().toByteArray()
+    }
+
+    private fun encodeToBinaryStringBuffer(encodedLine: List<Int>, bitPerNumber: Int): StringBuffer {
+        val result = StringBuffer()
+        encodedLine.forEach {
+            val bits = Integer.toBinaryString(it)
+            result.append(bits.padStart(bitPerNumber, '0'))
+        }
+        return result
+    }
+
+    private fun encodeLineToBinRle(line: ByteArray, bitSize: Int, maxCounter: Int): List<Int> {
+        val encodedLine = mutableListOf<Int>()
+        var lastBit = false
+        var counter = 0
+
+        line.toBitSetList().forEach {
+            for (i in bitSize downTo 0) {
+                if (it[i] == lastBit) {
                     counter++
-                    if (counter == 16) {
-                        stringBuilder.append("15 0 ")
+                    if (counter == maxCounter) {
+                        encodedLine.add(maxCounter)
+                        encodedLine.add(0)
                         counter = 1
                     }
                 } else {
                     analyzer.incrementEncodingOccMap(counter)
-                    stringBuilder.append("$counter ")
+                    encodedLine.add(counter)
                     lastBit = !lastBit
                     counter = 1
                 }
             }
-            stringBuilder.append(counter)
-            stringBuilder.append("\n")
         }
 
-        // return stringBuilder.toString()
-
-        FileOutputStream(file, true).use { writer ->
-            var outChar: Char
-            line!!.trim().split(" ").chunked(2).forEach { lineChunk ->
-                outChar = lineChunk.reduceToSingleChar()
-                writer.write(outChar.toInt())
-            }
-            writer.write(0xFF)
-
-            fun List<String>.reduceToSingleChar(): Char {
-    return when {
-        this.size == 2 -> this[0].toInt().shl(4).or(this[1].toInt()).toChar()
-        this.size == 1 -> this[0].toInt().shl(4).toChar()
-        else -> throw IllegalArgumentException()
-    }
-}
-        }*/
+        return encodedLine.toList()
     }
 
     override fun decodeChunk(chunk: DataChunk, range: IntRange): DataChunk {

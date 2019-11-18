@@ -1,8 +1,10 @@
 package edu.ba.twoDimensionalRLE
 
 import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
+import edu.ba.twoDimensionalRLE.extensions.toBitSet
 import org.junit.jupiter.api.Test
 import java.util.*
+import javax.print.attribute.IntegerSyntax
 
 class MixedEncoderTest {
 
@@ -19,5 +21,9 @@ class MixedEncoderTest {
     @Test
     fun encodeFile() {
         encoder.encodeInternal("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+    }
+
+    @Test
+    fun exp() {
     }
 }

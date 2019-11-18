@@ -12,3 +12,4 @@ fun StringBuffer.toBitSet(): BitSet {
     }
     return result
 }
+
