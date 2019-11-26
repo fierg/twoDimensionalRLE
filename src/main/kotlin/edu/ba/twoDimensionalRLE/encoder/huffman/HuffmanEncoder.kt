@@ -7,7 +7,6 @@ import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.*
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -50,7 +49,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
 
     fun encodeLine(bytes: ByteArray, line: Int): ByteArray {
-        assert(bitSize > line)
+        assert(bitSize >= line)
         val noOfChars = bytes.size / bitSize
         val currentLineAsByteArray = ByteArray(noOfChars)
         var byteCounter = 0
@@ -58,19 +57,19 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             if (index != 0 && index % bitSize == 0)
                 byteCounter++
             if (byte.and(2.pow(line).toByte()) == 2.pow(line).toByte())
-                currentLineAsByteArray[byteCounter] = currentLineAsByteArray[byteCounter].or(2.pow(index % bitSize).toByte())
+                currentLineAsByteArray[byteCounter] =
+                    currentLineAsByteArray[byteCounter].or(2.pow(index % bitSize).toByte())
         }
 
-        val ints = IntArray(noOfChars)
-        currentLineAsByteArray.forEachIndexed { index, byte -> ints[index] = byte.toInt() }
-
-        val huffmanTree = buildTree(ints)
-        printCodes(huffmanTree, StringBuffer())
-
-        //TODO fix mapping
-        val huffmanMapping = mapping
+        val huffmanMapping = getHuffmanMapping(noOfChars, currentLineAsByteArray)
 
         return writeEncodedAsStringBuffer(currentLineAsByteArray, huffmanMapping)
+    }
+
+    fun getHuffmanMapping(noOfChars: Int, currentLineAsByteArray: ByteArray): MutableMap<Byte, StringBuffer> {
+        val huffmanTree = buildTree(calcFrequencies(currentLineAsByteArray, noOfChars))
+        printCodes(huffmanTree, StringBuffer())
+        return mapping
     }
 
     private fun writeEncodedAsStringBuffer(bytes: ByteArray, mapping: Map<Byte, StringBuffer>): ByteArray {
@@ -143,9 +142,17 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return trees.poll()
     }
 
+    fun calcFrequencies(bytes: ByteArray, maxSymbols: Int): IntArray {
+        // calc frequencies
+        val freqs = IntArray(maxSymbols)
+        bytes.forEach { symbol -> freqs[symbol.index()] = freqs[symbol.index()] + 1 }
+        return freqs
+    }
+
+
     fun printCodes(tree: HuffmanTree, prefix: StringBuffer) {
         when (tree) {
-            is HuffmanLeaf ->  {
+            is HuffmanLeaf -> {
                 log.debug("${tree.value.toChar()} / ${tree.value}\t${tree.freq}\t$prefix")
                 mapping[tree.value] = StringBuffer(prefix.toString())
             }

@@ -3,7 +3,7 @@ package edu.ba.twoDimensionalRLE.encoder.mixed
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
-import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
+import edu.ba.twoDimensionalRLE.encoder.huffman2.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTrasformation
@@ -16,7 +16,6 @@ class MixedEncoder : Encoder {
     private val byteArraySize = 254
     private val btw = BurrowsWheelerTrasformation()
     private val analyzer = Analyzer()
-    private val huffmanEncoder = HuffmanEncoder()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
 
     init {
@@ -56,13 +55,15 @@ class MixedEncoder : Encoder {
         log.info("Encoding all chunks...")
         mappedChunks.forEach {
             val encodedChunk = binaryRunLengthEncoder.encodeChunk(it, IntRange(5, 8))
+            encodedChunk.encodedLines[3] = HuffmanEncoder.of(it.getLineFromChunk(3,8)).encodeIntoByteArray(it.getLineFromChunk(4,8))
+
             /*
-            encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 4)
             encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 3)
             encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 2)
             encodedChunk.encodedLines[3] = huffmanEncoder.encodeLine(it.bytes, 1)
             */
         }
 
+        log.info("Finished encoding. Writing all encoded lines of all chunks to file...")
     }
 }

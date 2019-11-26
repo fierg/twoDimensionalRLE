@@ -25,3 +25,5 @@ fun UByte.toBitSet(): BitSet {
     }
     return bitSet
 }
+
+fun Byte.index() = this.toInt() and 0xFFFF
