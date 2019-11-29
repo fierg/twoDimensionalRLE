@@ -35,7 +35,7 @@ class BinaryRLETest {
     fun encodeFile_small() {
         binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle")
     }
-//
+
 //    @Test
 //    @Order(3)
 //    fun encodeFile() {

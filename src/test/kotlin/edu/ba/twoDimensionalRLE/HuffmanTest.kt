@@ -1,11 +1,8 @@
 package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
-import edu.ba.twoDimensionalRLE.encoder.huffman2.HuffmanEncoder
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import java.io.File
 
 
 class HuffmanTest {

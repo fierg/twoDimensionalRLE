@@ -3,17 +3,18 @@ package edu.ba.twoDimensionalRLE.model
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.extensions.reversed
 import edu.ba.twoDimensionalRLE.extensions.toBitSet
-import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStreamWriter
 import kotlin.experimental.and
 import kotlin.experimental.or
+import kotlin.math.ceil
 
-class DataChunk(val bytes: ByteArray) {
+class DataChunk(val input: ByteArray) {
 
     val encodedLines = mutableMapOf<Int, ByteArray>()
+    val bytes = input.clone()
 
     companion object {
         fun readChunksFromFile(inputFile: String, byteArraySize: Int, log: Logger): MutableList<DataChunk> {
@@ -56,8 +57,10 @@ class DataChunk(val bytes: ByteArray) {
 
     fun getLineFromChunk(line: Int, bitSize: Int): ByteArray {
         assert(bitSize >= line)
-        val noOfChars = bytes.size / bitSize.toDouble()
-        assert(noOfChars.isWholeNumber())
+        var noOfChars = bytes.size / bitSize.toDouble()
+        if(!noOfChars.isWholeNumber()){
+            noOfChars = ceil(noOfChars)
+        }
 
         val chars = ByteArray(noOfChars.toInt())
         var byteCounter = 0
@@ -78,12 +81,27 @@ class DataChunk(val bytes: ByteArray) {
         return DataChunk(result.toByteArray())
     }
 
-    fun writeEncodedLinesToFile(fileOut: String, bitsPerSymbol: Int) {
+    fun revertByteMapping(mapping: Map<Byte, Byte>): DataChunk {
+        val result = mutableListOf<Byte>()
+        val reversedMapping = mapping.reversed()
+        bytes.forEach { byte ->
+            result.add(reversedMapping.getOrElse(byte, defaultValue = { throw IllegalArgumentException() }))
+        }
+        return DataChunk(result.toByteArray())
+    }
+
+    fun writeEncodedLinesToFile(fileOut: String, RLEbitsPerSymbol: Int) {
         FileOutputStream(fileOut, true).use { writer ->
             encodedLines.forEach { (i, bytes) ->
                 writer.write(bytes)
             }
-            writer.write(writeLineEnding(bitsPerSymbol))
+            writer.write(writeLineEnding(RLEbitsPerSymbol))
+        }
+    }
+
+    fun writeCurrentChunk(fileOut: String) {
+        FileOutputStream(fileOut, true).use { writer ->
+                writer.write(bytes)
         }
     }
 

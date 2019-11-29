@@ -27,7 +27,6 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
-    private val bitSize = 8
 
     init {
         log.newFormat {
@@ -35,10 +34,10 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
     }
 
-    override fun encodeChunk(chunk: DataChunk, range: IntRange): DataChunk {
+    override fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
         for (index in range) {
-            val currentLine = chunk.getLineFromChunk(index, bitSize)
-            chunk.encodedLines[index] = encodeLineOfChunk(currentLine, bitSize, 4)
+            val currentLine = chunk.getLineFromChunk(index, byteSize)
+            chunk.encodedLines[index] = encodeLineOfChunk(currentLine, byteSize, bitsPerNumber)
         }
         return chunk
     }
@@ -85,7 +84,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return encodedLine.toList()
     }
 
-    override fun decodeChunk(chunk: DataChunk, range: IntRange): DataChunk {
+    override fun decodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
