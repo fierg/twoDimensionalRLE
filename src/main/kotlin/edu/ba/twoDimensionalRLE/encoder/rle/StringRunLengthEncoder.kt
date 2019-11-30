@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE.encoder.RLE
+package edu.ba.twoDimensionalRLE.encoder.rle
 
 
 import de.jupf.staticlog.Log
@@ -6,7 +6,6 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import kotlin.text.StringBuilder
 
 class StringRunLengthEncoder : Encoder {
 
@@ -43,7 +42,7 @@ class StringRunLengthEncoder : Encoder {
         val regex = Regex("((\\d+) (.))")
         regex.findAll(line).iterator().forEach { group ->
             for (i in 0 until group.groups[2]!!.value.toInt()) {
-                sb.append(group.groups!![3]!!.value)
+                sb.append(group.groups[3]!!.value)
             }
         }
         return sb.toString()
@@ -64,16 +63,16 @@ class StringRunLengthEncoder : Encoder {
         FileOutputStream(outputFile, true).bufferedWriter().use { writer -> writer.write(sb.toString()) }
     }
 
-    override fun encode(file: String, outputFile: String) {
-        log.info("Starting to encode file $file with regular RLE. Output file will be at $outputFile")
-        val inputFile = File(file)
-        val outputFile = File(outputFile)
-        outputFile.createNewFile()
+    override fun encode(inputFile: String, outputFile: String) {
+        log.info("Starting to encodeChunk file $inputFile with regular rle. Output file will be at $outputFile")
+        val input = File(inputFile)
+        val output = File(outputFile)
+        output.createNewFile()
         var lastSeenByte = 0.toByte()
         var counter = 0
 
-        FileOutputStream(outputFile, true).buffered().use { writer ->
-            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
+        FileOutputStream(output, true).buffered().use { writer ->
+            FileInputStream(input).buffered().readBytes().forEach { byte ->
                 if (lastSeenByte == byte) {
                     if (++counter == maxLength) {
                         writer.write(writeAsTwoByte(lastSeenByte, counter))
@@ -94,15 +93,16 @@ class StringRunLengthEncoder : Encoder {
         }
     }
 
-    override fun decode(file: String, outputFile: String) {
-        val inputFile = File(file)
-        val outputFile = File(outputFile)
+    @ExperimentalUnsignedTypes
+    override fun decode(inputFile: String, outputFile: String) {
+        val input = File(inputFile)
+        val output = File(outputFile)
 
-        FileOutputStream(outputFile, true).buffered().use { writer ->
+        FileOutputStream(output, true).buffered().use { writer ->
             var counter = 0
             var char: Char
             var count = 0
-            FileInputStream(inputFile).buffered().readBytes().forEach { byte ->
+            FileInputStream(input).buffered().readBytes().forEach { byte ->
                 if (++counter % 2 == 0) {
                     char = byte.toChar()
                     for (i in 0 until count) {

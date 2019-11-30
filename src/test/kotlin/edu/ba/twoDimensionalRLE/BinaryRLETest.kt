@@ -1,6 +1,6 @@
 package edu.ba.twoDimensionalRLE
 
-import edu.ba.twoDimensionalRLE.encoder.RLE.BinaryRunLengthEncoder
+import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
 
@@ -35,12 +35,7 @@ class BinaryRLETest {
     fun encodeFile_small() {
         binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle")
     }
-//
-//    @Test
-//    @Order(3)
-//    fun encodeFile() {
-//        binaryRunLengthEncoder.encode("data/${fileToEncode}", "$encodeFolder/$fileToEncode.bin_rle")
-//    }
+
 
     @Test
     @Order(4)
@@ -51,25 +46,26 @@ class BinaryRLETest {
         )
     }
 
-//    @Test
-//    @Order(5)
-//    fun decodeFile() {
-//        binaryRunLengthEncoder.decode("$encodeFolder/${fileToEncode}.bin_rle_nr", "$decodeFolder/$fileToEncode")
-//    }
-
-//    @Test
-//    @Order(6)
-//    fun encodeFileMapped_small() {
-//        binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
-//    }
 
     @Test
     @Order(7)
-    fun encodeFileMapped() {
+    fun encodeAndDecodeFileMapped() {
         val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp")
         binaryRunLengthEncoder.decodeMapped(
             "$encodeFolder/$fileToEncode.mp_nr",
             "$decodeFolder/${fileToEncode}.mp",
+            mapping
+        )
+
+    }
+
+    @Test
+    @Order(8)
+    fun encodeAndDecodeFileMappedSmall() {
+        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
+        binaryRunLengthEncoder.decodeMapped(
+            "$encodeFolder/$fileToEncodeSmall.mp_nr",
+            "$decodeFolder/${fileToEncodeSmall}.mp",
             mapping
         )
 

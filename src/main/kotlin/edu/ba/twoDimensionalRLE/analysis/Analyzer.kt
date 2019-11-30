@@ -15,6 +15,21 @@ class Analyzer() {
         }
     }
 
+    fun printMappingToFile(outputFile: File) {
+        val result = mutableListOf<Byte>()
+        byteMapping.mapKeys { entry: Map.Entry<Byte, Byte> ->
+            result.add(entry.key)
+        }
+        outputFile.outputStream().write(result.toByteArray())
+    }
+
+    fun addBWTSymbolsToMapping() {
+        val currentMax = byteMapping.values.max()
+
+        byteMapping[2.toByte()] = currentMax!!.inc()
+        byteMapping[3.toByte()] = currentMax.inc().inc()
+    }
+
     fun printFileComparison(source: File, target: File) {
         log.info("Encoded File has a file size of ${target.length() / 1000000.toDouble()} MB")
         log.info("${(target.length() / source.length().toDouble())} times the original size")
