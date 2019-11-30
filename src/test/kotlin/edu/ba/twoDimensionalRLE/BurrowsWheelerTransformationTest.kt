@@ -3,10 +3,6 @@ package edu.ba.twoDimensionalRLE
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -18,7 +14,7 @@ import kotlin.test.assertFailsWith
 class BurrowsWheelerTransformationTest {
 
     private var log = Log.kotlinInstance()
-    private val byteArraySize = 254
+    private val byteArraySize = 126
     private val DEBUG = true
 
     init {
@@ -84,8 +80,7 @@ class BurrowsWheelerTransformationTest {
             for (test in tests) {
                 println(transformer.makePrintable(test))
                 print(" --> ")
-                var encoded = ""
-                encoded = transformer.transform(test)
+                val encoded = transformer.transform(test)
                 println(transformer.makePrintable(encoded))
             }
         }.message?.let { log.error(it) }
@@ -169,7 +164,7 @@ class BurrowsWheelerTransformationTest {
     fun transformChunkLargeFileAsync() {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
-        var reversedChunks = listOf<DataChunk>()
+        val reversedChunks: List<DataChunk>
         val bwt = BurrowsWheelerTransformation()
 
         log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")

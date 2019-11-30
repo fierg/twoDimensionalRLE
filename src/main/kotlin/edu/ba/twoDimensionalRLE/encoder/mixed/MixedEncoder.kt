@@ -11,7 +11,6 @@ import java.io.File
 
 class MixedEncoder : Encoder {
 
-    private val log = Log.kotlinInstance()
     private val byteArraySize = 254
     private val bwt = BurrowsWheelerTransformation()
     private val analyzer = Analyzer()
@@ -19,6 +18,7 @@ class MixedEncoder : Encoder {
     private val DEBUG = true
     private val byteSize = 8
     private val bitsPerRLENumber = 4
+    private val log = Log.kotlinInstance()
 
     init {
         log.newFormat {
@@ -26,6 +26,7 @@ class MixedEncoder : Encoder {
         }
     }
 
+    @ExperimentalStdlibApi
     override fun encode(inputFile: String, outputFile: String) {
         encodeInternal(inputFile, outputFile)
     }
@@ -34,6 +35,7 @@ class MixedEncoder : Encoder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    @ExperimentalStdlibApi
     private fun encodeInternal(inputFile: String, outputFile: String) {
         analyzer.analyzeFile(File(inputFile))
         analyzer.addBWTSymbolsToMapping()
@@ -78,12 +80,12 @@ class MixedEncoder : Encoder {
         log.info("Finished encoding.")
     }
 
-    fun decodeInternal(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>){
+    @ExperimentalUnsignedTypes
+    fun decodeInternal(inputFile: String, outputFile: String) {
         val encodedChunks = DataChunk.readChunksFromEncodedFile(inputFile, byteArraySize, log)
         val mappedChunks = mutableListOf<DataChunk>()
         val transformedChunks = mutableListOf<DataChunk>()
         val decodedChunks = mutableListOf<DataChunk>()
-
 
 
     }

@@ -30,15 +30,23 @@ class MixedEncoderTest {
         File(decodeFolder).mkdirs()
     }
 
+    @ExperimentalStdlibApi
     @Test
     @Order(2)
     fun encodeFileSmall() {
         encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
     }
 
+    @ExperimentalStdlibApi
     @Test
     @Order(3)
     fun encodeFile() {
         encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+    }
+
+    @Test
+    @Order(4)
+    fun decodeFileSmall() {
+        encoder.decodeInternal("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
     }
 }

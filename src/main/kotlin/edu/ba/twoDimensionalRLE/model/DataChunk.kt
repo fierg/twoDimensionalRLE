@@ -1,10 +1,12 @@
 package edu.ba.twoDimensionalRLE.model
 
+import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
 import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.reversed
-import edu.ba.twoDimensionalRLE.extensions.toBitSet
+import loggersoft.kotlin.streams.BitStream
+import loggersoft.kotlin.streams.openBinaryStream
+import loggersoft.kotlin.streams.toIntUnsigned
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.experimental.and
@@ -13,10 +15,19 @@ import kotlin.math.ceil
 
 class DataChunk(val input: ByteArray) {
 
+    private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val bytes = input.clone()
 
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
+
     companion object {
+        private val DEBUG = true
+
         fun readChunksFromFile(inputFile: String, byteArraySize: Int, log: Logger): MutableList<DataChunk> {
             val input = File(inputFile)
             val bytes = ByteArray(byteArraySize)
@@ -44,14 +55,66 @@ class DataChunk(val input: ByteArray) {
             return chunks
         }
 
+        @ExperimentalUnsignedTypes
         fun readChunksFromEncodedFile(inputFile: String, byteArraySize: Int, log: Logger): List<DataChunk> {
             val input = File(inputFile)
-            val bytes = ByteArray(byteArraySize)
             val chunks = mutableListOf<DataChunk>()
-            var counter = 0
+            var currentByte: Byte
+            val currentBytes = mutableListOf<Byte>()
+            var line = 0
+            var currentChunk = DataChunk(ByteArray(0))
+
+
             log.info("Reading $input into chunks of size $byteArraySize bytes...")
 
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            if (DEBUG) {
+                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                    while (stream.bitPosition < stream.size * 8) {
+                        print(if (stream.readBit()) "1" else "0")
+                    }
+                }
+                println()
+
+                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                    while (stream.bitPosition < stream.size * 8) {
+                        print(stream.readByte().toChar())
+                    }
+                }
+
+                println()
+
+                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                    while (stream.bitPosition < stream.size * 8) {
+                        print(stream.readByte().toIntUnsigned())
+                        print(" ")
+                    }
+                }
+            }
+
+            BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                while (stream.bitPosition < stream.size * 8) {
+                     currentByte = stream.readByte()
+
+                    if (line % 8 == 0 && line != 0) {
+                        chunks.add(currentChunk)
+                        currentChunk = DataChunk(ByteArray(0))
+                    }
+                    while (currentByte != 0.toByte() && stream.bitPosition < stream.size * 8) {
+                        currentBytes.add(currentByte)
+                        currentByte = stream.readByte()
+                    }
+
+                    currentChunk.encodedLines[line++ % 8] = currentBytes.toByteArray()
+                }
+                if (line % 8 == 0 && line != 0) {
+                    chunks.add(currentChunk)
+                    currentChunk = DataChunk(ByteArray(0))
+                } else {
+                    log.warn("Unexpected number of lines parsed! Lines: $line")
+                }
+            }
+
+            return chunks
         }
 
     }
@@ -59,7 +122,7 @@ class DataChunk(val input: ByteArray) {
     fun getLineFromChunk(line: Int, bitSize: Int): ByteArray {
         assert(bitSize >= line)
         var noOfChars = bytes.size / bitSize.toDouble()
-        if(!noOfChars.isWholeNumber()){
+        if (!noOfChars.isWholeNumber()) {
             noOfChars = ceil(noOfChars)
         }
 
@@ -82,27 +145,23 @@ class DataChunk(val input: ByteArray) {
         return DataChunk(result.toByteArray())
     }
 
+    @ExperimentalStdlibApi
     fun writeEncodedLinesToFile(fileOut: String, RLEbitsPerSymbol: Int) {
         FileOutputStream(fileOut, true).use { writer ->
-            encodedLines.forEach { (i, bytes) ->
+            encodedLines.forEach { (_, bytes) ->
+                if (bytes.contains(0.toByte())) {
+                    log.warn("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
+                }
                 writer.write(bytes)
+                writer.write(ByteArray(1))
             }
-            writer.write(writeLineEnding(RLEbitsPerSymbol))
         }
     }
 
     fun writeCurrentChunk(fileOut: String) {
         FileOutputStream(fileOut, true).use { writer ->
-                writer.write(bytes)
+            writer.write(bytes)
         }
     }
-
-    private fun writeLineEnding(bitsPerSymbol: Int): ByteArray {
-        val sb = StringBuffer()
-        sb.append("0".padStart(bitsPerSymbol - 1, '0'))
-        return sb.toBitSet().toByteArray()
-    }
-
-
 }
 
