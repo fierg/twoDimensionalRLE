@@ -19,6 +19,7 @@ class BurrowsWheelerTransformationTest {
 
     private var log = Log.kotlinInstance()
     private val byteArraySize = 254
+    private val DEBUG = true
 
     init {
         log.newFormat {
@@ -103,6 +104,7 @@ class BurrowsWheelerTransformationTest {
         chunks.forEach {
             transformedChunks.add(bwt.transformDataChunk(it))
         }
+
         log.info("Finished burrows wheeler transformation.")
         log.info("Performing inverse burrows wheeler transformation on all chunks...")
 
@@ -124,6 +126,8 @@ class BurrowsWheelerTransformationTest {
         chunks.forEachIndexed { index, dataChunk ->
             assert(reversedChunks[index].bytes.contentEquals(dataChunk.bytes))
         }
+        log.info("Validation succeeded.")
+
 
     }
 
@@ -165,7 +169,6 @@ class BurrowsWheelerTransformationTest {
     fun transformChunkLargeFileAsync() {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
-        val reversedChunksDeferred = mutableListOf<Deferred<DataChunk>>()
         var reversedChunks = listOf<DataChunk>()
         val bwt = BurrowsWheelerTransformation()
 
@@ -174,25 +177,21 @@ class BurrowsWheelerTransformationTest {
             transformedChunks.add(bwt.transformDataChunk(it))
         }
         log.info("Finished burrows wheeler transformation.")
-        log.info("Performing inverse burrows wheeler transformation on all chunks...")
 
-        transformedChunks.forEachIndexed { index, it ->
-            reversedChunksDeferred.add(GlobalScope.async {
-                if (index % 1000 == 0) {
-                    log.info("reversing chunk nr $index of ${transformedChunks.size}...")
-                }
-                return@async bwt.invertTransformDataChunk(it)
-            })
-
+        if (DEBUG) {
+            log.debug("Writing transformed chunks to ${encodeFolder}/${fileToEncode}_transformed")
+            transformedChunks.stream().forEach { it.writeCurrentChunk("${encodeFolder}/${fileToEncode}_transformed") }
         }
-        log.info("Started all coroutines...")
 
-        log.info("Awaiting termination of all coroutines...")
-        runBlocking {
-            reversedChunks = reversedChunksDeferred.map { it.await() }
-        }
+        reversedChunks = bwt.invertTransformationParallel(transformedChunks)
 
         log.info("Finished inverse transformation on all ${chunks.size} chunks.")
+
+        if (DEBUG) {
+            log.debug("Writing reversed chunks to ${decodeFolder}/${fileToEncode}")
+            reversedChunks.stream().forEach { it.writeCurrentChunk("${decodeFolder}/${fileToEncode}") }
+        }
+
         log.info("Validating equality of input and output...")
 
         chunks.forEachIndexed { index, dataChunk ->

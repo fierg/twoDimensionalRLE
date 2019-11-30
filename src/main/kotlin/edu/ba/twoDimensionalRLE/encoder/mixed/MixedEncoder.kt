@@ -11,7 +11,6 @@ import java.io.File
 
 class MixedEncoder : Encoder {
 
-
     private val log = Log.kotlinInstance()
     private val byteArraySize = 254
     private val bwt = BurrowsWheelerTransformation()
@@ -78,7 +77,6 @@ class MixedEncoder : Encoder {
         encodedChunks.stream().forEach { it.writeEncodedLinesToFile(outputFile, bitsPerRLENumber) }
         log.info("Finished encoding.")
     }
-
 
     fun decodeInternal(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>){
         val encodedChunks = DataChunk.readChunksFromEncodedFile(inputFile, byteArraySize, log)

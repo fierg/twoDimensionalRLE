@@ -82,15 +82,6 @@ class DataChunk(val input: ByteArray) {
         return DataChunk(result.toByteArray())
     }
 
-    fun revertByteMapping(mapping: Map<Byte, Byte>): DataChunk {
-        val result = mutableListOf<Byte>()
-        val reversedMapping = mapping.reversed()
-        bytes.forEach { byte ->
-            result.add(reversedMapping.getOrElse(byte, defaultValue = { throw IllegalArgumentException() }))
-        }
-        return DataChunk(result.toByteArray())
-    }
-
     fun writeEncodedLinesToFile(fileOut: String, RLEbitsPerSymbol: Int) {
         FileOutputStream(fileOut, true).use { writer ->
             encodedLines.forEach { (i, bytes) ->

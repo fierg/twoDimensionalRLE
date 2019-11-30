@@ -1,9 +1,21 @@
 package edu.ba.twoDimensionalRLE.tranformation
 
+import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.model.DataChunk
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.nio.charset.Charset
 
 class BurrowsWheelerTransformation {
+
+    private var log = Log.kotlinInstance()
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
 
     companion object {
         const val STX = "\u0002"
@@ -43,6 +55,27 @@ class BurrowsWheelerTransformation {
             }
         }
         return ""
+    }
+
+    fun invertTransformationParallel(transformedChunks:List<DataChunk>): List<DataChunk> {
+        val reversedChunksDeferred = mutableListOf<Deferred<DataChunk>>()
+
+        log.info("Performing inverse burrows wheeler transformation on all chunks in parallel...")
+        transformedChunks.forEachIndexed { index, it ->
+            reversedChunksDeferred.add(GlobalScope.async {
+                if (index % 1000 == 0) {
+                    log.info("reversing chunk nr $index of ${transformedChunks.size}...")
+                }
+                return@async invertTransformDataChunk(it)
+            })
+
+        }
+        log.info("Started all coroutines...")
+        log.info("Awaiting termination of all coroutines...")
+        return runBlocking {
+            return@runBlocking reversedChunksDeferred.map { it.await() }
+        }
+
     }
 
     fun makePrintable(input: String): String {
