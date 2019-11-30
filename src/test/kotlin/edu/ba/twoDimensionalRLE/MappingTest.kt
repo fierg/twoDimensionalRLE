@@ -1,6 +1,6 @@
 package edu.ba.twoDimensionalRLE
 
-import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
+import de.jupf.staticlog.Log
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -8,15 +8,21 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class MixedEncoderTest {
+class MappingTest {
 
+    private var log = Log.kotlinInstance()
+
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
 
     companion object {
-        private val encoder = MixedEncoder()
         private const val fileToEncodeSmall = "testFile_small.txt"
-        private const val fileToEncode = "t8.shakespeare.txt"
-        private const val encodeFolder = "data/encoded/mixed"
-        private const val decodeFolder = "data/decoded/mixed"
+        private const val fileToEncode = "t8.shakespeare_medium.txt"
+        private const val encodeFolder = "data/encoded/mapping"
+        private const val decodeFolder = "data/decoded/mapping"
     }
 
     @Test
@@ -30,15 +36,6 @@ class MixedEncoderTest {
         File(decodeFolder).mkdirs()
     }
 
-    @Test
-    @Order(2)
-    fun encodeFileSmall() {
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
-    }
 
-    @Test
-    @Order(3)
-    fun encodeFile() {
-        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
-    }
+
 }

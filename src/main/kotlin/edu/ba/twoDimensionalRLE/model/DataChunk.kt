@@ -40,6 +40,7 @@ class DataChunk(val input: ByteArray) {
                 }
                 chunks.add(DataChunk(bytesLeft))
             }
+            log.info("Finished reading input into ${chunks.size} chunks.")
             return chunks
         }
 

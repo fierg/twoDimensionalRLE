@@ -44,11 +44,33 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun encode(bytes: ByteArray, lines: Int) {
-        log.info("Encoding last $lines lines with chunks of size $byteArraySize bytes")
-        encodeLine(bytes, lines)
+    fun decode(encodedByteArray: ByteArray, dictEncode: Map<Byte, StringBuffer>): ByteArray {
+        val dictDecode = dictEncode.entries.asSequence().associateBy({ it.value }) { it.key }
+        val offset = encodedByteArray.first().toInt()
+        val byteString =
+            encodedByteArray.asSequence().drop(1).map { byteToString(it) }.joinToString("").dropLast(offset)
+        return decodeWithLoop(dictDecode, byteString)
     }
 
+    private fun byteToString(byte: Byte): String {
+        return ("0000000" + byte.toString(2)).substring(byte.toString(2).length)
+    }
+
+    private fun decodeWithLoop(dictDecode: Map<StringBuffer, Byte>, byteString: String): ByteArray {
+        var decryptedIndex = 0
+        var possibleIndex = 0
+        val decrypted = mutableListOf<Byte>()
+        while (decryptedIndex < byteString.length) {
+            possibleIndex += 1
+            val possibleByte = StringBuffer(byteString.substring(decryptedIndex, possibleIndex))
+            val currentByte = dictDecode[possibleByte]
+            if (currentByte != null) {
+                decrypted.add(currentByte)
+                decryptedIndex = possibleIndex
+            }
+        }
+        return decrypted.toByteArray()
+    }
 
     private fun encodeLine(bytes: ByteArray, line: Int): ByteArray {
         assert(byteSize >= line)
@@ -59,7 +81,8 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             if (index != 0 && index % byteSize == 0)
                 byteCounter++
             if (byte.and(2.pow(line).toByte()) == 2.pow(line).toByte())
-                currentLineAsByteArray[byteCounter] = currentLineAsByteArray[byteCounter].or(2.pow(index % byteSize).toByte())
+                currentLineAsByteArray[byteCounter] =
+                    currentLineAsByteArray[byteCounter].or(2.pow(index % byteSize).toByte())
         }
         val huffmanMapping = getHuffmanMapping(noOfChars, currentLineAsByteArray)
 
@@ -67,7 +90,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     fun getHuffmanMapping(noOfChars: Int, currentLineAsByteArray: ByteArray): MutableMap<Byte, StringBuffer> {
-        val huffmanTree = buildTree(calcFrequencies(currentLineAsByteArray, noOfChars))
+        val huffmanTree = buildTree(countOccurrences(currentLineAsByteArray, noOfChars))
         return getMappingFromTree(huffmanTree, StringBuffer())
     }
 
@@ -141,11 +164,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return trees.poll()
     }
 
-    private fun calcFrequencies(bytes: ByteArray, maxSymbols: Int): IntArray {
-        // calc frequencies
-        val freqs = IntArray(256)
-        bytes.forEach { byte -> freqs[byte.index()] = freqs[byte.index()] + 1 }
-        return freqs
+    private fun countOccurrences(bytes: ByteArray, maxSymbols: Int): IntArray {
+        val frequencies = IntArray(256)
+        bytes.forEach { byte -> frequencies[byte.index()] = frequencies[byte.index()] + 1 }
+        return frequencies
     }
 
     private fun getMappingFromTree(tree: HuffmanTree, prefix: StringBuffer): MutableMap<Byte, StringBuffer> {

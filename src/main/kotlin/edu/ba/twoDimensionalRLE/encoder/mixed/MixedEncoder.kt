@@ -14,7 +14,7 @@ class MixedEncoder : Encoder {
 
     private val log = Log.kotlinInstance()
     private val byteArraySize = 254
-    private val btw = BurrowsWheelerTrasformation()
+    private val bwt = BurrowsWheelerTrasformation()
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
     private val DEBUG = true
@@ -28,14 +28,14 @@ class MixedEncoder : Encoder {
     }
 
     override fun encode(inputFile: String, outputFile: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        encodeInternal(inputFile, outputFile)
     }
 
     override fun decode(inputFile: String, outputFile: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun encodeInternal(inputFile: String, outputFile: String) {
+    private fun encodeInternal(inputFile: String, outputFile: String) {
         analyzer.analyzeFile(File(inputFile))
         analyzer.addBWTSymbolsToMapping()
         val huffmanEncoder = HuffmanEncoder()
@@ -48,12 +48,12 @@ class MixedEncoder : Encoder {
 
         log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
         chunks.forEach {
-            transformedChunks.add(btw.transformDataChunk(it))
+            transformedChunks.add(bwt.transformDataChunk(it))
         }
         log.info("Finished burrows wheeler transformation.")
 
-        if (DEBUG){
-            transformedChunks.stream().forEach{ it.writeCurrentChunk(outputFile + "_transformed") }
+        if (DEBUG) {
+            transformedChunks.stream().forEach { it.writeCurrentChunk(outputFile + "_transformed") }
         }
 
         log.info("Performing byte mapping to lower values on all chunks...")
@@ -62,8 +62,8 @@ class MixedEncoder : Encoder {
         }
         log.info("Finished byte mapping.")
 
-        if (DEBUG){
-            mappedChunks.stream().forEach{ it.writeCurrentChunk(outputFile  + "_mapped") }
+        if (DEBUG) {
+            mappedChunks.stream().forEach { it.writeCurrentChunk(outputFile + "_mapped") }
         }
 
         log.info("Encoding all chunks with binary RLE and Huffman Encoding in parallel...")
@@ -77,5 +77,16 @@ class MixedEncoder : Encoder {
         log.info("Writing all encoded lines of all chunks to file...")
         encodedChunks.stream().forEach { it.writeEncodedLinesToFile(outputFile, bitsPerRLENumber) }
         log.info("Finished encoding.")
+    }
+
+
+    fun decodeInternal(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>){
+        val encodedChunks = DataChunk.readChunksFromEncodedFile(inputFile, byteArraySize, log)
+        val mappedChunks = mutableListOf<DataChunk>()
+        val transformedChunks = mutableListOf<DataChunk>()
+        val decodedChunks = mutableListOf<DataChunk>()
+
+
+
     }
 }

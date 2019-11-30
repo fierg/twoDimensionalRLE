@@ -1,10 +1,12 @@
 package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
+import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class HuffmanTest {
     private var log = Log.kotlinInstance()
 
