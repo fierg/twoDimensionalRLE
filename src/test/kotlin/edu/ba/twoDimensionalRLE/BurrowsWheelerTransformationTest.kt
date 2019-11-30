@@ -2,7 +2,7 @@ package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.model.DataChunk
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTrasformation
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -53,7 +53,7 @@ class BurrowsWheelerTransformationTest {
             "this is a sentence ii with iiii many iiiiis"
         )
 
-        val transformer = BurrowsWheelerTrasformation()
+        val transformer = BurrowsWheelerTransformation()
 
         for (test in tests) {
             println(transformer.makePrintable(test))
@@ -77,7 +77,7 @@ class BurrowsWheelerTransformationTest {
     fun simpleTestFail() {
         val tests = listOf("\u0002ABC\u0003")
 
-        val transformer = BurrowsWheelerTrasformation()
+        val transformer = BurrowsWheelerTransformation()
 
         assertFailsWith<RuntimeException> {
             for (test in tests) {
@@ -97,7 +97,7 @@ class BurrowsWheelerTransformationTest {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncodeSmall}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks = mutableListOf<DataChunk>()
-        val bwt = BurrowsWheelerTrasformation()
+        val bwt = BurrowsWheelerTransformation()
 
         log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
         chunks.forEach {
@@ -134,7 +134,7 @@ class BurrowsWheelerTransformationTest {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks = mutableListOf<DataChunk>()
-        val bwt = BurrowsWheelerTrasformation()
+        val bwt = BurrowsWheelerTransformation()
 
         log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
         chunks.forEach {
@@ -167,7 +167,7 @@ class BurrowsWheelerTransformationTest {
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunksDeferred = mutableListOf<Deferred<DataChunk>>()
         var reversedChunks = listOf<DataChunk>()
-        val bwt = BurrowsWheelerTrasformation()
+        val bwt = BurrowsWheelerTransformation()
 
         log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
         chunks.forEach {

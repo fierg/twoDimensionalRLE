@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -18,8 +19,8 @@ class HuffmanTest {
 
     @Test
     @Order(1)
-    fun huff1() {
-        val encoder = edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder()
+    fun getHuffmanMapping() {
+        val encoder = HuffmanEncoder()
         val mapping = encoder.getHuffmanMapping(256,"aaaabbbccddefg".toByteArray())
         mapping
     }

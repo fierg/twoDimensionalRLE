@@ -6,7 +6,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
 import edu.ba.twoDimensionalRLE.model.DataChunk
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTrasformation
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
 import java.io.File
 
 class MixedEncoder : Encoder {
@@ -14,7 +14,7 @@ class MixedEncoder : Encoder {
 
     private val log = Log.kotlinInstance()
     private val byteArraySize = 254
-    private val bwt = BurrowsWheelerTrasformation()
+    private val bwt = BurrowsWheelerTransformation()
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
     private val DEBUG = true

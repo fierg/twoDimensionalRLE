@@ -3,7 +3,7 @@ package edu.ba.twoDimensionalRLE.tranformation
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import java.nio.charset.Charset
 
-class BurrowsWheelerTrasformation {
+class BurrowsWheelerTransformation {
 
     companion object {
         const val STX = "\u0002"
