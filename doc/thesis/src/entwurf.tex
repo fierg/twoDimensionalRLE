@@ -9,34 +9,41 @@ In diesem Kapitel erfolgt die ausführliche Beschreibung des eigenen
 Lösungsansatzes. Dabei sollten Lösungsalternativen diskutiert und
 Entwurfsentscheidungen dargelegt werden.
 
-To archive the main obejctive a few ideas to improve run lenthg encoding where found. The first real difference is the conception of reading the data in chunks and thee encode it vertically, meaning all the most significant bits in one chunk, then all second most significant bits and so on. The second change was to switch between the encoding of runs of characters \/ bytes to count runs of ones and zeros so basically the same mechanism but on bit level.
+To archive the main objective a few ideas to improve run length encoding where found. The first real difference is the conception of reading the data in chunks and then encode it in parallel, meaning all the most significant bits in one chunk, then all second most significant bits and so on. The second change was to switch between the encoding of runs of characters \/ bytes to count runs of ones and zeros so basically the same mechanism but on bit level.
 
 %% ==============================
-\section{Vertical Byte Reading}
+\section{Parallel Byte Reading}
 %% ==============================
-\label{ch:Conceptual Design:sec:Vertical Byte Reading}
-
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-
+\label{ch:Conceptual Design:sec:Parallel Byte Reading}
+...
+\subsection{First Ideas}
+...
+\subsection{New Perspective}
+...
+\subsection{Performance Improvements}
+...
 %% ==============================
 \section{Preprocessing}
 %% ==============================
 \label{ch:Conceptual Design:sec:Preprocessing}
-
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. 
+...
 
 \subsection{Burrows Wheeler Transformation}
+...
 \subsection{Byte Mapping to reduce Input space}
+...
 \subsection{Dynamic Encoding}
-\subsection{Alternative Encoding / Compression}
+...
 
-
+\section{Alternative Compression for partial data}
+\label{ch:Conceptual Design:sec:Alternative Encoding}
+...
+\subsection{Huffman Coding}
+...
 %% ==============================
-\section{Summarization}
+\section{Summary}
 %% ==============================
-\label{ch:Conceptual Design:sec:Summarization}
+\label{ch:Conceptual Design:sec:Summary}
 
 Am Ende sollten ggf. die wichtigsten Ergebnisse nochmal in \emph{einem}
 kurzen Absatz zusammengefasst werden.
