@@ -25,9 +25,9 @@ class MixedEncoder : Encoder {
 
     companion object {
         private const val byteSize = 8
-        private const val bitsPerRLENumber = 4
-        val RLE_BIT_RANGE = IntRange(5, 7)
-        val HUFF_BIT_RANGE = IntRange(0, 4)
+        private const val bitsPerRLENumber = 8
+        val RLE_BIT_RANGE = IntRange(7, 7)
+        val HUFF_BIT_RANGE = IntRange(0, 6)
     }
 
     init {
@@ -78,9 +78,12 @@ class MixedEncoder : Encoder {
         }
 
         log.info("Encoding all chunks with binary RLE and Huffman Encoding in parallel...")
+        log.info("Using run length encoding for line ${RLE_BIT_RANGE.first} until ${RLE_BIT_RANGE.last}")
+        log.info("Using huffman encoding for line ${HUFF_BIT_RANGE.first} until ${HUFF_BIT_RANGE.last}")
+
         mappedChunks.forEach {
             var encodedChunk = binaryRunLengthEncoder.encodeChunk(it, RLE_BIT_RANGE, bitsPerRLENumber, byteSize)
-       //     encodedChunk = huffmanEncoder.encodeChunk(encodedChunk, HUFF_BIT_RANGE, bitsPerRLENumber, byteSize)
+            encodedChunk = huffmanEncoder.encodeChunk(encodedChunk, HUFF_BIT_RANGE, bitsPerRLENumber, byteSize)
             encodedChunks.add(encodedChunk)
         }
         log.info("Finished encoding.")
@@ -102,9 +105,8 @@ class MixedEncoder : Encoder {
     ): List<DataChunk> {
         val input = File(inputFile)
         val chunks = mutableListOf<DataChunk>()
-        var currentChunk = DataChunk(ByteArray(0))
         val expectedRLEBits = byteArraySize * (rleRange.last + 1 - rleRange.first)
-        val expectedHuffmanBits = byteArraySize * (huffmanRange.last + 1 - huffmanRange.first)
+        val expectedHuffmanBytes = byteArraySize * (huffmanRange.last + 1 - huffmanRange.first)
         val rle = BinaryRunLengthEncoder()
         val huff = HuffmanEncoder()
 
@@ -113,16 +115,19 @@ class MixedEncoder : Encoder {
         debugPrintFileContent(input)
 
         BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
-            val rleNumbers = mutableListOf<Int>()
-            while (stream.bitPosition < stream.size * 8 && rleNumbers.sum() <= expectedRLEBits) {
-                rleNumbers.add(stream.readBits(bitsPerRLENumber, false).toInt())
+            while (stream.position <= stream.size) {
+                val currentChunk = DataChunk(ByteArray(0))
+
+                val rleNumbers = mutableListOf<Int>()
+                while (stream.bitPosition < stream.size * 8 && rleNumbers.sum() <= expectedRLEBits) {
+                    rleNumbers.add(stream.readBits(bitsPerRLENumber, false).toInt())
+                }
+
+                rle.decodeChunkRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
+
+                huff.decodeChunkHuffman(currentChunk, HUFF_BIT_RANGE, bitsPerRLENumber, stream, huffmanMapping, expectedHuffmanBytes)
+                chunks.add(currentChunk)
             }
-
-            rle.decodeChunkRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
-
-            huff.decodeChunkHuffman(currentChunk, HUFF_BIT_RANGE, bitsPerRLENumber)
-
-            chunks.add(currentChunk)
         }
 
         return chunks

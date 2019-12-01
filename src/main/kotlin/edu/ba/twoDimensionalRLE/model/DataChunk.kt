@@ -71,14 +71,14 @@ class DataChunk(val input: ByteArray) {
             log.info("Reading $input into chunks of size $byteArraySize bytes...")
 
             if (DEBUG) {
-                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
                     while (stream.bitPosition < stream.size * 8) {
                         print(if (stream.readBit()) "1" else "0")
                     }
                 }
                 println()
 
-                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
                     while (stream.position < stream.size) {
                         print(stream.readByte().toChar())
                     }
@@ -86,7 +86,7 @@ class DataChunk(val input: ByteArray) {
 
                 println()
 
-                BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
+                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
                     while (stream.position < stream.size) {
                         print(stream.readByte().toIntUnsigned())
                         print(" ")

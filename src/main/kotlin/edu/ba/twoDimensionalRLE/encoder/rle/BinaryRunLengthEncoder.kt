@@ -11,6 +11,7 @@ import edu.ba.twoDimensionalRLE.extensions.toBitSetList
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
+import loggersoft.kotlin.streams.BitStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -43,7 +44,15 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return chunk
     }
 
-    override fun decodeChunkHuffman(chunk: DataChunk, range: IntRange, bitsPerNumber: Int): DataChunk {
+    @ExperimentalUnsignedTypes
+    override fun decodeChunkHuffman(
+        chunk: DataChunk,
+        range: IntRange,
+        byteSize: Int,
+        stream: BitStream,
+        huffmanMapping: Map<StringBuffer, Byte>,
+        expectedHuffmanBytes: Int
+    ): DataChunk {
         throw NotImplementedError()
     }
 

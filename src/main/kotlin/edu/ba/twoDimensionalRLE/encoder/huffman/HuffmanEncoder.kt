@@ -6,17 +6,17 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.*
 import edu.ba.twoDimensionalRLE.model.DataChunk
+import loggersoft.kotlin.streams.BitStream
+import loggersoft.kotlin.streams.openBinaryStream
+import java.io.File
 import java.util.*
-import kotlin.experimental.and
 import kotlin.experimental.or
-import kotlin.math.ceil
 
 class HuffmanEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     private val mapping = mutableMapOf<Byte, StringBuffer>()
     private val byteArraySize = 256
     private val byteSize = 8
-
 
     init {
         log.newFormat {
@@ -34,24 +34,66 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         throw NotImplementedError()
     }
 
+    @ExperimentalUnsignedTypes
     override fun encode(inputFile: String, outputFile: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        log.info("Parsing input file $inputFile ...")
+        val bytes = File(inputFile).readBytes()
+
+        log.info("Building tree to generate Huffman mapping...")
+        val huffmanMapping = getHuffmanMapping(bytes.size, bytes)
+        log.info("Finished building tree.")
+
+        log.info("Writing mapped input file as binary stream to $outputFile")
+        BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
+            bytes.forEach { byte ->
+                huffmanMapping[byte]?.writeToBinaryStream(stream)
+            }
+        }
+        log.info("Finished huffman encoding.")
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
+        val totalByteArraySize = byteArraySize * (range.last - range.first + 1)
+        var linesToEncode = ByteArray(totalByteArraySize)
+
         for (index in range) {
             assert(index in 0 until byteSize)
-            chunk.encodedLines[index] = encodeLine(chunk.bytes, index)
+            linesToEncode += chunk.getLineFromChunk(index, bitSize = 8)
         }
+        val huffmanMapping = getHuffmanMapping(totalByteArraySize, linesToEncode)
+        chunk.encodedLines[range.last] = writeEncodedAsStringBuffer(linesToEncode, huffmanMapping)
         return chunk
     }
 
-    override fun decodeChunkHuffman(chunk: DataChunk, range: IntRange, byteSize: Int): DataChunk {
+    @ExperimentalUnsignedTypes
+    override fun decodeChunkHuffman(
+        chunk: DataChunk,
+        range: IntRange,
+        byteSize: Int,
+        stream: BitStream,
+        huffmanMapping: Map<StringBuffer, Byte>,
+        expectedHuffmanBytes: Int
+    ): DataChunk {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    @ExperimentalUnsignedTypes
     override fun decode(inputFile: String, outputFile: String) {
+        BitStream(File(inputFile).openBinaryStream(false)).use { stream ->
+            while (stream.bitPosition < stream.size * 8) {
+                print(if (stream.readBit()) "1" else "0")
+            }
+        }
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+    @ExperimentalUnsignedTypes
+     fun decodeInternal(inputFile: String, outputFile: String, huffmanMapping: Map<StringBuffer, Byte>) {
+        BitStream(File(inputFile).openBinaryStream(false)).use { stream ->
+            while (stream.bitPosition < stream.size * 8) {
+                print(if (stream.readBit()) "1" else "0")
+            }
+        }
     }
 
     fun decode(encodedByteArray: ByteArray, dictEncode: Map<Byte, StringBuffer>): ByteArray {
@@ -82,25 +124,9 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return decrypted.toByteArray()
     }
 
-    private fun encodeLine(bytes: ByteArray, line: Int): ByteArray {
-        assert(byteSize >= line)
-        val noOfChars = ceil(bytes.size.toDouble() / byteSize).toInt()
-        val currentLineAsByteArray = ByteArray(noOfChars)
-        var byteCounter = 0
-        bytes.forEachIndexed { index, byte ->
-            if (index != 0 && index % byteSize == 0)
-                byteCounter++
-            if (byte.and(2.pow(line).toByte()) == 2.pow(line).toByte())
-                currentLineAsByteArray[byteCounter] =
-                    currentLineAsByteArray[byteCounter].or(2.pow(index % byteSize).toByte())
-        }
-        val huffmanMapping = getHuffmanMapping(noOfChars, currentLineAsByteArray)
-
-        return writeEncodedAsStringBuffer(currentLineAsByteArray, huffmanMapping)
-    }
-
-    fun getHuffmanMapping(noOfChars: Int, currentLineAsByteArray: ByteArray): MutableMap<Byte, StringBuffer> {
-        val huffmanTree = buildTree(countOccurrences(currentLineAsByteArray, noOfChars))
+    @ExperimentalUnsignedTypes
+    fun getHuffmanMapping(noOfChars: Int, byteArray: ByteArray): MutableMap<Byte, StringBuffer> {
+        val huffmanTree = buildTree(countOccurrences(byteArray, noOfChars))
         return getMappingFromTree(huffmanTree, StringBuffer())
     }
 
@@ -154,7 +180,6 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                 currentBytePosition = currentBitPosition / byteSize
             }
         }
-        result
     }
 
     private fun buildTree(charFreqs: IntArray): HuffmanTree {
@@ -174,6 +199,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return trees.poll()
     }
 
+    @ExperimentalUnsignedTypes
     private fun countOccurrences(bytes: ByteArray, maxSymbols: Int): IntArray {
         val frequencies = IntArray(256)
         bytes.forEach { byte -> frequencies[byte.index()] = frequencies[byte.index()] + 1 }
@@ -197,6 +223,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return mapping
     }
 
+    @ExperimentalUnsignedTypes
     private fun printCodes(tree: HuffmanTree, prefix: StringBuffer) {
         when (tree) {
             is HuffmanLeaf -> {
