@@ -10,9 +10,6 @@ fun Byte.toBitSet(): BitSet {
         if (this and 2.toDouble().pow(i).toByte() == 2.toDouble().pow(i).toByte())
             bitSet.set(i)
     }
-    if (this.coerceAtLeast(0) == 0.toByte()){
-        bitSet.set(8)
-    }
         return bitSet
 }
 

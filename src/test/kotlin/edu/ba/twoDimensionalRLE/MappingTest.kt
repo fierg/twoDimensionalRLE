@@ -59,7 +59,7 @@ class MappingTest {
 
         if (DEBUG) {
             log.debug("Writing mapped chunks to ${encodeFolder}/${fileToEncodeSmall}_mapped")
-            mappedChunks.stream().forEach { it.writeCurrentChunk("${encodeFolder}/${fileToEncodeSmall}_mapped") }
+            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncodeSmall}_mapped") }
         }
 
         log.info("Invert mapping of all chunks...")
@@ -70,7 +70,7 @@ class MappingTest {
 
         if (DEBUG) {
             log.debug("Writing mapped chunks to ${decodeFolder}/${fileToEncodeSmall}")
-            reMappedChunks.stream().forEach { it.writeCurrentChunk("${decodeFolder}/${fileToEncodeSmall}") }
+            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncodeSmall}") }
         }
 
         log.info("Validating equality of input and output...")
@@ -99,7 +99,7 @@ class MappingTest {
 
         if (DEBUG) {
             log.debug("Writing mapped chunks to ${encodeFolder}/${fileToEncode}_mapped")
-            mappedChunks.stream().forEach { it.writeCurrentChunk("${encodeFolder}/${fileToEncode}_mapped") }
+            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_mapped") }
         }
 
         log.info("Invert mapping of all chunks...")
@@ -109,7 +109,7 @@ class MappingTest {
         }
         if (DEBUG) {
             log.debug("Writing remapped chunks to ${decodeFolder}/${fileToEncode}")
-            reMappedChunks.stream().forEach { it.writeCurrentChunk("${decodeFolder}/${fileToEncode}") }
+            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
         }
 
         log.info("Validating equality of input and output...")
