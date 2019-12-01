@@ -85,6 +85,15 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     }
 
     override fun decodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
+        for (index in range) {
+            chunk.decodedLines[index] = decodeLine(chunk.encodedLines[index], bitsPerNumber, byteSize)
+        }
+
+
+        return DataChunk(ByteArray(0))
+    }
+
+    private fun decodeLine(bytes: ByteArray?, bitsPerNumber: Int, byteSize: Int): ByteArray {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

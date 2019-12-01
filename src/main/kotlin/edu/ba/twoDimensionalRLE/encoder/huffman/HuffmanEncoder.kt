@@ -34,7 +34,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
     override fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
         for (index in range) {
-            assert(index in 1..byteSize)
+            assert(index in 0 until byteSize)
             chunk.encodedLines[index] = encodeLine(chunk.bytes, index)
         }
         return chunk

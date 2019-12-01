@@ -12,11 +12,13 @@ import java.io.FileOutputStream
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.ceil
+import kotlin.math.max
 
 class DataChunk(val input: ByteArray) {
 
     private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
+    val decodedLines = mutableMapOf<Int, ByteArray>()
     val bytes = input.clone()
 
     init {
@@ -76,7 +78,7 @@ class DataChunk(val input: ByteArray) {
                 println()
 
                 BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
-                    while (stream.bitPosition < stream.size * 8) {
+                    while (stream.position < stream.size) {
                         print(stream.readByte().toChar())
                     }
                 }
@@ -84,7 +86,7 @@ class DataChunk(val input: ByteArray) {
                 println()
 
                 BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
-                    while (stream.bitPosition < stream.size * 8) {
+                    while (stream.position < stream.size) {
                         print(stream.readByte().toIntUnsigned())
                         print(" ")
                     }
@@ -93,7 +95,7 @@ class DataChunk(val input: ByteArray) {
 
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
                 while (stream.bitPosition < stream.size * 8) {
-                     currentByte = stream.readByte()
+                    currentByte = stream.readByte()
 
                     if (line % 8 == 0 && line != 0) {
                         chunks.add(currentChunk)
@@ -147,18 +149,38 @@ class DataChunk(val input: ByteArray) {
 
     @ExperimentalStdlibApi
     fun writeEncodedLinesToFile(fileOut: String, RLEbitsPerSymbol: Int) {
+        var consecutiveZeroPrints = 0
+        var maxConsecutiveZeroPrints = 0
+        var lastByteWasZero = false
         FileOutputStream(fileOut, true).use { writer ->
-            encodedLines.forEach { (_, bytes) ->
-                if (bytes.contains(0.toByte())) {
-                    log.warn("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
+            encodedLines.toSortedMap(reverseOrder()).forEach { (_, bytes) ->
+                if (DEBUG) {
+                    bytes.forEach { byte ->
+                        if (byte == 0.toByte()) {
+                            log.debug("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
+                            if (lastByteWasZero) {
+                                consecutiveZeroPrints++
+                            } else {
+                                consecutiveZeroPrints = 1
+                                lastByteWasZero = true
+                            }
+                        } else {
+                            maxConsecutiveZeroPrints = max(consecutiveZeroPrints, maxConsecutiveZeroPrints)
+                            lastByteWasZero = false
+                        }
+                    }
                 }
+
                 writer.write(bytes)
-                writer.write(ByteArray(1))
+            }
+
+            if (maxConsecutiveZeroPrints > 0) {
+                log.warn("Chunk contained ecoded line with $maxConsecutiveZeroPrints consecutive 0x0000 byte(s).")
             }
         }
     }
 
-    fun writeCurrentChunk(fileOut: String) {
+    fun appendCurrentChunkToFile(fileOut: String) {
         FileOutputStream(fileOut, true).use { writer ->
             writer.write(bytes)
         }

@@ -175,7 +175,7 @@ class BurrowsWheelerTransformationTest {
 
         if (DEBUG) {
             log.debug("Writing transformed chunks to ${encodeFolder}/${fileToEncode}_transformed")
-            transformedChunks.stream().forEach { it.writeCurrentChunk("${encodeFolder}/${fileToEncode}_transformed") }
+            transformedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_transformed") }
         }
 
         reversedChunks = bwt.invertTransformationParallel(transformedChunks)
@@ -184,7 +184,7 @@ class BurrowsWheelerTransformationTest {
 
         if (DEBUG) {
             log.debug("Writing reversed chunks to ${decodeFolder}/${fileToEncode}")
-            reversedChunks.stream().forEach { it.writeCurrentChunk("${decodeFolder}/${fileToEncode}") }
+            reversedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
         }
 
         log.info("Validating equality of input and output...")
