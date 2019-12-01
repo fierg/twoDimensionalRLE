@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
+import java.lang.IllegalArgumentException
+import kotlin.test.assertFailsWith
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class MixedEncoderTest {
@@ -64,6 +66,15 @@ class MixedEncoderTest {
     @Test
     @Order(5)
     fun encodeAndDecodeFileSmall() {
-        encoder.readEncodedFileConsecutive("${encodeFolder}/${fileToEncodeSmall}", 256, log, MixedEncoder.RLE_BIT_RANGE, MixedEncoder.HUFF_BIT_RANGE, emptyMap())
+        assertFailsWith<IllegalArgumentException> {
+            encoder.readEncodedFileConsecutive(
+                "${encodeFolder}/${fileToEncodeSmall}",
+                256,
+                log,
+                MixedEncoder.RLE_BIT_RANGE,
+                MixedEncoder.HUFF_BIT_RANGE,
+                emptyMap()
+            )
+        }
     }
 }

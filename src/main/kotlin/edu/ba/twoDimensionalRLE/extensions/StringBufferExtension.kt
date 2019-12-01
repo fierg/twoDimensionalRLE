@@ -4,8 +4,7 @@ import loggersoft.kotlin.streams.BitStream
 import java.util.*
 
 fun StringBuffer.toBitSet(): BitSet {
-    if (this.isBlank()) return BitSet()
-    require(this.toString().matches(Regex("([01]+)")))
+    require(this.toString().matches(Regex("([01]*)")))
 
     val result = BitSet()
     this.forEachIndexed { index, char ->

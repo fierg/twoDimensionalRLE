@@ -14,7 +14,7 @@ import kotlin.experimental.or
 
 class HuffmanEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
-    private val mapping = mutableMapOf<Byte, StringBuffer>()
+    val mapping = mutableMapOf<Byte, StringBuffer>()
     private val byteArraySize = 256
     private val byteSize = 8
 
@@ -75,7 +75,29 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         huffmanMapping: Map<StringBuffer, Byte>,
         expectedHuffmanBytes: Int
     ): DataChunk {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        require(huffmanMapping.isNotEmpty())
+        val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
+        val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
+        var currentMappingSize = smallestMapping
+        var currentPrefixSeen: StringBuffer
+        val decodingResult = mutableListOf<Byte>()
+        val stringMapping =
+            huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
+
+        while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size <= expectedHuffmanBytes) {
+            currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
+
+            if (stringMapping.containsKey(currentPrefixSeen.toString())) {
+                decodingResult.add(stringMapping.getOrElse(currentPrefixSeen.toString()) { throw IllegalStateException() })
+                stream.bitPosition = stream.bitPosition + currentMappingSize
+                currentMappingSize = smallestMapping
+            } else {
+                currentMappingSize++
+                assert(currentMappingSize <= largesMapping)
+            }
+        }
+        return chunk
     }
 
     @ExperimentalUnsignedTypes
@@ -87,13 +109,37 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
     @ExperimentalUnsignedTypes
-     fun decodeInternal(inputFile: String, outputFile: String, huffmanMapping: Map<StringBuffer, Byte>) {
+    fun decodeFileInternal(inputFile: String, outputFile: String, huffmanMapping: Map<StringBuffer, Byte>) {
+        val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
+        val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
+        var currentMappingSize = smallestMapping
+        var currentPrefixSeen: StringBuffer
+        val decodingResult = mutableListOf<Byte>()
+        val stringMapping =
+            huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
+
+        log.info("Starting to decode huffman encoding from $inputFile ...")
+
         BitStream(File(inputFile).openBinaryStream(false)).use { stream ->
-            while (stream.bitPosition < stream.size * 8) {
-                print(if (stream.readBit()) "1" else "0")
+            while ((stream.bitPosition + currentMappingSize) < stream.size * 8) {
+                currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
+
+                if (stringMapping.containsKey(currentPrefixSeen.toString())) {
+                    decodingResult.add(stringMapping.getOrElse(currentPrefixSeen.toString()) { throw IllegalStateException() })
+                    stream.bitPosition = stream.bitPosition + currentMappingSize
+                    currentMappingSize = smallestMapping
+                } else {
+                    currentMappingSize++
+                    assert(currentMappingSize <= largesMapping)
+                }
             }
         }
+
+        log.info("Finished decoding. Writing decoded stream to $outputFile ...")
+        File(outputFile).writeBytes(decodingResult.toByteArray())
+        log.info("Finished decoding.")
     }
 
     fun decode(encodedByteArray: ByteArray, dictEncode: Map<Byte, StringBuffer>): ByteArray {
@@ -182,10 +228,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    private fun buildTree(charFreqs: IntArray): HuffmanTree {
+    private fun buildTree(byteFrequencies: IntArray): HuffmanTree {
         val trees = PriorityQueue<HuffmanTree>()
 
-        charFreqs.forEachIndexed { index, freq ->
+        byteFrequencies.forEachIndexed { index, freq ->
             if (freq > 0) trees.offer(HuffmanLeaf(freq, index.toByte()))
         }
 

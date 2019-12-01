@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
+import edu.ba.twoDimensionalRLE.extensions.reversed
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -23,6 +24,7 @@ class HuffmanTest {
         private const val fileToEncode = "t8.shakespeare.txt"
         private const val encodeFolder = "data/encoded/huffman"
         private const val decodeFolder = "data/decoded/huffman"
+        private const val inputString = "aaaabbbccddefg"
     }
 
     @Test
@@ -36,27 +38,40 @@ class HuffmanTest {
         File(decodeFolder).mkdirs()
     }
 
+    @ExperimentalUnsignedTypes
     @Test
     @Order(2)
     fun getHuffmanMapping() {
-        val encoder = HuffmanEncoder()
-        val mapping = encoder.getHuffmanMapping(256, "aaaabbbccddefg".toByteArray())
-        mapping
+        log.info("Creating huffman mapping from String $inputString...")
+        HuffmanEncoder().getHuffmanMapping(256, inputString.toByteArray())
     }
+
 
     @ExperimentalUnsignedTypes
     @Test
     @Order(3)
-    fun encodeSmall() {
+    fun encodeAndDecodeFileSmall() {
         val encoder = HuffmanEncoder()
         encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
+
+        encoder.decodeFileInternal(
+            "${encodeFolder}/${fileToEncodeSmall}",
+            "${decodeFolder}/${fileToEncodeSmall}",
+            encoder.mapping.reversed()
+        )
     }
 
     @ExperimentalUnsignedTypes
     @Test
     @Order(3)
-    fun encodeLarge() {
+    fun encodeAndDecodeFileLarge() {
         val encoder = HuffmanEncoder()
         encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+
+        encoder.decodeFileInternal(
+            "${encodeFolder}/${fileToEncode}",
+            "${decodeFolder}/${fileToEncode}",
+            encoder.mapping.reversed()
+        )
     }
 }
