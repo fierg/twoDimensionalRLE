@@ -58,7 +58,8 @@ class DataChunk(val input: ByteArray) {
         }
 
         @ExperimentalUnsignedTypes
-        fun readChunksFromEncodedFile(inputFile: String, byteArraySize: Int, log: Logger): List<DataChunk> {
+        @Deprecated("Use mixed encoders methods instead! This is debug only!")
+        fun debugReadFromEncodedFile(inputFile: String, byteArraySize: Int, log: Logger): List<DataChunk> {
             val input = File(inputFile)
             val chunks = mutableListOf<DataChunk>()
             var currentByte: Byte
@@ -139,6 +140,10 @@ class DataChunk(val input: ByteArray) {
         return chars
     }
 
+    fun writeDecodedLinesToChunk(){
+
+    }
+
     fun applyByteMapping(mapping: Map<Byte, Byte>): DataChunk {
         val result = mutableListOf<Byte>()
         bytes.forEach { byte ->
@@ -157,7 +162,7 @@ class DataChunk(val input: ByteArray) {
                 if (DEBUG) {
                     bytes.forEach { byte ->
                         if (byte == 0.toByte()) {
-                            log.debug("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
+                       //     log.debug("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
                             if (lastByteWasZero) {
                                 consecutiveZeroPrints++
                             } else {

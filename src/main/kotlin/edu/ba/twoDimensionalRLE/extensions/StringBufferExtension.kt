@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.extensions
 import java.util.*
 
 fun StringBuffer.toBitSet(): BitSet {
+    if (this.isBlank()) return BitSet()
     require(this.toString().matches(Regex("([01]+)")))
 
     val result = BitSet()

@@ -56,13 +56,14 @@ class MixedEncoderTest {
     @Test
     @Order(4)
     fun decodeFileSmall() {
-        encoder.decodeInternal("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
+        encoder.debugPrintFileContent(File("${encodeFolder}/${fileToEncodeSmall}"))
     }
 
+    @ExperimentalUnsignedTypes
     @ExperimentalStdlibApi
     @Test
-    @Order(2)
+    @Order(5)
     fun encodeAndDecodeFileSmall() {
-        encoder.readEncodedFileConsecutive("${encodeFolder}/${fileToEncodeSmall}", 256, log, MixedEncoder.RLE_BIT_RANGE, MixedEncoder.HUFF_BIT_RANGE)
+        encoder.readEncodedFileConsecutive("${encodeFolder}/${fileToEncodeSmall}", 256, log, MixedEncoder.RLE_BIT_RANGE, MixedEncoder.HUFF_BIT_RANGE, emptyMap())
     }
 }

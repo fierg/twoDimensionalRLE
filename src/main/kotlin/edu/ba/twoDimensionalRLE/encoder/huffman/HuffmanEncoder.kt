@@ -24,8 +24,14 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    override fun decodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun decodeChunkRLE(
+        chunk: DataChunk,
+        range: IntRange,
+        bitsPerNumber: Int,
+        byteSize: Int,
+        rleNumbers: List<Int>
+    ): DataChunk {
+        throw NotImplementedError()
     }
 
     override fun encode(inputFile: String, outputFile: String) {
@@ -38,6 +44,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             chunk.encodedLines[index] = encodeLine(chunk.bytes, index)
         }
         return chunk
+    }
+
+    override fun decodeChunkHuffman(chunk: DataChunk, range: IntRange, byteSize: Int): DataChunk {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun decode(inputFile: String, outputFile: String) {

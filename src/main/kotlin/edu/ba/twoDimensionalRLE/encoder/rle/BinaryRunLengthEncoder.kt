@@ -27,6 +27,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
+    private val defaultLastBit = false
 
     init {
         log.newFormat {
@@ -40,6 +41,10 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             chunk.encodedLines[index] = encodeLineOfChunk(currentLine, byteSize, bitsPerNumber)
         }
         return chunk
+    }
+
+    override fun decodeChunkHuffman(chunk: DataChunk, range: IntRange, bitsPerNumber: Int): DataChunk {
+        throw NotImplementedError()
     }
 
     private fun encodeLineOfChunk(line: ByteArray, bitSize: Int, bitsPerNumber: Int): ByteArray {
@@ -60,7 +65,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     private fun encodeLineToBinRle(line: ByteArray, bitSize: Int, maxCounter: Int): List<Int> {
         val encodedLine = mutableListOf<Int>()
-        var lastBit = false
+        var lastBit = defaultLastBit
         var counter = 0
 
         line.toBitSetList().forEach {
@@ -84,17 +89,47 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return encodedLine.toList()
     }
 
-    override fun decodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
-        for (index in range) {
-            chunk.decodedLines[index] = decodeLine(chunk.encodedLines[index], bitsPerNumber, byteSize)
-        }
+    override fun decodeChunkRLE(
+        chunk: DataChunk,
+        range: IntRange,
+        bitsPerNumber: Int,
+        byteSize: Int,
+        rleNumbers: List<Int>
+    ): DataChunk {
 
-
-        return DataChunk(ByteArray(0))
+        val lines = createDecodedLinesFromNumbers(rleNumbers)
+        mapLineToDecodedLinesInChunk(range, chunk, lines)
+        return chunk
     }
 
-    private fun decodeLine(bytes: ByteArray?, bitsPerNumber: Int, byteSize: Int): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun mapLineToDecodedLinesInChunk(
+        range: IntRange,
+        chunk: DataChunk,
+        lines: ByteArray
+    ) {
+        val expectedRange = (byteArraySize / 8) -1
+        var start = 0
+        var endInclusive = expectedRange
+
+        for (index in range) {
+            chunk.decodedLines[index] = lines.sliceArray(IntRange(start, endInclusive))
+            start += expectedRange
+            endInclusive += expectedRange
+        }
+    }
+
+    private fun createDecodedLinesFromNumbers(rleNumbers: List<Int>): ByteArray {
+        var lastBit = defaultLastBit
+        val result = BitSet()
+        var counter = 0
+        rleNumbers.forEach { number ->
+            result.set(counter, (counter + number), lastBit)
+            counter += number
+            lastBit = !lastBit
+        }
+        val resultByteArray = result.toByteArray()
+        return ByteArray(counter / 8).mapIndexed { index, byte -> byte.or(resultByteArray.getOrElse(index) { 0.toByte() }) }
+            .toByteArray()
     }
 
     override fun encode(inputFile: String, outputFile: String) {
@@ -216,6 +251,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             writer.write(printBitString(bytes.toBitSetList()))
         }
     }
+
 
     private fun encodeMappedBytesToFile(file: File, bytes: ByteArray) {
         FileOutputStream(file, true).bufferedWriter().use { writer ->

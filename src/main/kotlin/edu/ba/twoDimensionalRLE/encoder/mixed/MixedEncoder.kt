@@ -80,7 +80,7 @@ class MixedEncoder : Encoder {
         log.info("Encoding all chunks with binary RLE and Huffman Encoding in parallel...")
         mappedChunks.forEach {
             var encodedChunk = binaryRunLengthEncoder.encodeChunk(it, RLE_BIT_RANGE, bitsPerRLENumber, byteSize)
-            encodedChunk = huffmanEncoder.encodeChunk(encodedChunk, HUFF_BIT_RANGE, bitsPerRLENumber, byteSize)
+       //     encodedChunk = huffmanEncoder.encodeChunk(encodedChunk, HUFF_BIT_RANGE, bitsPerRLENumber, byteSize)
             encodedChunks.add(encodedChunk)
         }
         log.info("Finished encoding.")
@@ -90,17 +90,6 @@ class MixedEncoder : Encoder {
         log.info("Finished encoding.")
     }
 
-    @ExperimentalUnsignedTypes
-    fun decodeInternal(inputFile: String, outputFile: String) {
-        val encodedChunks = DataChunk.readChunksFromEncodedFile(inputFile, byteArraySize, log)
-        val mappedChunks = mutableListOf<DataChunk>()
-        val transformedChunks = mutableListOf<DataChunk>()
-        val decodedChunks = mutableListOf<DataChunk>()
-
-        encodedChunks.forEach {
-            var encodedChunk = binaryRunLengthEncoder.decodeChunk(it, IntRange(5, 8), bitsPerRLENumber, byteSize)
-        }
-    }
 
     @ExperimentalUnsignedTypes
     fun readEncodedFileConsecutive(
@@ -108,17 +97,16 @@ class MixedEncoder : Encoder {
         byteArraySize: Int,
         log: Logger,
         rleRange: IntRange,
-        huffmanRange: IntRange
+        huffmanRange: IntRange,
+        huffmanMapping: Map<StringBuffer, Byte>
     ): List<DataChunk> {
         val input = File(inputFile)
         val chunks = mutableListOf<DataChunk>()
-        var currentByte: Byte
-        val currentBytes = mutableListOf<Byte>()
-        var line = 0
         var currentChunk = DataChunk(ByteArray(0))
         val expectedRLEBits = byteArraySize * (rleRange.last + 1 - rleRange.first)
         val expectedHuffmanBits = byteArraySize * (huffmanRange.last + 1 - huffmanRange.first)
-
+        val rle = BinaryRunLengthEncoder()
+        val huff = HuffmanEncoder()
 
         log.info("Reading $input consecutively into chunks of size $byteArraySize bytes...")
 
@@ -126,24 +114,29 @@ class MixedEncoder : Encoder {
 
         BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
             val rleNumbers = mutableListOf<Int>()
-            while (stream.bitPosition < stream.size * 8 && rleNumbers.sum() < expectedRLEBits) {
+            while (stream.bitPosition < stream.size * 8 && rleNumbers.sum() <= expectedRLEBits) {
                 rleNumbers.add(stream.readBits(bitsPerRLENumber, false).toInt())
             }
 
-            rleNumbers
+            rle.decodeChunkRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
+
+            huff.decodeChunkHuffman(currentChunk, HUFF_BIT_RANGE, bitsPerRLENumber)
+
+            chunks.add(currentChunk)
         }
 
         return chunks
     }
 
     @ExperimentalUnsignedTypes
-    private fun debugPrintFileContent(input: File) {
+    fun debugPrintFileContent(input: File) {
         if (DEBUG) {
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
                 while (stream.bitPosition < stream.size * 8) {
                     print(if (stream.readBit()) "1" else "0")
                 }
             }
+
             println()
 
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
