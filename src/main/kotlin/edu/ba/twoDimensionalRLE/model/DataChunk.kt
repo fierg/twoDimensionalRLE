@@ -153,7 +153,7 @@ open class DataChunk(val input: ByteArray) {
     }
 
     @ExperimentalStdlibApi
-    fun writeEncodedLinesToFile(fileOut: String, RLEbitsPerSymbol: Int) {
+    fun writeEncodedLinesToFile(fileOut: String) {
         var consecutiveZeroPrints = 0
         var maxConsecutiveZeroPrints = 0
         var lastByteWasZero = false
@@ -162,7 +162,6 @@ open class DataChunk(val input: ByteArray) {
                 if (DEBUG) {
                     bytes.forEach { byte ->
                         if (byte == 0.toByte()) {
-                       //     log.debug("Chunk contains line with 0x0000! ${bytes.decodeToString()}")
                             if (lastByteWasZero) {
                                 consecutiveZeroPrints++
                             } else {

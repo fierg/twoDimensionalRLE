@@ -50,28 +50,34 @@ class HuffmanTest {
     @ExperimentalUnsignedTypes
     @Test
     @Order(3)
-    fun encodeAndDecodeFileSmall() {
+    fun encodeFileSmall() {
         val encoder = HuffmanEncoder()
         encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
-
-        encoder.decodeFileInternal(
-            "${encodeFolder}/${fileToEncodeSmall}",
-            "${decodeFolder}/${fileToEncodeSmall}",
-            encoder.mapping.reversed()
-        )
     }
+
+
+    @ExperimentalUnsignedTypes
+    @Test
+    @Order(5)
+    fun decodeFileSmall() {
+        val encoder = HuffmanEncoder()
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
+    }
+
 
     @ExperimentalUnsignedTypes
     @Test
     @Order(4)
-    fun encodeAndDecodeFileLarge() {
+    fun encodeFileLarge() {
         val encoder = HuffmanEncoder()
         encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+    }
 
-        encoder.decodeFileInternal(
-            "${encodeFolder}/${fileToEncode}",
-            "${decodeFolder}/${fileToEncode}",
-            encoder.mapping.reversed()
-        )
+    @ExperimentalUnsignedTypes
+    @Test
+    @Order(6)
+    fun decodeFileLarge() {
+        val encoder = HuffmanEncoder()
+        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}")
     }
 }

@@ -6,13 +6,18 @@ import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
+import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import loggersoft.kotlin.streams.toIntUnsigned
 import java.io.File
+import kotlin.math.ceil
+import kotlin.math.log2
 
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
 class MixedEncoder : Encoder {
 
     private val byteArraySize = 254
@@ -36,7 +41,6 @@ class MixedEncoder : Encoder {
         }
     }
 
-    @ExperimentalStdlibApi
     override fun encode(inputFile: String, outputFile: String) {
         encodeInternal(inputFile, outputFile)
     }
@@ -45,7 +49,6 @@ class MixedEncoder : Encoder {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @ExperimentalStdlibApi
     private fun encodeInternal(inputFile: String, outputFile: String) {
         analyzer.analyzeFile(File(inputFile))
         analyzer.addBWTSymbolsToMapping()
@@ -89,12 +92,11 @@ class MixedEncoder : Encoder {
         log.info("Finished encoding.")
 
         log.info("Writing all encoded lines of all chunks to file...")
-        encodedChunks.stream().forEach { it.writeEncodedLinesToFile(outputFile, bitsPerRLENumber) }
+        encodedChunks.stream().forEach { it.writeEncodedLinesToFile(outputFile) }
         log.info("Finished encoding.")
     }
 
 
-    @ExperimentalUnsignedTypes
     fun readEncodedFileConsecutive(
         inputFile: String,
         byteArraySize: Int,
@@ -124,7 +126,14 @@ class MixedEncoder : Encoder {
                 }
 
                 rle.decodeChunkRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
-                huff.decodeChunkHuffman(currentChunk, HUFF_BIT_RANGE, bitsPerRLENumber, stream, huffmanMapping, expectedHuffmanBytes)
+                huff.decodeChunkHuffman(
+                    currentChunk,
+                    HUFF_BIT_RANGE,
+                    bitsPerRLENumber,
+                    stream,
+                    huffmanMapping,
+                    expectedHuffmanBytes
+                )
 
                 chunks.add(currentChunk)
             }
@@ -133,7 +142,6 @@ class MixedEncoder : Encoder {
         return chunks
     }
 
-    @ExperimentalUnsignedTypes
     fun debugPrintFileContent(input: File) {
         if (DEBUG) {
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
@@ -159,6 +167,37 @@ class MixedEncoder : Encoder {
                 }
             }
         }
+    }
+
+    fun writeByteMappingToStream(stream: BitStream, mapping: Map<Byte, Byte>) {
+        writeByteMappingLengthToStream(mapping, stream)
+
+        mapping.forEach { (input, _) ->
+            stream.write(input)
+        }
+        stream.write(0.toByte())
+    }
+
+    private fun writeByteMappingLengthToStream(
+        mapping: Map<Byte, Byte>,
+        stream: BitStream
+    ): Long {
+        val bytesNeeded = ceil(log2(mapping.size.toDouble() + 1) / 8)
+
+        log.info("Write mapping length header with $bytesNeeded bytes size.")
+
+        var header = mapping.size.toString(2)
+        val padSize = (bytesNeeded * 8).toInt()
+        header = header.padStart(padSize, '0')
+
+        StringBuffer(header).writeInvertedToBinaryStream(stream)
+        stream.write(0.toByte())
+
+        if (DEBUG) {
+            stream.flush()
+        }
+
+        return (bytesNeeded).toLong() + 1
     }
 
 }

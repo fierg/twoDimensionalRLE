@@ -10,6 +10,7 @@ import java.io.File
 import java.lang.IllegalArgumentException
 import kotlin.test.assertFailsWith
 
+@ExperimentalStdlibApi
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class MixedEncoderTest {
 
