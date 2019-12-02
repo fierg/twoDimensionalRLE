@@ -63,7 +63,7 @@ class HuffmanTest {
 
     @ExperimentalUnsignedTypes
     @Test
-    @Order(3)
+    @Order(4)
     fun encodeAndDecodeFileLarge() {
         val encoder = HuffmanEncoder()
         encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")

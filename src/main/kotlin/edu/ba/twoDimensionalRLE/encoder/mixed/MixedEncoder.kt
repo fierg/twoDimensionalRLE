@@ -124,8 +124,8 @@ class MixedEncoder : Encoder {
                 }
 
                 rle.decodeChunkRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
-
                 huff.decodeChunkHuffman(currentChunk, HUFF_BIT_RANGE, bitsPerRLENumber, stream, huffmanMapping, expectedHuffmanBytes)
+
                 chunks.add(currentChunk)
             }
         }

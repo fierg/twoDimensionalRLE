@@ -14,7 +14,7 @@ import kotlin.experimental.or
 import kotlin.math.ceil
 import kotlin.math.max
 
-class DataChunk(val input: ByteArray) {
+open class DataChunk(val input: ByteArray) {
 
     private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
@@ -30,7 +30,7 @@ class DataChunk(val input: ByteArray) {
     companion object {
         private val DEBUG = true
 
-        fun readChunksFromFile(inputFile: String, byteArraySize: Int, log: Logger): MutableList<DataChunk> {
+        internal fun readChunksFromFile(inputFile: String, byteArraySize: Int, log: Logger): MutableList<DataChunk> {
             val input = File(inputFile)
             val bytes = ByteArray(byteArraySize)
             val chunks = mutableListOf<DataChunk>()
@@ -179,7 +179,7 @@ class DataChunk(val input: ByteArray) {
                 writer.write(bytes)
             }
 
-            if (maxConsecutiveZeroPrints > 0) {
+            if (maxConsecutiveZeroPrints > 0 && DEBUG) {
                 log.warn("Chunk contained ecoded line with $maxConsecutiveZeroPrints consecutive 0x0000 byte(s).")
             }
         }

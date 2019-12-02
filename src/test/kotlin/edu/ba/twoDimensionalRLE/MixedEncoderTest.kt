@@ -57,7 +57,7 @@ class MixedEncoderTest {
     @ExperimentalUnsignedTypes
     @Test
     @Order(4)
-    fun decodeFileSmall() {
+    fun debugPrint() {
         encoder.debugPrintFileContent(File("${encodeFolder}/${fileToEncodeSmall}"))
     }
 
@@ -65,7 +65,7 @@ class MixedEncoderTest {
     @ExperimentalStdlibApi
     @Test
     @Order(5)
-    fun encodeAndDecodeFileSmall() {
+    fun decodeFileSmallNoMap() {
         assertFailsWith<IllegalArgumentException> {
             encoder.readEncodedFileConsecutive(
                 "${encodeFolder}/${fileToEncodeSmall}",

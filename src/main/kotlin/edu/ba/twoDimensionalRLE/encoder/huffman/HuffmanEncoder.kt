@@ -9,8 +9,12 @@ import edu.ba.twoDimensionalRLE.model.DataChunk
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
+import java.math.BigInteger
 import java.util.*
 import kotlin.experimental.or
+import kotlin.math.ceil
+import kotlin.math.exp
+import kotlin.math.log2
 
 class HuffmanEncoder : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
@@ -38,6 +42,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     override fun encode(inputFile: String, outputFile: String) {
         log.info("Parsing input file $inputFile ...")
         val bytes = File(inputFile).readBytes()
+        val count = File(inputFile).length()
+        log.info("Parsed $count bytes. Writing to encoded File as expected length.")
+
+        val headerSize = writeHuffmanLengthHeaderToFile(count, outputFile)
 
         log.info("Building tree to generate Huffman mapping...")
         val huffmanMapping = getHuffmanMapping(bytes.size, bytes)
@@ -45,11 +53,30 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
         log.info("Writing mapped input file as binary stream to $outputFile")
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
+            stream.position = headerSize
             bytes.forEach { byte ->
                 huffmanMapping[byte]?.writeToBinaryStream(stream)
             }
         }
         log.info("Finished huffman encoding.")
+    }
+
+    @ExperimentalUnsignedTypes
+    private fun writeHuffmanLengthHeaderToFile(count: Long, outputFile: String): Long {
+        log.debug("Finding shortest header size...")
+        val bytesNeeded = ceil(log2(count.toDouble() + 1) / 8)
+        log.debug("Write length header with $bytesNeeded bytes size.")
+        var header = count.toString(2)
+        val padSize = (bytesNeeded * 8).toInt()
+        header = header.padStart(padSize, '0')
+
+        BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
+
+            StringBuffer(header).writeInvertedToBinaryStream(stream)
+            stream.write(0.toByte())
+        }
+
+        return (bytesNeeded + 1).toLong()
     }
 
     @ExperimentalUnsignedTypes
@@ -77,6 +104,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     ): DataChunk {
 
         require(huffmanMapping.isNotEmpty())
+
         val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
         val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
         var currentMappingSize = smallestMapping
@@ -123,7 +151,9 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         log.info("Starting to decode huffman encoding from $inputFile ...")
 
         BitStream(File(inputFile).openBinaryStream(false)).use { stream ->
-            while ((stream.bitPosition + currentMappingSize) < stream.size * 8) {
+            val expectedSize = parseLengthHeader(stream)
+
+            while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size < expectedSize) {
                 currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
 
                 if (stringMapping.containsKey(currentPrefixSeen.toString())) {
@@ -135,11 +165,36 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                     assert(currentMappingSize <= largesMapping)
                 }
             }
+            if (decodingResult.size != expectedSize.toInt()) {
+                log.warn("Decoded result has unexpected size!")
+                log.warn("decoded ${decodingResult.size} but expected $expectedSize")
+            }
         }
+
 
         log.info("Finished decoding. Writing decoded stream to $outputFile ...")
         File(outputFile).writeBytes(decodingResult.toByteArray())
         log.info("Finished decoding.")
+    }
+
+    @ExperimentalUnsignedTypes
+    private fun parseLengthHeader(stream: BitStream): Long {
+        log.debug("Trying to parse length header...")
+        var currentByteSize = 1
+        var expectedSize = 0L
+        stream.position++
+
+        while (expectedSize == 0L) {
+            val currentByte = stream.readByte()
+            if (currentByte != 0.toByte()) {
+                currentByteSize++
+            } else {
+                stream.position = 0
+                expectedSize = stream.readBits(currentByteSize * 8, true)
+            }
+        }
+        log.debug("Expecting $expectedSize after decoding.")
+        return expectedSize + 2
     }
 
     fun decode(encodedByteArray: ByteArray, dictEncode: Map<Byte, StringBuffer>): ByteArray {
