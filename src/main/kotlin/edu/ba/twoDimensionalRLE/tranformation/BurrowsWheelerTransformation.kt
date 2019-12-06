@@ -8,9 +8,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.nio.charset.Charset
 
+@ExperimentalUnsignedTypes
 class BurrowsWheelerTransformation {
 
     private var log = Log.kotlinInstance()
+    private val DEBUG = true
+
     init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
@@ -80,5 +83,23 @@ class BurrowsWheelerTransformation {
 
     fun makePrintable(input: String): String {
         return input.replace(STX, "^").replace(ETX, "|")
+    }
+
+
+    fun performBurrowsWheelerTransformationOnAllChunks(
+        chunks: MutableList<DataChunk>,
+        outputFile: String
+    ): MutableList<DataChunk> {
+        val transformedChunks = mutableListOf<DataChunk>()
+        log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
+        chunks.forEach {
+            transformedChunks.add(transformDataChunk(it))
+        }
+        log.info("Finished burrows wheeler transformation.")
+
+        if (DEBUG) {
+            transformedChunks.stream().forEach { it.appendCurrentChunkToFile(outputFile + "_transformed") }
+        }
+        return transformedChunks
     }
 }

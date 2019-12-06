@@ -82,7 +82,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return encodeLineToBinRle(line, bitSize, maxCounter)
     }
 
-    private fun encodeToBinaryStringBuffer(encodedLine: List<Int>, bitPerNumber: Int): StringBuffer {
+    fun encodeToBinaryStringBuffer(encodedLine: List<Int>, bitPerNumber: Int): StringBuffer {
         val result = StringBuffer()
         encodedLine.forEach {
             val bits = Integer.toBinaryString(it)
@@ -125,7 +125,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         byteSize: Int,
         rleNumbers: List<Int>
     ): DataChunk {
-
+        assert(rleNumbers.isNotEmpty())
         val lines = createDecodedLinesFromNumbers(rleNumbers)
         mapLineToDecodedLinesInChunk(range, chunk, lines)
         return chunk

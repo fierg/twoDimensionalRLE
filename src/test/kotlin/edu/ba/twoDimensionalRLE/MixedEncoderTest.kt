@@ -65,7 +65,7 @@ class MixedEncoderTest {
     @Test
     @Order(5)
     fun decodeFileSmallNoMap() {
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWith<IndexOutOfBoundsException> {
             encoder.readEncodedFileConsecutive(
                 "${encodeFolder}/${fileToEncodeSmall}",
                 256,
@@ -75,5 +75,11 @@ class MixedEncoderTest {
                 emptyMap()
             )
         }
+    }
+
+    @Test
+    @Order(6)
+    fun decodeFileSmall() {
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
     }
 }

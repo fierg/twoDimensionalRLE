@@ -60,68 +60,6 @@ open class DataChunk(val input: ByteArray) {
             log.info("Finished reading input into ${chunks.size} chunks.")
             return chunks
         }
-
-        fun debugReadFromEncodedFile(inputFile: String, byteArraySize: Int, log: Logger): List<DataChunk> {
-            val input = File(inputFile)
-            val chunks = mutableListOf<DataChunk>()
-            var currentByte: Byte
-            val currentBytes = mutableListOf<Byte>()
-            var line = 0
-            var currentChunk = DataChunk(ByteArray(0))
-
-
-            log.info("Reading $input into chunks of size $byteArraySize bytes...")
-
-            if (DEBUG) {
-                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
-                    while (stream.bitPosition < stream.size * 8) {
-                        print(if (stream.readBit()) "1" else "0")
-                    }
-                }
-                println()
-
-                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
-                    while (stream.position < stream.size) {
-                        print(stream.readByte().toChar())
-                    }
-                }
-
-                println()
-
-                BitStream(File(input.toURI()).openBinaryStream(true)).use { stream ->
-                    while (stream.position < stream.size) {
-                        print(stream.readByte().toIntUnsigned())
-                        print(" ")
-                    }
-                }
-            }
-
-            BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
-                while (stream.bitPosition < stream.size * 8) {
-                    currentByte = stream.readByte()
-
-                    if (line % 8 == 0 && line != 0) {
-                        chunks.add(currentChunk)
-                        currentChunk = DataChunk(ByteArray(0))
-                    }
-                    while (currentByte != 0.toByte() && stream.bitPosition < stream.size * 8) {
-                        currentBytes.add(currentByte)
-                        currentByte = stream.readByte()
-                    }
-
-                    currentChunk.encodedLines[line++ % 8] = currentBytes.toByteArray()
-                }
-                if (line % 8 == 0 && line != 0) {
-                    chunks.add(currentChunk)
-                    currentChunk = DataChunk(ByteArray(0))
-                } else {
-                    log.warn("Unexpected number of lines parsed! Lines: $line")
-                }
-            }
-
-            return chunks
-        }
-
     }
 
     fun getLineFromChunk(line: Int, bitSize: Int): ByteArray {
@@ -150,33 +88,12 @@ open class DataChunk(val input: ByteArray) {
         return DataChunk(result.toByteArray())
     }
 
+
+    @Deprecated("encode continuously!")
     fun writeEncodedLinesToFile(fileOut: String) {
-        var consecutiveZeroPrints = 0
-        var maxConsecutiveZeroPrints = 0
-        var lastByteWasZero = false
         FileOutputStream(fileOut, true).use { writer ->
             encodedLines.toSortedMap(reverseOrder()).forEach { (_, bytes) ->
-                if (DEBUG) {
-                    bytes.forEach { byte ->
-                        if (byte == 0.toByte()) {
-                            if (lastByteWasZero) {
-                                consecutiveZeroPrints++
-                            } else {
-                                consecutiveZeroPrints = 1
-                                lastByteWasZero = true
-                            }
-                        } else {
-                            maxConsecutiveZeroPrints = max(consecutiveZeroPrints, maxConsecutiveZeroPrints)
-                            lastByteWasZero = false
-                        }
-                    }
-                }
-
                 writer.write(bytes)
-            }
-
-            if (maxConsecutiveZeroPrints > 0 && DEBUG) {
-                log.warn("Chunk contained ecoded line with $maxConsecutiveZeroPrints consecutive 0x0000 byte(s).")
             }
         }
     }

@@ -164,6 +164,8 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     private fun parseHuffmanMapping(stream: BitStream, expectedMappingSize: Long): Map<StringBuffer, Byte> {
+
+        log.info("Trying to parse $expectedMappingSize mappings from encoded file...")
         var skipContentLengthHeader = true
         var skipMappingSizeHeader = true
 
@@ -184,6 +186,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             }
             huffmanMapping[currentPrefix] = byteToMap
         }
+        log.info("Parsed ${huffmanMapping.size} mappings from encoded file.")
         return huffmanMapping
     }
 
@@ -202,6 +205,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
 
         stream.position++
 
+        log.info("Parsing encoded file with mapping $stringMapping")
         while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size < expectedSize) {
             currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
 
@@ -353,7 +357,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     private fun countOccurrences(bytes: ByteArray, maxSymbols: Int): IntArray {
-        val frequencies = IntArray(256)
+        val frequencies = IntArray(maxSymbols)
         bytes.forEach { byte -> frequencies[byte.index()] = frequencies[byte.index()] + 1 }
         return frequencies
     }
