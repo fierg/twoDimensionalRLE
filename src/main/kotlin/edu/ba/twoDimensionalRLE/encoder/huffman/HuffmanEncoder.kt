@@ -234,7 +234,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return decodeWithLoop(dictDecode, byteString)
     }
 
-    private fun writeDictionaryToStream(stream: BitStream, huffmanMapping: MutableMap<Byte, StringBuffer>) {
+     fun writeDictionaryToStream(stream: BitStream, huffmanMapping: Map<Byte, StringBuffer>) {
         log.info("Writing huffman dictionary to file...")
 
         huffmanMapping.forEach { (byte, mapping) ->

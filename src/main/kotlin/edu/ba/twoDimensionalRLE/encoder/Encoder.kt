@@ -52,6 +52,7 @@ interface Encoder {
 
         log.debug("Write length header with $bytesNeeded bytes size.")
         StringBuffer(header).writeInvertedToBinaryStream(stream)
+        if (DEBUG) stream.flush()
         return bytesNeeded
     }
 
@@ -99,7 +100,6 @@ interface Encoder {
     }
 
     fun parseCurrentHeader(stream: BitStream, numberOfZerosAfter: Int ,log: Logger): Int {
-        log.info("Trying to parse current size header...")
         var currentByteSize = 0
         var zerosRead = 0
         var bytesRead = 0
@@ -116,13 +116,15 @@ interface Encoder {
                 if (zerosRead == numberOfZerosAfter) {
                     stream.position = stream.position - bytesRead
                     expectedSize = stream.readBits(currentByteSize * 8, true)
+                    stream.position++
                 } else {
                     currentByteSize++
                 }
             }
         }
-        log.info("Parsed ${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
+        log.debug("Parsed ${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
         assert(Int.MAX_VALUE > expectedSize)
         return expectedSize.toInt()
     }
+
 }
