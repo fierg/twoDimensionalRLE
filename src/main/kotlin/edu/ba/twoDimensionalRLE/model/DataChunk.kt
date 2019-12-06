@@ -14,11 +14,15 @@ import kotlin.experimental.or
 import kotlin.math.ceil
 import kotlin.math.max
 
+@ExperimentalUnsignedTypes
 open class DataChunk(val input: ByteArray) {
 
     private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
+    val huffEncodedStringBuffer = StringBuffer()
+    val binRleEncodedNumbers = mutableListOf<Short>()
+    val rleEncodedBytes = mutableListOf<Byte>()
     val bytes = input.clone()
 
     init {
@@ -57,8 +61,6 @@ open class DataChunk(val input: ByteArray) {
             return chunks
         }
 
-        @ExperimentalUnsignedTypes
-        @Deprecated("Use mixed encoders methods instead! This is debug only!")
         fun debugReadFromEncodedFile(inputFile: String, byteArraySize: Int, log: Logger): List<DataChunk> {
             val input = File(inputFile)
             val chunks = mutableListOf<DataChunk>()
@@ -140,10 +142,6 @@ open class DataChunk(val input: ByteArray) {
         return chars
     }
 
-    fun writeDecodedLinesToChunk(){
-
-    }
-
     fun applyByteMapping(mapping: Map<Byte, Byte>): DataChunk {
         val result = mutableListOf<Byte>()
         bytes.forEach { byte ->
@@ -152,7 +150,6 @@ open class DataChunk(val input: ByteArray) {
         return DataChunk(result.toByteArray())
     }
 
-    @ExperimentalStdlibApi
     fun writeEncodedLinesToFile(fileOut: String) {
         var consecutiveZeroPrints = 0
         var maxConsecutiveZeroPrints = 0

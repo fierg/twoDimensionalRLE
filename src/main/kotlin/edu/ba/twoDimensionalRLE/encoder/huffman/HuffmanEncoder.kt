@@ -97,6 +97,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         StringBuffer(header).writeInvertedToBinaryStream(stream)
         stream.write(0.toByte())
 
+
         if (DEBUG) {
             stream.flush()
         }
@@ -246,6 +247,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
 
         log.info("Starting to decode huffman encoding from $inputFile ...")
+        stream.position++
 
         while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size < expectedSize) {
             currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
