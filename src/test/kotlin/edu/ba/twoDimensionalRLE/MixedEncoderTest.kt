@@ -10,6 +10,8 @@ import java.io.File
 import java.lang.IllegalArgumentException
 import kotlin.test.assertFailsWith
 
+@ExperimentalUnsignedTypes
+@ExperimentalStdlibApi
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class MixedEncoderTest {
 
@@ -40,24 +42,21 @@ class MixedEncoderTest {
         File(decodeFolder).mkdirs()
     }
 
-    @ExperimentalStdlibApi
     @Test
     @Order(2)
     fun encodeFileSmall() {
         encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
     }
 
-    @ExperimentalStdlibApi
     @Test
     @Order(3)
     fun encodeFile() {
         encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
     }
 
-    @ExperimentalUnsignedTypes
     @Test
     @Order(4)
-    fun decodeFileSmall() {
+    fun debugPrint() {
         encoder.debugPrintFileContent(File("${encodeFolder}/${fileToEncodeSmall}"))
     }
 
@@ -65,16 +64,22 @@ class MixedEncoderTest {
     @ExperimentalStdlibApi
     @Test
     @Order(5)
-    fun encodeAndDecodeFileSmall() {
-        assertFailsWith<IllegalArgumentException> {
+    fun decodeFileSmallNoMap() {
+        assertFailsWith<IndexOutOfBoundsException> {
             encoder.readEncodedFileConsecutive(
                 "${encodeFolder}/${fileToEncodeSmall}",
                 256,
                 log,
-                MixedEncoder.RLE_BIT_RANGE,
+                MixedEncoder.BIN_RLE_BIT_RANGE,
                 MixedEncoder.HUFF_BIT_RANGE,
                 emptyMap()
             )
         }
+    }
+
+    @Test
+    @Order(6)
+    fun decodeFileSmall() {
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
     }
 }

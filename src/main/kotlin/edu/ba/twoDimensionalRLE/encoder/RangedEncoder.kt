@@ -4,8 +4,8 @@ import edu.ba.twoDimensionalRLE.model.DataChunk
 import loggersoft.kotlin.streams.BitStream
 
 interface RangedEncoder : Encoder {
-    fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk
-    fun decodeChunkRLE(
+    fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk
+    fun decodeChunkBinRLE(
         chunk: DataChunk,
         range: IntRange,
         bitsPerNumber: Int,
@@ -20,5 +20,13 @@ interface RangedEncoder : Encoder {
         stream: BitStream,
         huffmanMapping: Map<StringBuffer, Byte>,
         expectedHuffmanBytes: Int
+    ): DataChunk
+
+    fun encodeChunkHuffman(
+        chunk: DataChunk,
+        range: IntRange,
+        bitsPerNumber: Int,
+        byteSize: Int,
+        mapping: Map<Byte, StringBuffer>
     ): DataChunk
 }

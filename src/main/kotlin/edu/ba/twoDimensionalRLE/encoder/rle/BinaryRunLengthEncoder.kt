@@ -23,12 +23,14 @@ import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+@ExperimentalUnsignedTypes
 class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     private val log = Log.kotlinInstance()
     private val byteArraySize = 256
     private val analyzer = Analyzer()
     private val defaultLastBit = false
+    private val DEBUG = true
 
     init {
         log.newFormat {
@@ -36,15 +38,17 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
     }
 
-    override fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
+    override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
+        var linesToEncode = ByteArray(0)
         for (index in range) {
             val currentLine = chunk.getLineFromChunk(index, byteSize)
-            chunk.encodedLines[index] = encodeLineOfChunk(currentLine, byteSize, bitsPerNumber)
+            linesToEncode += currentLine
+            if (DEBUG) chunk.encodedLines[index] = encodeLineOfChunkAsByteArray(currentLine, byteSize, bitsPerNumber)
         }
+        chunk.binRleEncodedNumbers = encodeLineOfChunkAsListOfNumbers(linesToEncode, byteSize, bitsPerNumber)
         return chunk
     }
 
-    @ExperimentalUnsignedTypes
     override fun decodeChunkHuffman(
         chunk: DataChunk,
         range: IntRange,
@@ -56,14 +60,29 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         throw NotImplementedError()
     }
 
-    private fun encodeLineOfChunk(line: ByteArray, bitSize: Int, bitsPerNumber: Int): ByteArray {
+    override fun encodeChunkHuffman(
+        chunk: DataChunk,
+        range: IntRange,
+        bitsPerNumber: Int,
+        byteSize: Int,
+        mapping: Map<Byte, StringBuffer>
+    ): DataChunk {
+        throw NotImplementedError()
+    }
+
+    private fun encodeLineOfChunkAsByteArray(line: ByteArray, bitSize: Int, bitsPerNumber: Int): ByteArray {
         val maxCounter = 2.pow(bitsPerNumber) - 1
         val encodedLine = encodeLineToBinRle(line, bitSize, maxCounter)
         val buffer = encodeToBinaryStringBuffer(encodedLine, bitsPerNumber)
         return buffer.toBitSet().toByteArray()
     }
 
-    private fun encodeToBinaryStringBuffer(encodedLine: List<Int>, bitPerNumber: Int): StringBuffer {
+    private fun encodeLineOfChunkAsListOfNumbers(line: ByteArray, bitSize: Int, bitsPerNumber: Int): MutableList<Int> {
+        val maxCounter = 2.pow(bitsPerNumber) - 1
+        return encodeLineToBinRle(line, bitSize, maxCounter)
+    }
+
+    fun encodeToBinaryStringBuffer(encodedLine: List<Int>, bitPerNumber: Int): StringBuffer {
         val result = StringBuffer()
         encodedLine.forEach {
             val bits = Integer.toBinaryString(it)
@@ -72,7 +91,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return result
     }
 
-    private fun encodeLineToBinRle(line: ByteArray, bitSize: Int, maxCounter: Int): List<Int> {
+    private fun encodeLineToBinRle(line: ByteArray, bitSize: Int, maxCounter: Int): MutableList<Int> {
         val encodedLine = mutableListOf<Int>()
         var lastBit = defaultLastBit
         var counter = 0
@@ -94,18 +113,19 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
                 }
             }
         }
+        if (counter != 0) encodedLine.add(counter)
 
-        return encodedLine.toList()
+        return encodedLine
     }
 
-    override fun decodeChunkRLE(
+    override fun decodeChunkBinRLE(
         chunk: DataChunk,
         range: IntRange,
         bitsPerNumber: Int,
         byteSize: Int,
         rleNumbers: List<Int>
     ): DataChunk {
-
+        assert(rleNumbers.isNotEmpty())
         val lines = createDecodedLinesFromNumbers(rleNumbers)
         mapLineToDecodedLinesInChunk(range, chunk, lines)
         return chunk
@@ -116,7 +136,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         chunk: DataChunk,
         lines: ByteArray
     ) {
-        val expectedRange = (byteArraySize / 8) -1
+        val expectedRange = (byteArraySize / 8) - 1
         var start = 0
         var endInclusive = expectedRange
 
@@ -275,7 +295,6 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
     }
 
-    @ExperimentalUnsignedTypes
     fun decodeMapped(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>?) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
@@ -387,7 +406,6 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("finished remapping & decoding original byte stream.")
     }
 
-    @ExperimentalUnsignedTypes
     override fun decode(inputFile: String, outputFile: String) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
@@ -561,7 +579,6 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return stringBuilder.toString()
     }
 
-    @ExperimentalUnsignedTypes
     private fun encodeBitsAsByteArray(listOfBits: List<BitSet>): UByteArray {
         val bitLength = 7
         val byteList = mutableListOf<UByte>()

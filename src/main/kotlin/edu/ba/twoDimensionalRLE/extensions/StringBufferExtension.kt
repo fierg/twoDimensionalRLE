@@ -16,7 +16,6 @@ fun StringBuffer.toBitSet(): BitSet {
 
 @ExperimentalUnsignedTypes
 fun StringBuffer.writeToBinaryStream(bitStream: BitStream) {
-    require(this.toString().matches(Regex("([01]+)")))
     this.forEach { char ->
         when (char) {
             '1' -> bitStream.write(true)
@@ -25,4 +24,18 @@ fun StringBuffer.writeToBinaryStream(bitStream: BitStream) {
         }
     }
 }
+
+@ExperimentalUnsignedTypes
+fun StringBuffer.writeInvertedToBinaryStream(bitStream: BitStream) {
+    this.reverse().chunked(8).forEach { byte ->
+        byte.forEach { bit ->
+            when (bit) {
+                '1' -> bitStream.write(true)
+                '0' -> bitStream.write(false)
+                else -> throw IllegalArgumentException("Unexpected buffer parsed!")
+            }
+        }
+    }
+}
+
 
