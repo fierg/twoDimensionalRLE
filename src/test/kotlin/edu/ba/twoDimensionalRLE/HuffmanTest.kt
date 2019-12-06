@@ -43,7 +43,7 @@ class HuffmanTest {
     @Order(2)
     fun getHuffmanMapping() {
         log.info("Creating huffman mapping from String $inputString...")
-        HuffmanEncoder().getHuffmanMapping(256, inputString.toByteArray())
+        log.info(HuffmanEncoder().getHuffmanMapping(256, inputString.toByteArray()).toString())
     }
 
 

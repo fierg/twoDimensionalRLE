@@ -11,8 +11,6 @@ import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.util.*
 import kotlin.experimental.or
-import kotlin.math.ceil
-import kotlin.math.log2
 
 @ExperimentalUnsignedTypes
 class HuffmanEncoder : Encoder, RangedEncoder {
@@ -28,7 +26,11 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    override fun decodeChunkRLE(
+    override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
+        throw NotImplementedError()
+    }
+
+    override fun decodeChunkBinRLE(
         chunk: DataChunk,
         range: IntRange,
         bitsPerNumber: Int,
@@ -49,10 +51,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         log.info("Finished building tree.")
 
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
-            val headerSizePosition = writeHuffmanLengthHeaderToFile(count, stream)
+            val headerSizePosition = writeDecodedLengthHeaderToFile(count, stream, log)
             stream.position = headerSizePosition
 
-            val mappingSizePosition = writeHuffmanMappingLengthToFile(huffmanMapping, stream)
+            val mappingSizePosition = writeHuffmanMappingLengthToFile(huffmanMapping, stream, log)
             stream.position = headerSizePosition + mappingSizePosition
 
             writeDictionaryToStream(stream, huffmanMapping)
@@ -65,56 +67,22 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         log.info("Finished huffman encoding.")
     }
 
-    private fun writeHuffmanLengthHeaderToFile(count: Long, stream: BitStream): Long {
-        log.info("Finding shortest header size...")
-        val bytesNeeded = ceil(log2(count.toDouble() + 1) / 8)
-        log.info("Write length header with $bytesNeeded bytes size.")
-        var header = count.toString(2)
-        val padSize = (bytesNeeded * 8).toInt()
-        header = header.padStart(padSize, '0')
-
-        StringBuffer(header).writeInvertedToBinaryStream(stream)
-        stream.write(0.toByte())
-
-        if (DEBUG) {
-            stream.flush()
-        }
-        return (bytesNeeded + 1).toLong()
-    }
-
-    private fun writeHuffmanMappingLengthToFile(
-        huffmanMapping: MutableMap<Byte, StringBuffer>,
-        stream: BitStream
-    ): Long {
-        val bytesNeeded = ceil(log2(huffmanMapping.size.toDouble() + 1) / 8)
-
-        log.info("Write mapping length header with $bytesNeeded bytes size.")
-
-        var header = huffmanMapping.size.toString(2)
-        val padSize = (bytesNeeded * 8).toInt()
-        header = header.padStart(padSize, '0')
-
-        StringBuffer(header).writeInvertedToBinaryStream(stream)
-        stream.write(0.toByte())
-
-
-        if (DEBUG) {
-            stream.flush()
-        }
-
-        return (bytesNeeded).toLong() + 1
-    }
-
-    override fun encodeChunk(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
-        val totalByteArraySize = byteArraySize * (range.last - range.first + 1)
-        var linesToEncode = ByteArray(totalByteArraySize)
+    override fun encodeChunkHuffman(
+        chunk: DataChunk,
+        range: IntRange,
+        bitsPerNumber: Int,
+        byteSize: Int,
+        mapping: Map<Byte, StringBuffer>
+    ): DataChunk {
+        var linesToEncode = ByteArray(0)
 
         for (index in range) {
             assert(index in 0 until byteSize)
             linesToEncode += chunk.getLineFromChunk(index, bitSize = 8)
         }
-        val huffmanMapping = getHuffmanMapping(totalByteArraySize, linesToEncode)
-        chunk.encodedLines[range.last] = writeEncodedAsStringBuffer(linesToEncode, huffmanMapping)
+        val encodedLines = writeEncodedAsStringBuffer(linesToEncode, mapping)
+        chunk.huffEncodedStringBuffer = encodedLines
+        if(DEBUG) chunk.encodedLines[range.last] = encodedLines.toBitSet().toByteArray()
         return chunk
     }
 
@@ -153,13 +121,20 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     override fun decode(inputFile: String, outputFile: String) {
-        BitStream(File(inputFile).openBinaryStream(true)).use { stream ->
-            val expectedSize = parseLengthHeader(stream)
-            val expectedMappingSize = parseMappingSizeHeader(stream)
-            val huffmanMapping = parseMapping(stream, expectedMappingSize)
+        log.info("Starting to decode huffman encoding from $inputFile ...")
+        var decodingResult = ByteArray(0)
 
-            decodeFileInternal(inputFile, outputFile, huffmanMapping, stream, expectedSize)
+        BitStream(File(inputFile).openBinaryStream(true)).use { stream ->
+            val expectedSize = parseLengthHeader(stream, log)
+            val expectedMappingSize = parseMappingSizeHeader(stream)
+            val huffmanMapping = parseHuffmanMapping(stream, expectedMappingSize)
+
+            decodingResult = decodeFileInternal(huffmanMapping, stream, expectedSize).toByteArray()
         }
+
+        log.info("Finished decoding. Writing decoded stream to $outputFile ...")
+        File(outputFile).writeBytes(decodingResult)
+        log.info("Finished decoding.")
     }
 
     private fun parseMappingSizeHeader(stream: BitStream): Long {
@@ -188,26 +163,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return expectedSize
     }
 
-    private fun parseLengthHeader(stream: BitStream): Long {
-        log.info("Trying to parse length header from encoded file...")
-        var currentByteSize = 1
-        var expectedSize = 0L
-        stream.position++
-
-        while (expectedSize == 0L) {
-            val currentByte = stream.readByte()
-            if (currentByte != 0.toByte()) {
-                currentByteSize++
-            } else {
-                stream.position = 0
-                expectedSize = stream.readBits(currentByteSize * 8, true)
-            }
-        }
-        log.info("Expecting $expectedSize bytes of content after decoding.")
-        return expectedSize + 2
-    }
-
-    private fun parseMapping(stream: BitStream, expectedMappingSize: Long): Map<StringBuffer, Byte> {
+    private fun parseHuffmanMapping(stream: BitStream, expectedMappingSize: Long): Map<StringBuffer, Byte> {
         var skipContentLengthHeader = true
         var skipMappingSizeHeader = true
 
@@ -232,12 +188,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     private fun decodeFileInternal(
-        inputFile: String,
-        outputFile: String,
         huffmanMapping: Map<StringBuffer, Byte>,
         stream: BitStream,
         expectedSize: Long
-    ) {
+    ): MutableList<Byte> {
         val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
         val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
         var currentMappingSize = smallestMapping
@@ -246,7 +200,6 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         val stringMapping =
             huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
 
-        log.info("Starting to decode huffman encoding from $inputFile ...")
         stream.position++
 
         while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size < expectedSize) {
@@ -265,10 +218,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             log.warn("Decoded result has unexpected size!")
             log.warn("decoded ${decodingResult.size} bytes but expected $expectedSize bytes")
         }
-
-        log.info("Finished decoding. Writing decoded stream to $outputFile ...")
-        File(outputFile).writeBytes(decodingResult.toByteArray())
-        log.info("Finished decoding.")
+        return decodingResult
     }
 
 
@@ -319,16 +269,26 @@ class HuffmanEncoder : Encoder, RangedEncoder {
     }
 
     fun getHuffmanMapping(noOfChars: Int, byteArray: ByteArray): MutableMap<Byte, StringBuffer> {
+        log.info("Generating Huffman Dictionary to encode file...")
+
         val huffmanTree = buildTree(countOccurrences(byteArray, noOfChars))
         return getMappingFromTree(huffmanTree, StringBuffer())
     }
 
-    private fun writeEncodedAsStringBuffer(bytes: ByteArray, mapping: Map<Byte, StringBuffer>): ByteArray {
+    private fun writeEncodedAsByteArray(bytes: ByteArray, mapping: Map<Byte, StringBuffer>): ByteArray {
         val result = StringBuffer()
         bytes.forEach {
             result.append(mapping[it])
         }
         return result.toBitSet().toByteArray()
+    }
+
+    private fun writeEncodedAsStringBuffer(bytes: ByteArray, mapping: Map<Byte, StringBuffer>): StringBuffer {
+        val result = StringBuffer()
+        bytes.forEach {
+            result.append(mapping[it])
+        }
+        return result
     }
 
     private fun writeEncoded(bytes: ByteArray, huffmanMapping: MutableMap<Byte, String>) {

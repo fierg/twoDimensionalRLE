@@ -20,8 +20,8 @@ open class DataChunk(val input: ByteArray) {
     private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
-    val huffEncodedStringBuffer = StringBuffer()
-    val binRleEncodedNumbers = mutableListOf<Short>()
+    var huffEncodedStringBuffer = StringBuffer()
+    var binRleEncodedNumbers = mutableListOf<Int>()
     val rleEncodedBytes = mutableListOf<Byte>()
     val bytes = input.clone()
 

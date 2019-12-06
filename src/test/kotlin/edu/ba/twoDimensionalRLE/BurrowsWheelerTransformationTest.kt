@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 import kotlin.test.assertFailsWith
 
+@ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BurrowsWheelerTransformationTest {
 
@@ -129,7 +130,7 @@ class BurrowsWheelerTransformationTest {
     @ExperimentalStdlibApi
     @Test
     @Order(5)
-    fun transformChunkLargeFileSync() {
+    fun transformsChunkLargeFileSync() {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks = mutableListOf<DataChunk>()
@@ -161,7 +162,7 @@ class BurrowsWheelerTransformationTest {
     @ExperimentalStdlibApi
     @Test
     @Order(6)
-    fun transformChunkLargeFileAsync() {
+    fun transformChunksLargeFileAsync() {
         val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks: List<DataChunk>
@@ -175,17 +176,16 @@ class BurrowsWheelerTransformationTest {
 
         if (DEBUG) {
             log.debug("Writing transformed chunks to ${encodeFolder}/${fileToEncode}_transformed")
-            transformedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_transformed") }
+            transformedChunks.stream()
+                .forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_transformed") }
         }
 
         reversedChunks = bwt.invertTransformationParallel(transformedChunks)
 
         log.info("Finished inverse transformation on all ${chunks.size} chunks.")
+        log.info("Writing reversed chunks to ${decodeFolder}/${fileToEncode}")
 
-        if (DEBUG) {
-            log.debug("Writing reversed chunks to ${decodeFolder}/${fileToEncode}")
-            reversedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
-        }
+        reversedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
 
         log.info("Validating equality of input and output...")
 

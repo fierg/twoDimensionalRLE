@@ -64,7 +64,7 @@ class StringRunLengthEncoder : Encoder {
     }
 
     override fun encode(inputFile: String, outputFile: String) {
-        log.info("Starting to encodeChunk file $inputFile with regular rle. Output file will be at $outputFile")
+        log.info("Starting to encode file $inputFile with regular rle. Output file will be at $outputFile")
         val input = File(inputFile)
         val output = File(outputFile)
         output.createNewFile()
@@ -91,6 +91,7 @@ class StringRunLengthEncoder : Encoder {
             }
             writer.write(writeAsTwoByte(lastSeenByte, counter))
         }
+        log.info("Finished encoding.")
     }
 
     @ExperimentalUnsignedTypes
@@ -98,6 +99,7 @@ class StringRunLengthEncoder : Encoder {
         val input = File(inputFile)
         val output = File(outputFile)
 
+        log.info("Starting to decode $input...")
         FileOutputStream(output, true).buffered().use { writer ->
             var counter = 0
             var char: Char
@@ -116,6 +118,7 @@ class StringRunLengthEncoder : Encoder {
 
             }
         }
+        log.info("Finished decoding $input to $output.")
     }
 
     private fun writeAsTwoByte(lastSeenByte: Byte, count: Int): ByteArray {
