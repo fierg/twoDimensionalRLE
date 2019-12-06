@@ -23,7 +23,6 @@ import kotlin.math.log2
 class MixedEncoder : Encoder {
 
     private val byteArraySize = 254
-    private val byteArraySizeAfterBWT = 256 / 8
     private val bwt = BurrowsWheelerTransformation()
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
@@ -66,6 +65,7 @@ class MixedEncoder : Encoder {
 
             log.info("Expecting $binRLElentgh bytes of binary rle encoded, then $huffmanlentgh bytes of huffman encoded bytes.")
 
+            throw NotImplementedError()
         }
 
     }
@@ -95,7 +95,7 @@ class MixedEncoder : Encoder {
             }
         }
 
-        //TODO create better mapping creation to use less space
+        //TODO create better mapping creation to use less ram
         val huffmanMapping = huffmanEncoder.getHuffmanMapping(256, huffbytes)
 
         val bytesPerLine = ceil(mappedChunks.map { it.bytes.size }.sum().toDouble() / 8).toInt()
@@ -113,40 +113,46 @@ class MixedEncoder : Encoder {
                 encodedChunks.stream().forEach { it.writeEncodedLinesToFile(outputFile + "_lines") }
             }
 
+            appendEncodedChunksToStream(encodedChunks, stream)
+        }
+        log.info("Finished encoding.")
+    }
 
-            log.debug("Appending all binary rle encoded numbers to output stream...")
-            var currentOut = StringBuffer()
-            encodedChunks.forEach { chunk ->
-                currentOut.append(
-                    binaryRunLengthEncoder.encodeToBinaryStringBuffer(
-                        chunk.binRleEncodedNumbers,
-                        bitsPerRLENumber
-                    )
+    private fun appendEncodedChunksToStream(
+        encodedChunks: MutableList<DataChunk>,
+        stream: BitStream
+    ) {
+        log.debug("Appending all binary rle encoded numbers to output stream...")
+        var currentOut = StringBuffer()
+        encodedChunks.forEach { chunk ->
+            currentOut.append(
+                binaryRunLengthEncoder.encodeToBinaryStringBuffer(
+                    chunk.binRleEncodedNumbers,
+                    bitsPerRLENumber
                 )
-            }
-            currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
+            )
+        }
+        currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
+        if (DEBUG) stream.flush()
 
-            if (DEBUG) stream.flush()
-
-            //TODO
-            /*
+        //TODO
+        /*
             log.debug("Appending all rle encoded bytes to stream...")
             currentOut = StringBuffer()
             encodedChunks.forEach { chunk ->
                 currentOut.append(writeRLEencodedToFile(stream, chunk))
             }
             currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
+                        if (DEBUG) stream.flush()
             */
 
-            log.debug("Appending all huffman encoded bytes to stream...")
-            currentOut = StringBuffer()
-            encodedChunks.forEach { chunk ->
-                currentOut.append(chunk.huffEncodedStringBuffer)
-            }
-            currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
-
+        log.debug("Appending all huffman encoded bytes to stream...")
+        currentOut = StringBuffer()
+        encodedChunks.forEach { chunk ->
+            currentOut.append(chunk.huffEncodedStringBuffer)
         }
-        log.info("Finished encoding.")
+        currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
+        if (DEBUG) stream.flush()
     }
 
     private fun encodeAllChunks(
@@ -282,7 +288,7 @@ class MixedEncoder : Encoder {
 
     fun debugPrintFileContent(input: File) {
         if (DEBUG) {
-            log.info("Printing as binary string...")
+            log.debug("Printing as binary string...")
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
                 while (stream.bitPosition < stream.size * 8) {
                     print(if (stream.readBit()) "1" else "0")
@@ -291,7 +297,7 @@ class MixedEncoder : Encoder {
 
             println()
 
-            log.info("Printing as chars...")
+            log.debug("Printing as chars...")
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
                 while (stream.position < stream.size) {
                     print(stream.readByte().toChar())
@@ -300,7 +306,7 @@ class MixedEncoder : Encoder {
 
             println()
 
-            log.info("Printing as unsigned byte values...")
+            log.debug("Printing as unsigned byte values...")
             BitStream(File(input.toURI()).openBinaryStream(false)).use { stream ->
                 while (stream.position < stream.size) {
                     print(stream.readByte().toIntUnsigned())
@@ -340,5 +346,4 @@ class MixedEncoder : Encoder {
 
         return (bytesNeeded).toLong() + 1
     }
-
 }
