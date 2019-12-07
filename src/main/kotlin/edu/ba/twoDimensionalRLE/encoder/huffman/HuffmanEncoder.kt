@@ -214,6 +214,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         stream: BitStream,
         expectedSize: Int
     ): MutableList<Byte> {
+        assert(huffmanMapping.isNotEmpty()) {"Parsed empty huffman mapping."}
         log.info("Reading huffman encoded bytes from steam, expecting $expectedSize bytes after decoding...")
         val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
         val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
@@ -238,7 +239,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                 currentMappingSize = smallestMapping
             } else {
                 currentMappingSize++
-                assert(currentMappingSize <= largesMapping)
+                assert(currentMappingSize <= largesMapping, lazyMessage = {"No mapping found!"})
             }
         }
         if (decodingResult.size != expectedSize.toInt()) {
