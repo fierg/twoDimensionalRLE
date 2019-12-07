@@ -99,7 +99,7 @@ interface Encoder {
         return expectedSize + 2
     }
 
-    fun parseCurrentHeader(stream: BitStream, numberOfZerosAfter: Int ,log: Logger): Int {
+    fun parseCurrentHeader(stream: BitStream, numberOfZerosAfter: Int, log: Logger): Int {
         var currentByteSize = 0
         var zerosRead = 0
         var bytesRead = 0
@@ -107,7 +107,8 @@ interface Encoder {
 
         while (expectedSize == 0L) {
             val currentByte = stream.readByte()
-            bytesRead ++
+            log.debug("current byte read : ${Integer.toHexString(currentByte.toInt())}")
+            bytesRead++
             if (currentByte != 0.toByte()) {
                 currentByteSize++
                 zerosRead = 0
@@ -115,16 +116,57 @@ interface Encoder {
                 zerosRead++
                 if (zerosRead == numberOfZerosAfter) {
                     stream.position = stream.position - bytesRead
-                    expectedSize = stream.readBits(currentByteSize * 8, true)
+                    expectedSize = stream.readBits(currentByteSize * 8, false)
                     stream.position++
                 } else {
                     currentByteSize++
                 }
             }
         }
-        log.debug("Parsed ${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
+        log.debug("Parsed 0x${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
         assert(Int.MAX_VALUE > expectedSize)
         return expectedSize.toInt()
     }
 
+    fun parseHuffmanMappingFromStream(
+        stream: BitStream,
+        expectedMappingSize: Int,
+        log: Logger
+    ): Map<StringBuffer, Byte> {
+
+        log.info("Trying to parse $expectedMappingSize mappings from encoded file...")
+        val huffmanMapping = mutableMapOf<StringBuffer, Byte>()
+
+        while (stream.position < stream.size && huffmanMapping.size < expectedMappingSize) {
+            val currentPrefix = StringBuffer()
+            val byteToMap = stream.readByte()
+            val prefixLength = stream.readBits(8, false)
+            for (position in 0 until prefixLength) {
+                if (stream.readBit()) currentPrefix.append('1') else currentPrefix.append('0')
+            }
+            huffmanMapping[currentPrefix] = byteToMap
+        }
+        log.info("Parsed ${huffmanMapping.size} mappings from encoded file.")
+        return huffmanMapping
+    }
+
+    fun writeByteMappingToStream(stream: BitStream, mapping: Map<Byte, Byte>, log: Logger) {
+        log.info("Writing byte mapping to stream...")
+        mapping.keys.forEach {
+            stream.write(it)
+        }
+
+        if (DEBUG) stream.flush()
+    }
+
+    fun readByteMappingFromStream(stream: BitStream, expectedMappingSize: Int, log: Logger): Map<Byte, Byte> {
+        log.info("Expecting $expectedMappingSize mappings from stream...")
+        val mapping = mutableMapOf<Byte,Byte>()
+        var mappingCounter = 0
+        while (stream.position < stream.size && mapping.size < expectedMappingSize){
+            val currentByte = stream.readByte()
+            mapping[mappingCounter++.toByte()] = currentByte
+        }
+        return mapping
+    }
 }

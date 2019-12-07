@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
-import java.lang.IllegalArgumentException
 import kotlin.test.assertFailsWith
 
 @ExperimentalUnsignedTypes
@@ -25,7 +24,7 @@ class MixedEncoderTest {
 
     companion object {
         private val encoder = MixedEncoder()
-        private const val fileToEncodeSmall = "testFile_small.txt"
+        private const val fileToEncodeSmall = "testFile_small2.txt"
         private const val fileToEncode = "t8.shakespeare.txt"
         private const val encodeFolder = "data/encoded/mixed"
         private const val decodeFolder = "data/decoded/mixed"
@@ -65,7 +64,7 @@ class MixedEncoderTest {
     @Test
     @Order(5)
     fun decodeFileSmallNoMap() {
-        assertFailsWith<IndexOutOfBoundsException> {
+        assertFailsWith<IllegalArgumentException> {
             encoder.readEncodedFileConsecutive(
                 "${encodeFolder}/${fileToEncodeSmall}",
                 256,

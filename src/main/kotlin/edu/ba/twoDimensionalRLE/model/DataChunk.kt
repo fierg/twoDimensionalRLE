@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.model
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
 import edu.ba.twoDimensionalRLE.extensions.pow
@@ -17,7 +18,6 @@ import kotlin.math.max
 @ExperimentalUnsignedTypes
 open class DataChunk(val input: ByteArray) {
 
-    private val log = Log.kotlinInstance()
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
     var huffEncodedStringBuffer = StringBuffer()
@@ -25,15 +25,8 @@ open class DataChunk(val input: ByteArray) {
     val rleEncodedBytes = mutableListOf<Byte>()
     val bytes = input.clone()
 
-    init {
-        log.newFormat {
-            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
-        }
-    }
 
     companion object {
-        private val DEBUG = true
-
         internal fun readChunksFromFile(inputFile: String, byteArraySize: Int, log: Logger): MutableList<DataChunk> {
             val input = File(inputFile)
             val bytes = ByteArray(byteArraySize)

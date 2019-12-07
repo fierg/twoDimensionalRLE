@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE.encoder.huffman
 
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
 import edu.ba.twoDimensionalRLE.extensions.*
@@ -24,6 +25,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
     }
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
@@ -125,11 +127,11 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         var decodingResult = ByteArray(0)
 
         BitStream(File(inputFile).openBinaryStream(true)).use { stream ->
-            val expectedSize = parseLengthHeader(stream, log)
+            val expectedSize = parseLengthHeader(stream, log).toInt()
             val expectedMappingSize = parseMappingSizeHeader(stream)
             val huffmanMapping = parseHuffmanMapping(stream, expectedMappingSize)
 
-            decodingResult = decodeFileInternal(huffmanMapping, stream, expectedSize).toByteArray()
+            decodingResult = decodeFromStream(huffmanMapping, stream, expectedSize).toByteArray()
         }
 
         log.info("Finished decoding. Writing decoded stream to $outputFile ...")
@@ -137,7 +139,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         log.info("Finished decoding.")
     }
 
-    private fun parseMappingSizeHeader(stream: BitStream): Long {
+    private fun parseMappingSizeHeader(stream: BitStream): Int {
         var skip = true
         var skippedBytes = 0L
         stream.position = 0
@@ -160,10 +162,11 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             }
         }
         log.info("Expecting $expectedSize mappings of <byte, Pair <length , prefix>> in encoded file.")
-        return expectedSize
+        assert(Int.MAX_VALUE.toLong() > expectedSize)
+        return expectedSize.toInt()
     }
 
-    private fun parseHuffmanMapping(stream: BitStream, expectedMappingSize: Long): Map<StringBuffer, Byte> {
+     private fun parseHuffmanMapping(stream: BitStream, expectedMappingSize: Int): Map<StringBuffer, Byte> {
 
         log.info("Trying to parse $expectedMappingSize mappings from encoded file...")
         var skipContentLengthHeader = true
@@ -190,10 +193,10 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return huffmanMapping
     }
 
-    private fun decodeFileInternal(
+     fun decodeFromStream(
         huffmanMapping: Map<StringBuffer, Byte>,
         stream: BitStream,
-        expectedSize: Long
+        expectedSize: Int
     ): MutableList<Byte> {
         val smallestMapping = huffmanMapping.keys.minBy { it.length }!!.length
         val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length

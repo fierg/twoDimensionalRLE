@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE.encoder.rle
 
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import java.io.File
 import java.io.FileInputStream
@@ -10,11 +11,13 @@ import java.io.FileOutputStream
 class StringRunLengthEncoder : Encoder {
 
     private val log = Log.kotlinInstance()
+    private val DEBUG = true
 
     init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
     }
 
     companion object {

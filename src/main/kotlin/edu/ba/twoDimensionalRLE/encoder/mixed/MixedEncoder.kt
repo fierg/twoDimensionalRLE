@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.encoder.mixed
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
@@ -42,6 +43,8 @@ class MixedEncoder : Encoder {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
+
     }
 
     override fun encode(inputFile: String, outputFile: String) {
@@ -50,6 +53,8 @@ class MixedEncoder : Encoder {
 
     override fun decode(inputFile: String, outputFile: String) {
         val input = File(inputFile)
+        val huff = HuffmanEncoder()
+        val binRLE = BinaryRunLengthEncoder()
         log.info("Staring to decode $inputFile...")
 
 
@@ -62,10 +67,28 @@ class MixedEncoder : Encoder {
 
             log.info("Trying to parse nr of huffman encoded bytes...")
             val huffmanlentgh = readHeaderFromEncodedFile(stream)
-
             log.info("Expecting $binRLElentgh bytes of binary rle encoded, then $huffmanlentgh bytes of huffman encoded bytes.")
 
-            throw NotImplementedError()
+
+            val huffmanMappingSize = readHeaderFromEncodedFile(stream)
+            val huffmanMapping = huff.parseHuffmanMappingFromStream(stream, huffmanMappingSize, log)
+            log.debug("Huffman dictionary found: $huffmanMapping")
+
+            stream.position++
+
+            log.debug("Trying to parse byte mapping size...")
+            val byteMappingSize = readHeaderFromEncodedFile(stream)
+
+            val mapping = readByteMappingFromStream(stream, byteMappingSize, log)
+            log.debug("Mapping found: $mapping")
+
+            log.info("Reading binary rle encoded bytes from stream, expecting $binRLElentgh bytes after decoding...")
+            val binRleNumbers = binRLE.readRLENumbersFromStream(stream, binRLElentgh, bitsPerRLENumber)
+            log.info("Parsed ${binRleNumbers.size} binary rle encoded numbers from stream.")
+
+            log.info("Reading huffman encoded bytes from steam, expecting $huffmanlentgh bytes after decoding...")
+            val huffDecoded = huff.decodeFromStream(huffmanMapping, stream, huffmanlentgh)
+            log.info("Parsed ${huffDecoded.size} huffman decoded bytes from stream.")
         }
 
     }
@@ -102,8 +125,15 @@ class MixedEncoder : Encoder {
 
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
             writeHeadersToEncodedFile(
-                stream, huffmanEncoder, huffmanMapping, log, BIN_RLE_BIT_RANGE.getSize() * bytesPerLine,
-                HUFF_BIT_RANGE.getSize() * bytesPerLine, RLE_RANGE.getSize() * bytesPerLine, huffmanEncoder
+                stream,
+                huffmanEncoder,
+                huffmanMapping,
+                log,
+                BIN_RLE_BIT_RANGE.getSize() * bytesPerLine,
+                HUFF_BIT_RANGE.getSize() * bytesPerLine,
+                RLE_RANGE.getSize() * bytesPerLine,
+                huffmanEncoder,
+                analyzer.getByteMapping()
             )
 
             val encodedChunks = encodeAllChunks(mappedChunks, huffmanEncoder, huffmanMapping)
@@ -133,6 +163,8 @@ class MixedEncoder : Encoder {
             )
         }
         currentOut.toBitSet().toByteArray().forEach { stream.write(it) }
+        log.debug("Wrote ${encodedChunks.map { it.binRleEncodedNumbers.count() }.sum()} binary rle encoded numbers to stream.")
+
         if (DEBUG) stream.flush()
 
         //TODO
@@ -204,22 +236,24 @@ class MixedEncoder : Encoder {
         binRLEsize: Int,
         huffSize: Int,
         rleSize: Int,
-        huffmanEncoder: HuffmanEncoder
+        huffmanEncoder: HuffmanEncoder,
+        byteMapping: MutableMap<Byte, Byte>
     ) {
         log.info("Writing headers to file...")
-
+        val numbersOfZerosAfter = 1
         //TODO check if counter contains 0x00 and if so -> increase numberOfZerosAfter!
-        log.debug("Writing binary rle header, ${binRLEsize.toString(2)} , ${Integer.toHexString(binRLEsize)}")
-        encoder.writeLengthHeaderToFile(binRLEsize, stream, log, 1)
 
-        //     log.debug("Writing rle header, ${rleSize.toString(2)} , ${Integer.toHexString(rleSize)}")
-        //    encoder.writeLengthHeaderToFile(rleSize, stream, log, 1)
+        log.debug("Writing binary rle header, ${binRLEsize.toString(2)} , 0x${Integer.toHexString(binRLEsize)}")
+        encoder.writeLengthHeaderToFile(binRLEsize, stream, log, numbersOfZerosAfter)
 
-        log.debug("Writing huffman header, ${huffSize.toString(2)} , ${Integer.toHexString(huffSize)}")
-        encoder.writeLengthHeaderToFile(huffSize, stream, log, 1)
+        //     log.debug("Writing rle header, ${rleSize.toString(2)} , 0x${Integer.toHexString(rleSize)}")
+        //    encoder.writeLengthHeaderToFile(rleSize, stream, log, numberOfZerosAfter)
+
+        log.debug("Writing huffman header, ${huffSize.toString(2)} , 0x${Integer.toHexString(huffSize)}")
+        encoder.writeLengthHeaderToFile(huffSize, stream, log, numbersOfZerosAfter)
 
         log.debug(
-            "Writing huffman mapping length to file, ${huffmanMapping.size.toString(2)} , ${Integer.toHexString(
+            "Writing huffman mapping length to stream, ${huffmanMapping.size.toString(2)} , 0x${Integer.toHexString(
                 huffmanMapping.size
             )}"
         )
@@ -227,6 +261,14 @@ class MixedEncoder : Encoder {
 
         log.debug("Writing huffman mapping to file ${huffmanMapping}...")
         huffmanEncoder.writeDictionaryToStream(stream, huffmanMapping)
+
+        log.debug("Writing mapping size header ${byteMapping.size.toString(2)} , 0x${Integer.toHexString(byteMapping.size)}")
+        encoder.writeLengthHeaderToFile(byteMapping.size, stream, log, numbersOfZerosAfter)
+
+        log.debug("Writing byteMapping to stream ${byteMapping.map { entry -> "0x" + Integer.toHexString(entry.key.toInt()) }}")
+        encoder.writeByteMappingToStream(stream, byteMapping, log)
+
+        log.debug("Finished writing header.")
     }
 
     private fun printEncodingInfo() {

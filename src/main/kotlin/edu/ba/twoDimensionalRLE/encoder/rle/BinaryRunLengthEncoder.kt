@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.encoder.rle
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
@@ -36,6 +37,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
     }
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
@@ -201,7 +203,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(input, fileBinRLEStr)
 
-        log.info("### Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)... ###")
+        log.info("Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)...")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -629,6 +631,17 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             result[index++] = inverseMapping[byte]!!
         }
         return result
+    }
+
+    fun readRLENumbersFromStream(stream: BitStream, expectingBinRleBytes: Int, bitsPerNumber: Int): List<Int> {
+        val rleNumbers = mutableListOf<Int>()
+
+        while (stream.position < stream.size && rleNumbers.sum() + 1 < expectingBinRleBytes * 8 ){
+            val currentIntParsed = stream.readBits(bitsPerNumber, false).toInt()
+            log.debug("Parsed binary rle number $currentIntParsed, as 0x${Integer.toHexString(currentIntParsed)}")
+            rleNumbers.add(currentIntParsed)
+        }
+        return rleNumbers
     }
 }
 
