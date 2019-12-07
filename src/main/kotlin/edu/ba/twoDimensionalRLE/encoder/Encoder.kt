@@ -92,11 +92,11 @@ interface Encoder {
                 currentByteSize++
             } else {
                 stream.position = 0
-                expectedSize = stream.readBits(currentByteSize * 8, true)
+                expectedSize = stream.readBits(currentByteSize * 8, false)
             }
         }
         log.info("Expecting $expectedSize bytes of content after decoding.")
-        return expectedSize + 2
+        return expectedSize
     }
 
     fun parseCurrentHeader(stream: BitStream, numberOfZerosAfter: Int, log: Logger): Int {
@@ -107,7 +107,7 @@ interface Encoder {
 
         while (expectedSize == 0L) {
             val currentByte = stream.readByte()
-            log.debug("current byte read : ${Integer.toHexString(currentByte.toInt())}")
+            log.debug("current byte read at 0x${Integer.toHexString(stream.position.toUByte().toInt() - 1).padStart(2,'0')}, position ${stream.position - 1}: ${Integer.toHexString(currentByte.toUByte().toInt())}")
             bytesRead++
             if (currentByte != 0.toByte()) {
                 currentByteSize++
@@ -124,7 +124,7 @@ interface Encoder {
             }
         }
         log.debug("Parsed 0x${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
-        assert(Int.MAX_VALUE > expectedSize)
+        assert(Int.MAX_VALUE > expectedSize, lazyMessage = {"Casting overflow!"})
         return expectedSize.toInt()
     }
 
@@ -147,6 +147,7 @@ interface Encoder {
             huffmanMapping[currentPrefix] = byteToMap
         }
         log.info("Parsed ${huffmanMapping.size} mappings from encoded file.")
+        log.debug("Huffman dictionary found: $huffmanMapping")
         return huffmanMapping
     }
 
@@ -167,6 +168,7 @@ interface Encoder {
             val currentByte = stream.readByte()
             mapping[mappingCounter++.toByte()] = currentByte
         }
+        log.debug("Mapping found: $mapping")
         return mapping
     }
 }

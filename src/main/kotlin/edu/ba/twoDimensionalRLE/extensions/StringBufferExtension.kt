@@ -13,6 +13,16 @@ fun StringBuffer.toBitSet(): BitSet {
     }
     return result
 }
+fun StringBuffer.toBitSet(n :Int): BitSet {
+    require(this.toString().matches(Regex("([01]*)")))
+
+    val result = BitSet(n)
+    this.forEachIndexed { index, char ->
+        if (char == "1"[0]) result.set(index, true)
+        else if (char == "0"[0]) result.set(index, false)
+    }
+    return result
+}
 
 @ExperimentalUnsignedTypes
 fun StringBuffer.writeToBinaryStream(bitStream: BitStream) {

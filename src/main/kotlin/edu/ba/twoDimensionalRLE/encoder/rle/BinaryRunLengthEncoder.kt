@@ -16,6 +16,7 @@ import loggersoft.kotlin.streams.BitStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.Map.Entry
@@ -42,12 +43,15 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
         var linesToEncode = ByteArray(0)
+        val currentLinesAsStrBuffer = StringBuffer()
         for (index in range) {
+            currentLinesAsStrBuffer.append(chunk.getLineFromChunkAsStringBuffer(index))
             val currentLine = chunk.getLineFromChunk(index, byteSize)
             linesToEncode += currentLine
             if (DEBUG) chunk.encodedLines[index] = encodeLineOfChunkAsByteArray(currentLine, byteSize, bitsPerNumber)
         }
         chunk.binRleEncodedNumbers = encodeLineOfChunkAsListOfNumbers(linesToEncode, byteSize, bitsPerNumber)
+        chunk.binRleEncodedNumbersFromBuffer = encodeLineOfChunkAsListOfNumbers(currentLinesAsStrBuffer.toBitSet(currentLinesAsStrBuffer.length).toByteArray(), byteSize, bitsPerNumber)
         return chunk
     }
 
@@ -88,6 +92,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         val result = StringBuffer()
         encodedLine.forEach {
             val bits = Integer.toBinaryString(it)
+            assert(bits.length <= bitPerNumber)
             result.append(bits.padStart(bitPerNumber, '0'))
         }
         return result
@@ -142,10 +147,15 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         var start = 0
         var endInclusive = expectedRange
 
+        try {
+
+
         for (index in range) {
             chunk.decodedLines[index] = lines.sliceArray(IntRange(start, endInclusive))
             start += expectedRange
             endInclusive += expectedRange
+        }} catch (e: IndexOutOfBoundsException) {
+            throw IllegalArgumentException("Parsed content is not directly mappable to lines of chunk!")
         }
     }
 
@@ -633,15 +643,17 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return result
     }
 
-    fun readRLENumbersFromStream(stream: BitStream, expectingBinRleBytes: Int, bitsPerNumber: Int): List<Int> {
+    fun readRLENumbersFromStream(stream: BitStream, expectingBinRleNumbers: Int, bitsPerNumber: Int): List<Int> {
+        log.info("Reading binary rle encoded bytes from stream, expecting $expectingBinRleNumbers bytes after decoding...")
         val rleNumbers = mutableListOf<Int>()
 
-        while (stream.position < stream.size && rleNumbers.sum() + 1 < expectingBinRleBytes * 8 ){
+        while (stream.position < stream.size && rleNumbers.size < expectingBinRleNumbers) {
             val currentIntParsed = stream.readBits(bitsPerNumber, false).toInt()
-            log.debug("Parsed binary rle number $currentIntParsed, as 0x${Integer.toHexString(currentIntParsed)}")
+            //    log.debug("Parsed binary rle number $currentIntParsed, as 0x${Integer.toHexString(currentIntParsed)}")
             rleNumbers.add(currentIntParsed)
         }
-        return rleNumbers
+        log.info("Parsed ${rleNumbers.size} binary rle encoded numbers from stream.")
+        return rleNumbers.reversed()
     }
 }
 
