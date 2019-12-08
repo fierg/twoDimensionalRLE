@@ -127,7 +127,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
             currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
 
             if (stringMapping.containsKey(currentPrefixSeen.toString())) {
-                decodingResult.add(stringMapping.getOrElse(currentPrefixSeen.toString()) { throw IllegalStateException() })
+                decodingResult.add(stringMapping.getOrElse(currentPrefixSeen.toString()) { throw IllegalStateException("Trying to map unknown prefix!") })
                 stream.bitPosition = stream.bitPosition + currentMappingSize
                 currentMappingSize = smallestMapping
             } else {
@@ -145,6 +145,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         BitStream(File(inputFile).openBinaryStream(true)).use { stream ->
             val expectedSize = parseLengthHeader(stream, log).toInt()
             val expectedMappingSize = parseMappingSizeHeader(stream)
+            assert(expectedMappingSize > 0) {"Parsed negative mapping length header!"}
             val huffmanMapping = parseHuffmanMapping(stream, expectedMappingSize)
 
             decodingResult = decodeFromStream(huffmanMapping, stream, expectedSize).toByteArray()
@@ -174,7 +175,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                 currentByteSize++
             } else {
                 stream.position = skippedBytes
-                expectedSize = stream.readBits(currentByteSize * 8, true)
+                expectedSize = stream.readBits(currentByteSize * 8, false)
             }
         }
         log.info("Expecting $expectedSize mappings of <byte, Pair <length , prefix>> in encoded file.")
@@ -227,12 +228,12 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         stream.position++
 
         log.info("Parsing encoded file with mapping $stringMapping")
-        while ((stream.bitPosition + currentMappingSize) < stream.size * 8 && decodingResult.size < expectedSize) {
+        while ((stream.bitPosition + currentMappingSize) <= stream.size * 8 && decodingResult.size < expectedSize) {
             currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
 
             if (stringMapping.containsKey(currentPrefixSeen.toString())) {
                 val byteDecoded =
-                    stringMapping.getOrElse(currentPrefixSeen.toString(), { throw IllegalStateException() })
+                    stringMapping.getOrElse(currentPrefixSeen.toString(), { throw IllegalStateException("No mapping found!") })
                 //              log.debug("Decoded 0x${Integer.toHexString(byteDecoded.toUByte().toInt())} , $byteDecoded")
                 decodingResult.add(byteDecoded)
                 stream.bitPosition = stream.bitPosition + currentMappingSize

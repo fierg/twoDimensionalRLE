@@ -5,10 +5,7 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
-import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
-import edu.ba.twoDimensionalRLE.extensions.toBitSet
-import edu.ba.twoDimensionalRLE.extensions.toBitSetList
+import edu.ba.twoDimensionalRLE.extensions.*
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
@@ -16,7 +13,6 @@ import loggersoft.kotlin.streams.BitStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.Map.Entry
@@ -51,7 +47,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             if (DEBUG) chunk.encodedLines[index] = encodeLineOfChunkAsByteArray(currentLine, byteSize, bitsPerNumber)
         }
         chunk.binRleEncodedNumbers = encodeLineOfChunkAsListOfNumbers(linesToEncode, byteSize, bitsPerNumber)
-        chunk.binRleEncodedNumbersFromBuffer = encodeLineOfChunkAsListOfNumbers(currentLinesAsStrBuffer.toBitSet(currentLinesAsStrBuffer.length).toByteArray(), byteSize, bitsPerNumber)
+        chunk.binRleEncodedNumbersFromBuffer = encodeLineOfChunkAsListOfNumbers(currentLinesAsStrBuffer.toByteArray(), byteSize, bitsPerNumber)
         return chunk
     }
 
@@ -643,7 +639,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return result
     }
 
-    fun readRLENumbersFromStream(stream: BitStream, expectingBinRleNumbers: Int, bitsPerNumber: Int): List<Int> {
+    fun readBinRLENumbersFromStream(stream: BitStream, expectingBinRleNumbers: Int, bitsPerNumber: Int): List<Int> {
         log.info("Reading binary rle encoded bytes from stream, expecting $expectingBinRleNumbers bytes after decoding...")
         val rleNumbers = mutableListOf<Int>()
 
@@ -654,6 +650,18 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
         log.info("Parsed ${rleNumbers.size} binary rle encoded numbers from stream.")
         return rleNumbers.reversed()
+    }
+
+    fun decodeBinRleNumbersToBuffer(numbers : List<Int>, bitsPerNumber: Int) : StringBuffer {
+        val result = StringBuffer()
+        var currentBit = false
+
+        numbers.forEach { number ->
+            for (i in 0 until  number) result.append(if (currentBit) '1' else '0')
+           currentBit = !currentBit
+        }
+
+        return result
     }
 }
 

@@ -8,7 +8,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.encoder.rle.BinaryRunLengthEncoder
 import edu.ba.twoDimensionalRLE.extensions.getSize
-import edu.ba.twoDimensionalRLE.extensions.toBitSet
+import edu.ba.twoDimensionalRLE.extensions.toByteArray
 import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import edu.ba.twoDimensionalRLE.extensions.writeToBinaryStream
 import edu.ba.twoDimensionalRLE.model.DataChunk
@@ -80,12 +80,17 @@ class MixedEncoder : Encoder {
             val byteMappingSize = readHeaderFromEncodedFile(stream)
 
             val mapping = readByteMappingFromStream(stream, byteMappingSize, log)
-            val binRleNumbers = binRLE.readRLENumbersFromStream(stream, binRLElentgh, bitsPerRLENumber)
+            val binRleNumbers = binRLE.readBinRLENumbersFromStream(stream, binRLElentgh, bitsPerRLENumber)
             val huffDecoded = huff.decodeFromStream(huffmanMapping, stream, huffmanlentgh)
 
 
             val decodedChunks = DataChunk.readChunksFromDecodedParts(
-                BIN_RLE_BIT_RANGE, RLE_RANGE, HUFF_BIT_RANGE, huffDecoded.toByteArray(), binRleNumbers)
+                BIN_RLE_BIT_RANGE,
+                RLE_RANGE,
+                HUFF_BIT_RANGE,
+                huffDecoded.toByteArray(),
+                binRLE.decodeBinRleNumbersToBuffer(binRleNumbers, bitsPerRLENumber)
+            )
 
             log.info("Applying reverted byte mapping to all chunks...")
             val remappedBytes = applyMapping(decodedChunks, mapping, outputFile)
@@ -124,7 +129,7 @@ class MixedEncoder : Encoder {
         }
 
         //TODO create better mapping creation to use less ram
-        val huffBufferArray = huffBuffer.toBitSet(huffBuffer.length).toByteArray()
+        val huffBufferArray = huffBuffer.toByteArray()
         val huffmanMapping = huffmanEncoder.getHuffmanMapping(256, huffBufferArray)
 
 

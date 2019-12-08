@@ -54,7 +54,7 @@ class MixedEncoderTest {
         encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
     }
 
-
+/*
     @Test
     @Order(3)
     fun encodeFileSmall2() {
@@ -105,5 +105,5 @@ class MixedEncoderTest {
     fun decodeFile() {
         encoder.decode("${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}")
     }
-
+*/
 }

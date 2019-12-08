@@ -51,7 +51,19 @@ open class DataChunk(val input: ByteArray) {
             return chunks
         }
 
-        internal fun readChunksFromDecodedParts(binRleRange: IntRange, rleRange: IntRange, huffRange: IntRange, huffDecodedBytes: ByteArray, binRLENumbers: List<Int>) : List<DataChunk> {
+        internal fun readChunksFromDecodedParts(binRleRange: IntRange, rleRange: IntRange, huffRange: IntRange, huffDecodedBytes: ByteArray, binRleBuffer: StringBuffer) : List<DataChunk> {
+            val result = mutableListOf<DataChunk>()
+
+            val huffBitBuffer = StringBuffer()
+            huffDecodedBytes.forEach { byte ->
+                huffBitBuffer.append(byte.toUByte().toInt().toString(2).padStart(8,'0'))
+            }
+
+            binRleBuffer
+            huffBitBuffer
+
+
+
             TODO()
         }
     }
