@@ -48,11 +48,18 @@ class MixedEncoder : Encoder {
 
     }
 
-    override fun encode(inputFile: String, outputFile: String) {
-        encodeInternal(inputFile, outputFile)
+    override fun encode(
+        inputFile: String, outputFile: String, applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
+        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation)
     }
 
-    override fun decode(inputFile: String, outputFile: String) {
+    override fun decode(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean) {
         val input = File(inputFile)
         val huff = HuffmanEncoder()
         val binRLE = BinaryRunLengthEncoder()
@@ -60,6 +67,9 @@ class MixedEncoder : Encoder {
 
 
         BitStream(input.openBinaryStream(true)).use { stream ->
+            log.info("Trying to parse the total number of encoded bytes...")
+            val totalSize = readHeaderFromEncodedFile(stream)
+
             log.info("Trying to parse the number of binary RLE encoded bytes...")
             val binRLElentgh = readHeaderFromEncodedFile(stream)
 
@@ -85,6 +95,8 @@ class MixedEncoder : Encoder {
 
 
             val decodedChunks = DataChunk.readChunksFromDecodedParts(
+                totalSize,
+                byteArraySize,
                 BIN_RLE_BIT_RANGE,
                 RLE_RANGE,
                 HUFF_BIT_RANGE,
@@ -107,22 +119,33 @@ class MixedEncoder : Encoder {
         return parseCurrentHeader(stream, 2, log)
     }
 
-    private fun encodeInternal(inputFile: String, outputFile: String) {
+    private fun encodeInternal(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
         val input = File(inputFile)
+        var totalSize = input.length()
         val huffmanEncoder = HuffmanEncoder()
-        val chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
+        var chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
         val huffBuffer = StringBuffer()
 
         analyzer.analyzeFile(input)
         analyzer.addBWTSymbolsToMapping()
 
-        val transformedChunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
-        val mappedChunks = applyMapping(transformedChunks, analyzer.getByteMapping(), outputFile)
+        if (applyBurrowsWheelerTransformation){
+            chunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
+            totalSize += (chunks.count() * 2)
+        }
+
+        if (applyByteMapping)
+            chunks = applyMapping(chunks, analyzer.getByteMapping(), outputFile)
 
         printEncodingInfo()
 
         log.info("Collecting all bytes to encode with huffman encoding to build dictionary...")
-        mappedChunks.forEach {
+        chunks.forEach {
             for (i in HUFF_BIT_RANGE) {
                 huffBuffer.append(it.getLineFromChunkAsStringBuffer(i))
             }
@@ -134,7 +157,7 @@ class MixedEncoder : Encoder {
 
 
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
-            val encodedChunks = encodeAllChunks(mappedChunks, huffmanEncoder, huffmanMapping, huffBufferArray)
+            val encodedChunks = encodeAllChunks(chunks, huffmanEncoder, huffmanMapping, huffBufferArray)
 
             val encodedBinRLENumbers = encodedChunks.map { it.binRleEncodedNumbers.count() }.sum()
             val encodedHuffBytes = encodedChunks.map { it.huffEncodedBytes }.sum()
@@ -148,7 +171,8 @@ class MixedEncoder : Encoder {
                 encodedHuffBytes,
                 RLE_RANGE.getSize(),
                 huffmanEncoder,
-                analyzer.getByteMapping()
+                analyzer.getByteMapping(),
+                totalSize
             )
 
 
@@ -252,11 +276,26 @@ class MixedEncoder : Encoder {
         huffSize: Int,
         rleSize: Int,
         huffmanEncoder: HuffmanEncoder,
-        byteMapping: MutableMap<Byte, Byte>
+        byteMapping: MutableMap<Byte, Byte>,
+        totalFileSize: Long
     ) {
         log.info("Writing headers to file...")
-        val numbersOfZerosAfter = 2
         //TODO check if counter contains 0x00 and if so -> increase numberOfZerosAfter!
+        val numbersOfZerosAfter = 2
+
+        //TODO use long to enable encoding of files larger than 2147.483647 mb
+        assert(totalFileSize < Int.MAX_VALUE)
+        val totalFileSizeI = totalFileSize.toInt()
+        log.debug(
+            "Writing total size in bytes header, ${totalFileSizeI.toString(2).padStart(
+                8,
+                '0'
+            )} , 0x${Integer.toHexString(
+                totalFileSizeI
+            )}"
+        )
+        encoder.writeLengthHeaderToFile(totalFileSizeI, stream, log, numbersOfZerosAfter)
+
 
         log.debug(
             "Writing binary rle header, ${binRLEsize.toString(2).padStart(8, '0')} , 0x${Integer.toHexString(

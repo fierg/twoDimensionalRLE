@@ -14,6 +14,7 @@ open class DataChunk(val input: ByteArray) {
 
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
+    val decodedLinesStrBuffer = mutableMapOf<Int, String>()
     var huffEncodedStringBuffer = StringBuffer()
     var huffEncodedBytes = 0
     var binRleEncodedNumbers = mutableListOf<Int>()
@@ -51,21 +52,44 @@ open class DataChunk(val input: ByteArray) {
             return chunks
         }
 
-        internal fun readChunksFromDecodedParts(binRleRange: IntRange, rleRange: IntRange, huffRange: IntRange, huffDecodedBytes: ByteArray, binRleBuffer: StringBuffer) : List<DataChunk> {
+        internal fun readChunksFromDecodedParts(
+            totalSize: Int,
+            byteArraySize: Int,
+            binRleRange: IntRange,
+            rleRange: IntRange,
+            huffRange: IntRange,
+            huffDecodedBytes: ByteArray,
+            binRleBuffer: StringBuffer
+        ): List<DataChunk> {
             val result = mutableListOf<DataChunk>()
-
+            var currentChunk = DataChunk(ByteArray(0))
+            var remainingSize = totalSize
+            var remainingBinRleBuffer = StringBuffer(binRleBuffer)
+            var remainingHuffmanBuffer = StringBuffer()
             val huffBitBuffer = StringBuffer()
             huffDecodedBytes.forEach { byte ->
-                huffBitBuffer.append(byte.toUByte().toInt().toString(2).padStart(8,'0'))
+                huffBitBuffer.append(byte.toUByte().toInt().toString(2).padStart(8, '0'))
             }
 
-            binRleBuffer
-            huffBitBuffer
+            var currentLength = if (remainingSize > byteArraySize) {
+                remainingSize -= byteArraySize
+                byteArraySize
+            } else remainingSize
 
 
+            //build bin rle decoded lines
+            binRleRange.forEachIndexed { index, line ->
+                currentChunk.decodedLinesStrBuffer[line] = remainingBinRleBuffer.substring(0, currentLength)
+                remainingBinRleBuffer.delete(0, currentLength)
+            }
+
+            huffRange.forEach { line ->
+                currentChunk.decodedLinesStrBuffer[line]
+            }
 
             TODO()
         }
+
     }
 
     fun getLineFromChunk(line: Int, lineSizeInNrOfByteArrays: Int): ByteArray {
@@ -101,7 +125,11 @@ open class DataChunk(val input: ByteArray) {
     fun applyByteMapping(mapping: Map<Byte, Byte>): DataChunk {
         val result = mutableListOf<Byte>()
         bytes.forEach { byte ->
-            result.add(mapping.getOrElse(byte, defaultValue = { throw IllegalArgumentException("Trying to apply byte mapping to unknown byte $byte.") }))
+            result.add(
+                mapping.getOrElse(
+                    byte,
+                    defaultValue = { throw IllegalArgumentException("Trying to apply byte mapping to unknown byte $byte.") })
+            )
         }
         return DataChunk(result.toByteArray())
     }

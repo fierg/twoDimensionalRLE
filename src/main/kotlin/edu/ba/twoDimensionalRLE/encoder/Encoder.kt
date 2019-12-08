@@ -13,8 +13,18 @@ interface Encoder {
         get() = true
 
 
-    fun encode(inputFile: String, outputFile: String)
-    fun decode(inputFile: String, outputFile: String)
+    fun encode(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    )
+    fun decode(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    )
 
     fun writeDecodedLengthHeaderToFile(count: Long, stream: BitStream, log: Logger): Long {
         val bytesNeeded = writeCountToStream(log, count.toInt(), stream)
@@ -171,4 +181,5 @@ interface Encoder {
         log.debug("Mapping found: $mapping")
         return mapping
     }
+
 }

@@ -42,7 +42,9 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         throw NotImplementedError()
     }
 
-    override fun encode(inputFile: String, outputFile: String) {
+    override fun encode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         log.info("Parsing input file $inputFile ...")
         val bytes = File(inputFile).readBytes()
         val count = File(inputFile).length()
@@ -138,7 +140,9 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         return chunk
     }
 
-    override fun decode(inputFile: String, outputFile: String) {
+    override fun decode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         log.info("Starting to decode huffman encoding from $inputFile ...")
         var decodingResult = ByteArray(0)
 

@@ -19,5 +19,10 @@ fun UByteArray.toBitSetList(): List<BitSet> {
     return bitSetList
 }
 
+@ExperimentalUnsignedTypes
+fun ByteArray.toBinStringBuffer(): StringBuffer {
+    return StringBuffer(this.map { it.toUByte().toString(2).padStart(8, '0') }.reduce { acc, s -> acc + s })
+}
+
 
 

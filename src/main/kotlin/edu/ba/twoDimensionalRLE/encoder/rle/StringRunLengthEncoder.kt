@@ -66,7 +66,11 @@ class StringRunLengthEncoder : Encoder {
         FileOutputStream(outputFile, true).bufferedWriter().use { writer -> writer.write(sb.toString()) }
     }
 
-    override fun encode(inputFile: String, outputFile: String) {
+    override fun encode(
+        inputFile: String, outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
         log.info("Starting to encode file $inputFile with regular rle. Output file will be at $outputFile")
         val input = File(inputFile)
         val output = File(outputFile)
@@ -98,7 +102,11 @@ class StringRunLengthEncoder : Encoder {
     }
 
     @ExperimentalUnsignedTypes
-    override fun decode(inputFile: String, outputFile: String) {
+    override fun decode(
+        inputFile: String, outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
         val input = File(inputFile)
         val output = File(outputFile)
 

@@ -46,12 +46,16 @@ class MixedEncoderTest {
     @Test
     @Order(2)
     fun encodeFileSmall() {
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
+        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
     @Test
     @Order(7)
     fun decodeFileSmall() {
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
 /*

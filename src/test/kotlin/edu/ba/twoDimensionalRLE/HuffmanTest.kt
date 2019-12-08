@@ -52,7 +52,9 @@ class HuffmanTest {
     @Order(3)
     fun encodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
+        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
 
@@ -61,7 +63,9 @@ class HuffmanTest {
     @Order(5)
     fun decodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
 
@@ -70,7 +74,9 @@ class HuffmanTest {
     @Order(4)
     fun encodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
     @ExperimentalUnsignedTypes
@@ -78,6 +84,8 @@ class HuffmanTest {
     @Order(6)
     fun decodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}")
+        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 }

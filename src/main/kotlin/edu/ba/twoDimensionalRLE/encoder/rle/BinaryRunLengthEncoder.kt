@@ -169,7 +169,9 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             .toByteArray()
     }
 
-    override fun encode(inputFile: String, outputFile: String) {
+    override fun encode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         val input = File(inputFile)
         val stream = input.inputStream()
         val bytes = ByteArray(byteArraySize)
@@ -414,7 +416,9 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("finished remapping & decoding original byte stream.")
     }
 
-    override fun decode(inputFile: String, outputFile: String) {
+    override fun decode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
