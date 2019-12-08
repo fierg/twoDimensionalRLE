@@ -3,11 +3,13 @@ package edu.ba.twoDimensionalRLE.model
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.extensions.toBinStringBuffer
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.ceil
+import kotlin.math.log
 
 @ExperimentalUnsignedTypes
 open class DataChunk(val input: ByteArray) {
@@ -59,35 +61,54 @@ open class DataChunk(val input: ByteArray) {
             rleRange: IntRange,
             huffRange: IntRange,
             huffDecodedBytes: ByteArray,
-            binRleBuffer: StringBuffer
+            binRleBuffer: StringBuffer,
+            log: Logger
         ): List<DataChunk> {
+            log.info("Starting to reconstruct DataChunks from parsed buffers...")
             val result = mutableListOf<DataChunk>()
             var currentChunk = DataChunk(ByteArray(0))
             var remainingSize = totalSize
-            var remainingBinRleBuffer = StringBuffer(binRleBuffer)
-            var remainingHuffmanBuffer = StringBuffer()
-            val huffBitBuffer = StringBuffer()
-            huffDecodedBytes.forEach { byte ->
-                huffBitBuffer.append(byte.toUByte().toInt().toString(2).padStart(8, '0'))
+            val remainingBinRleBuffer = StringBuffer(binRleBuffer)
+
+            log.info("Building buffer from bytes...")
+            val remainingHuffmanBuffer = huffDecodedBytes.toBinStringBuffer()
+            var currentLength = 1
+
+            try {
+                while (currentLength > 0) {
+                    currentLength = if (remainingSize >= byteArraySize) {
+                        remainingSize -= byteArraySize
+                        byteArraySize
+                    } else {
+                        remainingSize
+                    }
+
+                    //build bin rle decoded lines
+                    binRleRange.forEach { line ->
+                        currentChunk.decodedLinesStrBuffer[line] = remainingBinRleBuffer.substring(0, currentLength)
+                        remainingBinRleBuffer.delete(0, currentLength)
+                    }
+
+                    //huff decoded lines
+                    huffRange.forEach { line ->
+                        currentChunk.decodedLinesStrBuffer[line] = remainingHuffmanBuffer.substring(0, currentLength)
+                        remainingHuffmanBuffer.delete(0, currentLength)
+                    }
+
+                    result.add(currentChunk)
+                    currentChunk = DataChunk(ByteArray(0))
+
+                    if (result.size % 100 == 0){
+                        log.info("reconstructed chunk number ${result.size}")
+                    }
+                }
+            } catch (e: Exception) {
+                //TODO check if really no mor data is left
+                log.debug("Unable to parse further chunks!")
             }
 
-            var currentLength = if (remainingSize > byteArraySize) {
-                remainingSize -= byteArraySize
-                byteArraySize
-            } else remainingSize
-
-
-            //build bin rle decoded lines
-            binRleRange.forEachIndexed { index, line ->
-                currentChunk.decodedLinesStrBuffer[line] = remainingBinRleBuffer.substring(0, currentLength)
-                remainingBinRleBuffer.delete(0, currentLength)
-            }
-
-            huffRange.forEach { line ->
-                currentChunk.decodedLinesStrBuffer[line]
-            }
-
-            TODO()
+            log.info("Finished reconstructing all lines in all chunks.")
+            return result
         }
 
     }

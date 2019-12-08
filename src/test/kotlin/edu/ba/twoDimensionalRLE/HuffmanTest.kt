@@ -2,12 +2,10 @@ package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
-import edu.ba.twoDimensionalRLE.extensions.reversed
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class HuffmanTest {
@@ -25,17 +23,6 @@ class HuffmanTest {
         private const val encodeFolder = "data/encoded/huffman"
         private const val decodeFolder = "data/decoded/huffman"
         private const val inputString = "aaaabbbccddefg"
-    }
-
-    @Test
-    @Order(1)
-    fun cleanup() {
-        if (File(encodeFolder).exists()) {
-            File(encodeFolder).deleteRecursively()
-            File(decodeFolder).deleteRecursively()
-        }
-        File(encodeFolder).mkdirs()
-        File(decodeFolder).mkdirs()
     }
 
     @ExperimentalUnsignedTypes

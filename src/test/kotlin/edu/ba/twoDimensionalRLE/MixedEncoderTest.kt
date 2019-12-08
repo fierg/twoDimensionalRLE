@@ -46,31 +46,44 @@ class MixedEncoderTest {
     @Test
     @Order(2)
     fun encodeFileSmall() {
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
+        encoder.encode(
+            "data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true
+        )
     }
+
     @Test
     @Order(7)
     fun decodeFileSmall() {
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
+        encoder.decode(
+            "${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true
+        )
+    }
+
+
+    @Test
+    @Order(3)
+    fun encodeFileSmall2() {
+        encoder.encode(
+            "data/${fileToEncodeSmall2}", "${encodeFolder}/${fileToEncodeSmall2}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
 /*
     @Test
-    @Order(3)
-    fun encodeFileSmall2() {
-        encoder.encode("data/${fileToEncodeSmall2}", "${encodeFolder}/${fileToEncodeSmall2}")
-    }
-
-
-    @Test
     @Order(4)
     fun encodeFile() {
-        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
-    }
+        encoder.encode(
+            "data/${fileToEncode}", "${encodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
+    }*/
 
     @Test
     @Order(5)
@@ -96,18 +109,25 @@ class MixedEncoderTest {
     }
 
 
-
-
     @Test
     @Order(8)
     fun decodeFileSmall2() {
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall2}", "${decodeFolder}/${fileToEncodeSmall2}")
+        encoder.decode(
+            "${encodeFolder}/${fileToEncodeSmall2}", "${decodeFolder}/${fileToEncodeSmall2}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
+    /*
     @Test
     @Order(8)
     fun decodeFile() {
-        encoder.decode("${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}")
+        encoder.decode(
+            "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 */
 }

@@ -33,16 +33,16 @@ class MixedEncoderCorpusTest {
     @Test
     @Order(1)
     fun cleanup() {
-        if (File("$encodeFolder/CalgaryCorpus").exists()) {
-            log.info("deleting directory: $encodeFolder/CalgaryCorpus")
-            File("$encodeFolder/CalgaryCorpus").deleteRecursively()
-            File("$decodeFolder/CalgaryCorpus").deleteRecursively()
+        if (File("${encodeFolder}/CalgaryCorpus").exists()) {
+            log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
+            File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
+            File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
 
 
         }
-        log.info("creating directory: $encodeFolder/CalgaryCorpus")
-        File("$encodeFolder/CalgaryCorpus").mkdirs()
-        File("$decodeFolder/CalgaryCorpus").mkdirs()
+        log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
+        File("${encodeFolder}/CalgaryCorpus").mkdirs()
+        File("${decodeFolder}/CalgaryCorpus").mkdirs()
 
     }
 

@@ -63,6 +63,8 @@ class MixedEncoder : Encoder {
         val input = File(inputFile)
         val huff = HuffmanEncoder()
         val binRLE = BinaryRunLengthEncoder()
+
+        val totalByteArraySize = if (applyBurrowsWheelerTransformation) byteArraySize + 2 else byteArraySize
         log.info("Staring to decode $inputFile...")
 
 
@@ -96,12 +98,13 @@ class MixedEncoder : Encoder {
 
             val decodedChunks = DataChunk.readChunksFromDecodedParts(
                 totalSize,
-                byteArraySize,
+                totalByteArraySize,
                 BIN_RLE_BIT_RANGE,
                 RLE_RANGE,
                 HUFF_BIT_RANGE,
                 huffDecoded.toByteArray(),
-                binRLE.decodeBinRleNumbersToBuffer(binRleNumbers, bitsPerRLENumber)
+                binRLE.decodeBinRleNumbersToBuffer(binRleNumbers, bitsPerRLENumber),
+                log
             )
 
             log.info("Applying reverted byte mapping to all chunks...")
