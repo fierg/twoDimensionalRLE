@@ -33,7 +33,10 @@ class BinaryRLETest {
     @Test
     @Order(2)
     fun encodeFile_small() {
-        binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle")
+        binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
 
@@ -42,7 +45,9 @@ class BinaryRLETest {
     fun decodeFile_small() {
         binaryRunLengthEncoder.decode(
             "$encodeFolder/${fileToEncodeSmall}.bin_rle_nr",
-            "$decodeFolder/$fileToEncodeSmall"
+            "$decodeFolder/$fileToEncodeSmall",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
         )
     }
 

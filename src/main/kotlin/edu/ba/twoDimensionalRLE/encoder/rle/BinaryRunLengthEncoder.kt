@@ -1,13 +1,11 @@
 package edu.ba.twoDimensionalRLE.encoder.rle
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.RangedEncoder
-import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.reduceToSingleChar
-import edu.ba.twoDimensionalRLE.extensions.toBitSet
-import edu.ba.twoDimensionalRLE.extensions.toBitSetList
+import edu.ba.twoDimensionalRLE.extensions.*
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.model.Matrix
 import edu.ba.twoDimensionalRLE.model.toMatrix
@@ -36,16 +34,20 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
     }
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
         var linesToEncode = ByteArray(0)
+        val currentLinesAsStrBuffer = StringBuffer()
         for (index in range) {
+            currentLinesAsStrBuffer.append(chunk.getLineFromChunkAsStringBuffer(index))
             val currentLine = chunk.getLineFromChunk(index, byteSize)
             linesToEncode += currentLine
             if (DEBUG) chunk.encodedLines[index] = encodeLineOfChunkAsByteArray(currentLine, byteSize, bitsPerNumber)
         }
         chunk.binRleEncodedNumbers = encodeLineOfChunkAsListOfNumbers(linesToEncode, byteSize, bitsPerNumber)
+        chunk.binRleEncodedNumbersFromBuffer = encodeLineOfChunkAsListOfNumbers(currentLinesAsStrBuffer.toByteArray(), byteSize, bitsPerNumber)
         return chunk
     }
 
@@ -86,6 +88,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         val result = StringBuffer()
         encodedLine.forEach {
             val bits = Integer.toBinaryString(it)
+            assert(bits.length <= bitPerNumber)
             result.append(bits.padStart(bitPerNumber, '0'))
         }
         return result
@@ -140,10 +143,15 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         var start = 0
         var endInclusive = expectedRange
 
+        try {
+
+
         for (index in range) {
             chunk.decodedLines[index] = lines.sliceArray(IntRange(start, endInclusive))
             start += expectedRange
             endInclusive += expectedRange
+        }} catch (e: IndexOutOfBoundsException) {
+            throw IllegalArgumentException("Parsed content is not directly mappable to lines of chunk!")
         }
     }
 
@@ -161,7 +169,9 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
             .toByteArray()
     }
 
-    override fun encode(inputFile: String, outputFile: String) {
+    override fun encode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         val input = File(inputFile)
         val stream = input.inputStream()
         val bytes = ByteArray(byteArraySize)
@@ -201,7 +211,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("Finished encoding as raw bit string and as rle bit string.")
         analyzer.printFileComparison(input, fileBinRLEStr)
 
-        log.info("### Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)... ###")
+        log.info("Starting to encodeChunk the rle encoded bit string as 4 bit each (base 16)...")
         fileBinRLEStr.inputStream().bufferedReader().lines().forEach { line ->
             encodeRLEtoNumberValue(line, fileBinRLEbitEncoded)
         }
@@ -406,7 +416,9 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         log.info("finished remapping & decoding original byte stream.")
     }
 
-    override fun decode(inputFile: String, outputFile: String) {
+    override fun decode(inputFile: String, outputFile: String,
+                        applyByteMapping: Boolean,
+                        applyBurrowsWheelerTransformation: Boolean) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
@@ -628,6 +640,31 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         bytes.forEach { byte ->
             result[index++] = inverseMapping[byte]!!
         }
+        return result
+    }
+
+    fun readBinRLENumbersFromStream(stream: BitStream, expectingBinRleNumbers: Int, bitsPerNumber: Int): List<Int> {
+        log.info("Reading binary rle encoded bytes from stream, expecting $expectingBinRleNumbers bytes after decoding...")
+        val rleNumbers = mutableListOf<Int>()
+
+        while (stream.position < stream.size && rleNumbers.size < expectingBinRleNumbers) {
+            val currentIntParsed = stream.readBits(bitsPerNumber, false).toInt()
+            //    log.debug("Parsed binary rle number $currentIntParsed, as 0x${Integer.toHexString(currentIntParsed)}")
+            rleNumbers.add(currentIntParsed)
+        }
+        log.info("Parsed ${rleNumbers.size} binary rle encoded numbers from stream.")
+        return rleNumbers.reversed()
+    }
+
+    fun decodeBinRleNumbersToBuffer(numbers : List<Int>, bitsPerNumber: Int) : StringBuffer {
+        val result = StringBuffer()
+        var currentBit = false
+
+        numbers.forEach { number ->
+            for (i in 0 until  number) result.append(if (currentBit) '1' else '0')
+           currentBit = !currentBit
+        }
+
         return result
     }
 }

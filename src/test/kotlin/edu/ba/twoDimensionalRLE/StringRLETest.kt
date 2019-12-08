@@ -38,25 +38,41 @@ class StringRLETest {
     @Test
     @Order(3)
     fun encodeStringRLE_short() {
-        strRLE.encode("data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle")
+        strRLE.encode(
+            "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
     @Test
     @Order(4)
     fun encodeStringRLE_long() {
-        strRLE.encode("data/$fileToEncode", "$encodeFolder/$fileToEncode.rle")
+        strRLE.encode(
+            "data/$fileToEncode", "$encodeFolder/$fileToEncode.rle",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
     @Test
     @Order(5)
     fun decodeStringRLE_long() {
-        strRLE.decode("$encodeFolder/${fileToEncode}.rle", "$decodeFolder/$fileToEncode")
+        strRLE.decode(
+            "$encodeFolder/${fileToEncode}.rle", "$decodeFolder/$fileToEncode",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
     @Test
     @Order(6)
     fun decodeStringRLE_short() {
-        strRLE.decode("$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall")
+        strRLE.decode(
+            "$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true
+        )
     }
 
 

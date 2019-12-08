@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.analysis
 
 import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import java.io.File
 
 class Analyzer() {
@@ -8,11 +9,13 @@ class Analyzer() {
     private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
     private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
     private var byteMapping = mutableMapOf<Byte, Byte>()
+    private val DEBUG = true
 
     init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
     }
 
     fun printMappingToFile(outputFile: File) {

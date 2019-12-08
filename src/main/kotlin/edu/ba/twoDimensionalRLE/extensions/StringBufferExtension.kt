@@ -3,13 +3,37 @@ package edu.ba.twoDimensionalRLE.extensions
 import loggersoft.kotlin.streams.BitStream
 import java.util.*
 
+
+@Deprecated("Use toByteSet!")
 fun StringBuffer.toBitSet(): BitSet {
     require(this.toString().matches(Regex("([01]*)")))
 
-    val result = BitSet()
+    val result = BitSet(this.length)
     this.forEachIndexed { index, char ->
         if (char == "1"[0]) result.set(index, true)
         else if (char == "0"[0]) result.set(index, false)
+    }
+    return result
+}
+
+@Deprecated("Use toByteSet!")
+fun StringBuffer.toBitSet(n :Int): BitSet {
+    require(this.toString().matches(Regex("([01]*)")))
+
+    val result = BitSet(n)
+    this.forEachIndexed { index, char ->
+        if (char == "1"[0]) result.set(index, true)
+        else if (char == "0"[0]) result.set(index, false)
+    }
+    return result
+}
+
+fun StringBuffer.toByteArray(): ByteArray {
+    require(this.toString().matches(Regex("([01]*)")))
+    var result = ByteArray(0)
+
+    this.chunked(8).forEach { chunk ->
+        result += Integer.parseInt(chunk,2).toByte()
     }
     return result
 }

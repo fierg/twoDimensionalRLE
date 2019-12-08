@@ -2,12 +2,10 @@ package edu.ba.twoDimensionalRLE
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
-import edu.ba.twoDimensionalRLE.extensions.reversed
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.File
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class HuffmanTest {
@@ -27,17 +25,6 @@ class HuffmanTest {
         private const val inputString = "aaaabbbccddefg"
     }
 
-    @Test
-    @Order(1)
-    fun cleanup() {
-        if (File(encodeFolder).exists()) {
-            File(encodeFolder).deleteRecursively()
-            File(decodeFolder).deleteRecursively()
-        }
-        File(encodeFolder).mkdirs()
-        File(decodeFolder).mkdirs()
-    }
-
     @ExperimentalUnsignedTypes
     @Test
     @Order(2)
@@ -52,7 +39,9 @@ class HuffmanTest {
     @Order(3)
     fun encodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}")
+        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
 
@@ -61,7 +50,9 @@ class HuffmanTest {
     @Order(5)
     fun decodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}")
+        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
 
@@ -70,7 +61,9 @@ class HuffmanTest {
     @Order(4)
     fun encodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}")
+        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 
     @ExperimentalUnsignedTypes
@@ -78,6 +71,8 @@ class HuffmanTest {
     @Order(6)
     fun decodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}")
+        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true)
     }
 }
