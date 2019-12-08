@@ -47,6 +47,8 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                         applyBurrowsWheelerTransformation: Boolean) {
         log.info("Parsing input file $inputFile ...")
         val bytes = File(inputFile).readBytes()
+
+        //TODO account for added bytes by bwt
         val count = File(inputFile).length()
         log.info("Parsed $count bytes. Writing to encoded File as expected length.")
 

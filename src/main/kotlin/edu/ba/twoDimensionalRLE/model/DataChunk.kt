@@ -98,8 +98,8 @@ open class DataChunk(val input: ByteArray) {
                     result.add(currentChunk)
                     currentChunk = DataChunk(ByteArray(0))
 
-                    if (result.size % 100 == 0){
-                        log.info("reconstructed chunk number ${result.size}")
+                    if (result.size % 1000 == 0){
+                        log.info("reconstructed lines of chunk number ${result.size}")
                     }
                 }
             } catch (e: Exception) {

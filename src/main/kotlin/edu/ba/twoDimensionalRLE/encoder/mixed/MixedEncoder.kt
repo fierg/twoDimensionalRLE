@@ -148,12 +148,14 @@ class MixedEncoder : Encoder {
         printEncodingInfo()
 
         log.info("Collecting all bytes to encode with huffman encoding to build dictionary...")
+        //TODO improve buffer collecting
         chunks.forEach {
             for (i in HUFF_BIT_RANGE) {
                 huffBuffer.append(it.getLineFromChunkAsStringBuffer(i))
             }
         }
 
+        log.debug("Creating byte array from ${huffBuffer.length} bit large buffer...")
         //TODO create better mapping creation to use less ram
         val huffBufferArray = huffBuffer.toByteArray()
         val huffmanMapping = huffmanEncoder.getHuffmanMapping(256, huffBufferArray)

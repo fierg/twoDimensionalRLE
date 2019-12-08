@@ -21,7 +21,9 @@ fun UByteArray.toBitSetList(): List<BitSet> {
 
 @ExperimentalUnsignedTypes
 fun ByteArray.toBinStringBuffer(): StringBuffer {
-    return StringBuffer(this.map { it.toUByte().toString(2).padStart(8, '0') }.reduce { acc, s -> acc + s })
+    val sb = StringBuffer()
+    this.map { it.toUByte().toString(2).padStart(8, '0') }.stream().forEach { sb.append(it) }
+    return sb
 }
 
 
