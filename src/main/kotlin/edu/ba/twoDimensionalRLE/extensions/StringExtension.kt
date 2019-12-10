@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.extensions
 
 import java.util.*
+import kotlin.experimental.or
 
 fun List<String>.reduceToSingleChar(): Char {
     return when (this.size) {
@@ -20,4 +21,16 @@ fun String.toBytePair(): Pair<BitSet, Int> {
         count++
     }
     return Pair(result, count)
+}
+
+
+fun String.binaryStringToByteArray(bitPosition: Int, input: ByteArray): ByteArray {
+    require(this.matches(Regex("([01]*)")))
+
+    this.forEachIndexed { index, char ->
+        when (char) {
+            '1' -> input[index] = input[index].or(2.pow(bitPosition).toByte())
+        }
+    }
+    return input
 }

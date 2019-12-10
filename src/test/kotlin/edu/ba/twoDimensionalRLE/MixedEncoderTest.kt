@@ -26,7 +26,7 @@ class MixedEncoderTest {
         private val encoder = MixedEncoder()
         private const val fileToEncodeSmall = "testFile_small.txt"
         private const val fileToEncodeSmall2 = "testFile_small2.txt"
-        private const val fileToEncode = "t8.shakespeare.txt"
+        private const val fileToEncode = "t8.shakespeare_medium.txt"
         private const val encodeFolder = "data/encoded/mixed"
         private const val decodeFolder = "data/decoded/mixed"
     }
@@ -49,7 +49,7 @@ class MixedEncoderTest {
         encoder.encode(
             "data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = false
         )
     }
 
@@ -59,10 +59,9 @@ class MixedEncoderTest {
         encoder.decode(
             "${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = false
         )
     }
-
 
     @Test
     @Order(3)
@@ -70,11 +69,11 @@ class MixedEncoderTest {
         encoder.encode(
             "data/${fileToEncodeSmall2}", "${encodeFolder}/${fileToEncodeSmall2}",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = false
         )
     }
 
-/*
+
     @Test
     @Order(4)
     fun encodeFile() {
@@ -83,7 +82,7 @@ class MixedEncoderTest {
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
         )
-    }*/
+    }
 
     @Test
     @Order(5)
@@ -119,7 +118,7 @@ class MixedEncoderTest {
         )
     }
 
-    /*
+
     @Test
     @Order(8)
     fun decodeFile() {
@@ -129,5 +128,5 @@ class MixedEncoderTest {
             applyBurrowsWheelerTransformation = true
         )
     }
-*/
+
 }

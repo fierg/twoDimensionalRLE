@@ -1,29 +1,23 @@
 package edu.ba.twoDimensionalRLE.model
 
 import de.jupf.staticlog.core.Logger
-import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
-import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.toBinStringBuffer
+import edu.ba.twoDimensionalRLE.extensions.*
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.ceil
-import kotlin.math.log
 
 @ExperimentalUnsignedTypes
 open class DataChunk(val input: ByteArray) {
 
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
-    val decodedLinesStrBuffer = mutableMapOf<Int, String>()
     var huffEncodedStringBuffer = StringBuffer()
     var huffEncodedBytes = 0
     var binRleEncodedNumbers = mutableListOf<Int>()
     var binRleEncodedNumbersFromBuffer = mutableListOf<Int>()
-    var bytesToEncodeWithHuffman = ByteArray(0)
-    val rleEncodedBytes = mutableListOf<Byte>()
-    val bytes = input.clone()
+    var bytes = input.clone()
 
 
     companion object {
@@ -65,15 +59,15 @@ open class DataChunk(val input: ByteArray) {
             log: Logger
         ): List<DataChunk> {
             log.info("Starting to reconstruct DataChunks from parsed buffers...")
-            val result = mutableListOf<DataChunk>()
-            var currentChunk = DataChunk(ByteArray(0))
+            var currentLinesOfChunk = mutableMapOf<Int, String>()
             var remainingSize = totalSize
-            val remainingBinRleBuffer = StringBuffer(binRleBuffer)
 
             log.info("Building buffer from bytes...")
-            val remainingHuffmanBuffer = huffDecodedBytes.toBinStringBuffer()
+            val remainingHuffmanBuffer = huffDecodedBytes.toBinStringBuffer().append("00")
             var currentLength = 1
 
+            log.info("Reconstructing lines of all chunks...")
+            val lineMaps = mutableListOf<Map<Int, String>>()
             try {
                 while (currentLength > 0) {
                     currentLength = if (remainingSize >= byteArraySize) {
@@ -85,30 +79,46 @@ open class DataChunk(val input: ByteArray) {
 
                     //build bin rle decoded lines
                     binRleRange.forEach { line ->
-                        currentChunk.decodedLinesStrBuffer[line] = remainingBinRleBuffer.substring(0, currentLength)
-                        remainingBinRleBuffer.delete(0, currentLength)
+                        currentLinesOfChunk[line] = binRleBuffer.substring(0, currentLength)
+                        binRleBuffer.delete(0, currentLength)
                     }
 
                     //huff decoded lines
                     huffRange.forEach { line ->
-                        currentChunk.decodedLinesStrBuffer[line] = remainingHuffmanBuffer.substring(0, currentLength)
+                        currentLinesOfChunk[line] = remainingHuffmanBuffer.substring(0, currentLength)
                         remainingHuffmanBuffer.delete(0, currentLength)
                     }
 
-                    result.add(currentChunk)
-                    currentChunk = DataChunk(ByteArray(0))
+                    lineMaps.add(currentLinesOfChunk)
+                    currentLinesOfChunk = mutableMapOf()
 
-                    if (result.size % 1000 == 0){
-                        log.info("reconstructed lines of chunk number ${result.size}")
+                    if (lineMaps.size % 1000 == 0) {
+                        log.info("reconstructed lines of chunk number ${lineMaps.size}")
                     }
                 }
             } catch (e: Exception) {
                 //TODO check if really no mor data is left
                 log.debug("Unable to parse further chunks!")
             }
-
             log.info("Finished reconstructing all lines in all chunks.")
+
+            log.info("Reconstructing bytes of all chunks from their lines...")
+
+            val result = mutableListOf<DataChunk>()
+            lineMaps.forEach { result.add(buildBytesFromLines(it)) }
+
+            log.info("Finished reading chunks from decoded Buffers.")
             return result
+        }
+
+        private fun buildBytesFromLines(lines: Map<Int, String>): DataChunk {
+            assert(lines.values.all { it.length == lines.values.first().length }) { "Not all lines have an equal length!" }
+            val result = ByteArray(lines.values.first().length)
+
+            lines.toSortedMap().forEach { (index, buffer) ->
+                buffer.binaryStringToByteArray(index, result)
+            }
+            return DataChunk(result)
         }
 
     }
@@ -170,5 +180,22 @@ open class DataChunk(val input: ByteArray) {
             writer.write(bytes)
         }
     }
-}
 
+    fun debugPrintBinLines(fileOut: String) {
+        val lines = mutableMapOf<Int, StringBuffer>()
+        (0..7).map { lines[it] = StringBuffer() }
+
+        this.bytes.forEach { it ->
+            var line = 0
+            it.toUByte().toString(2).padStart(8,'0').forEach {
+                lines[line++]!!.append(it)
+            }
+        }
+
+        FileOutputStream(fileOut, true).use { writer ->
+            lines.toSortedMap().forEach{
+                writer.write(it.value.toByteArray())
+            }
+        }
+    }
+}

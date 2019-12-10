@@ -79,8 +79,8 @@ class MixedEncoder : Encoder {
             //     val rlelentgh = readHeaderFromEncodedFile(stream)
 
             log.info("Trying to parse number of huffman encoded bytes...")
-            val huffmanlentgh = readHeaderFromEncodedFile(stream)
-            log.info("Expecting $binRLElentgh bytes of binary rle encoded, then $huffmanlentgh bytes of huffman encoded bytes.")
+            val huffmanLength = readHeaderFromEncodedFile(stream)
+            log.info("Expecting $binRLElentgh binary rle encoded numbers with size $bitsPerRLENumber bits, then $huffmanLength bytes of huffman encoded bytes.")
 
             val huffmanMappingSize = readHeaderFromEncodedFile(stream)
             val huffmanMapping = huff.parseHuffmanMappingFromStream(stream, huffmanMappingSize, log)
@@ -93,7 +93,7 @@ class MixedEncoder : Encoder {
 
             val mapping = readByteMappingFromStream(stream, byteMappingSize, log)
             val binRleNumbers = binRLE.readBinRLENumbersFromStream(stream, binRLElentgh, bitsPerRLENumber)
-            val huffDecoded = huff.decodeFromStream(huffmanMapping, stream, huffmanlentgh)
+            val huffDecoded = huff.decodeFromStream(huffmanMapping, stream, huffmanLength)
 
 
             val decodedChunks = DataChunk.readChunksFromDecodedParts(
@@ -110,10 +110,11 @@ class MixedEncoder : Encoder {
             log.info("Applying reverted byte mapping to all chunks...")
             val remappedBytes = applyMapping(decodedChunks, mapping, outputFile)
 
-            val result = bwt.invertTransformationParallel(remappedBytes)
+          //  val result = mutableListOf<DataChunk>()
+            //remappedBytes.forEach { result.add( bwt.invertTransformDataChunk(it))}
 
             log.info("Writing decoded result to $outputFile")
-            result.forEach { it.appendCurrentChunkToFile(outputFile) }
+            remappedBytes.forEach { it.appendCurrentChunkToFile(outputFile) }
         }
 
     }
@@ -137,13 +138,24 @@ class MixedEncoder : Encoder {
         analyzer.analyzeFile(input)
         analyzer.addBWTSymbolsToMapping()
 
+        if (DEBUG) {
+            chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines")}
+        }
+
         if (applyBurrowsWheelerTransformation){
             chunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
             totalSize += (chunks.count() * 2)
+            if (DEBUG) {
+                chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines_bwt")}
+            }
         }
 
-        if (applyByteMapping)
+        if (applyByteMapping) {
             chunks = applyMapping(chunks, analyzer.getByteMapping(), outputFile)
+            if (DEBUG) {
+                chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines_mapped")}
+            }
+        }
 
         printEncodingInfo()
 
