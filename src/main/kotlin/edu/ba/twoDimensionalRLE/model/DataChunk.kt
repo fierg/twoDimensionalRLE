@@ -1,10 +1,7 @@
 package edu.ba.twoDimensionalRLE.model
 
 import de.jupf.staticlog.core.Logger
-import edu.ba.twoDimensionalRLE.extensions.binaryStringToByteArray
-import edu.ba.twoDimensionalRLE.extensions.isWholeNumber
-import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.toBinStringBuffer
+import edu.ba.twoDimensionalRLE.extensions.*
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.experimental.and
@@ -16,13 +13,10 @@ open class DataChunk(val input: ByteArray) {
 
     val encodedLines = mutableMapOf<Int, ByteArray>()
     val decodedLines = mutableMapOf<Int, ByteArray>()
-    val decodedLinesStrBuffer = mutableMapOf<Int, String>()
     var huffEncodedStringBuffer = StringBuffer()
     var huffEncodedBytes = 0
     var binRleEncodedNumbers = mutableListOf<Int>()
     var binRleEncodedNumbersFromBuffer = mutableListOf<Int>()
-    var bytesToEncodeWithHuffman = ByteArray(0)
-    val rleEncodedBytes = mutableListOf<Byte>()
     var bytes = input.clone()
 
 
@@ -118,10 +112,10 @@ open class DataChunk(val input: ByteArray) {
         }
 
         private fun buildBytesFromLines(lines: Map<Int, String>): DataChunk {
-            assert(lines.values.all { it.length == lines.values.first().length }) {"Not all lines have an equal length!"}
+            assert(lines.values.all { it.length == lines.values.first().length }) { "Not all lines have an equal length!" }
             val result = ByteArray(lines.values.first().length)
 
-            lines.forEach { (index, buffer) ->
+            lines.toSortedMap().forEach { (index, buffer) ->
                 buffer.binaryStringToByteArray(index, result)
             }
             return DataChunk(result)
@@ -184,6 +178,24 @@ open class DataChunk(val input: ByteArray) {
     fun appendCurrentChunkToFile(fileOut: String) {
         FileOutputStream(fileOut, true).use { writer ->
             writer.write(bytes)
+        }
+    }
+
+    fun debugPrintBinLines(fileOut: String) {
+        val lines = mutableMapOf<Int, StringBuffer>()
+        (0..7).map { lines[it] = StringBuffer() }
+
+        this.bytes.forEach { it ->
+            var line = 0
+            it.toUByte().toString(2).padStart(8,'0').forEach {
+                lines[line++]!!.append(it)
+            }
+        }
+
+        FileOutputStream(fileOut, true).use { writer ->
+            lines.toSortedMap().forEach{
+                writer.write(it.value.toByteArray())
+            }
         }
     }
 }

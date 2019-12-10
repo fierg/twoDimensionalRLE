@@ -28,7 +28,7 @@ class MixedEncoder : Encoder {
     private val bwt = BurrowsWheelerTransformation()
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-    private val DEBUG = false
+    private val DEBUG = true
 
     private val log = Log.kotlinInstance()
 
@@ -138,13 +138,24 @@ class MixedEncoder : Encoder {
         analyzer.analyzeFile(input)
         analyzer.addBWTSymbolsToMapping()
 
+        if (DEBUG) {
+            chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines")}
+        }
+
         if (applyBurrowsWheelerTransformation){
             chunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
             totalSize += (chunks.count() * 2)
+            if (DEBUG) {
+                chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines_bwt")}
+            }
         }
 
-        if (applyByteMapping)
+        if (applyByteMapping) {
             chunks = applyMapping(chunks, analyzer.getByteMapping(), outputFile)
+            if (DEBUG) {
+                chunks.forEach {  it.debugPrintBinLines(outputFile + "_in_lines_mapped")}
+            }
+        }
 
         printEncodingInfo()
 

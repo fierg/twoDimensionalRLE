@@ -63,7 +63,6 @@ class MixedEncoderTest {
         )
     }
 
-
     @Test
     @Order(3)
     fun encodeFileSmall2() {
@@ -73,7 +72,7 @@ class MixedEncoderTest {
             applyBurrowsWheelerTransformation = false
         )
     }
-/*
+
 
     @Test
     @Order(4)
@@ -83,7 +82,7 @@ class MixedEncoderTest {
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
         )
-    }*/
+    }
 
     @Test
     @Order(5)
@@ -119,7 +118,7 @@ class MixedEncoderTest {
         )
     }
 
-    /*
+
     @Test
     @Order(8)
     fun decodeFile() {
@@ -129,5 +128,5 @@ class MixedEncoderTest {
             applyBurrowsWheelerTransformation = true
         )
     }
-*/
+
 }
