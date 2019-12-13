@@ -132,7 +132,7 @@ class MixedEncoder : Encoder {
         var totalSize = input.length()
         val huffmanEncoder = HuffmanEncoder()
         var chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
-        val huffBuffer = StringBuffer()
+        val huffBuffer = mutableListOf<Boolean>()
 
         analyzer.analyzeFile(input)
         analyzer.addBWTSymbolsToMapping()
@@ -158,15 +158,15 @@ class MixedEncoder : Encoder {
 
         printEncodingInfo()
 
-        log.info("Collecting all bytes to encode with huffman encoding to build dictionary...")
+        log.info("Collecting all bits to encode with huffman encoding to build dictionary...")
         //TODO improve buffer collecting
         chunks.forEach {
             for (i in HUFF_BIT_RANGE) {
-                huffBuffer.append(it.getLineFromChunkAsStringBuffer(i))
+                huffBuffer.addAll(it.getLineFromChunkAsBoolList(i))
             }
         }
 
-        log.debug("Creating byte array from ${huffBuffer.length} bit large buffer...")
+        log.debug("Creating byte array from ${huffBuffer.size} bit large buffer...")
         //TODO create better mapping creation to use less ram
         val huffBufferArray = huffBuffer.toByteArray()
         val huffmanMapping = huffmanEncoder.getHuffmanMapping(256, huffBufferArray)

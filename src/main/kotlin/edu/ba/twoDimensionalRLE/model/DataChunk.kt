@@ -55,11 +55,11 @@ open class DataChunk(val input: ByteArray) {
             rleRange: IntRange,
             huffRange: IntRange,
             huffDecodedBytes: ByteArray,
-            binRleBuffer: StringBuffer,
+            binRleBuffer: List<Boolean>,
             log: Logger
         ): List<DataChunk> {
             log.info("Starting to reconstruct DataChunks from parsed buffers...")
-            var currentLinesOfChunk = mutableMapOf<Int, String>()
+            var currentLinesOfChunk = mutableMapOf<Int, List<Boolean>>()
             var remainingSize = totalSize
 
             log.info("Building buffer from bytes...")
@@ -79,13 +79,13 @@ open class DataChunk(val input: ByteArray) {
 
                     //build bin rle decoded lines
                     binRleRange.forEach { line ->
-                        currentLinesOfChunk[line] = binRleBuffer.substring(0, currentLength)
-                        binRleBuffer.delete(0, currentLength)
+                        currentLinesOfChunk[line] = binRleBuffer.subList(0, currentLength)
+                        binRleBuffer.subList(currentLength, binRleBuffer.size)
                     }
 
                     //huff decoded lines
                     huffRange.forEach { line ->
-                        currentLinesOfChunk[line] = remainingHuffmanBuffer.substring(0, currentLength)
+                        currentLinesOfChunk[line] = remainingHuffmanBuffer.subSequence(0, currentLength)
                         remainingHuffmanBuffer.delete(0, currentLength)
                     }
 
@@ -148,6 +148,18 @@ open class DataChunk(val input: ByteArray) {
                 bits.append('1')
             } else {
                 bits.append('0')
+            }
+        }
+        return bits
+    }
+
+    fun getLineFromChunkAsBoolList(line: Int): List<Boolean> {
+        val bits = mutableListOf<Boolean>()
+        bytes.forEach { byte ->
+            if (byte.toInt().shl(7 - line).toUByte().toInt().shr(7) == 1) {
+                bits.add(true)
+            } else {
+                bits.add(false)
             }
         }
         return bits
