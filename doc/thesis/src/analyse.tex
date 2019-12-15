@@ -42,25 +42,38 @@ To have a comparison to some extent, the initial performance analysis was perfor
 	\end{tabular}
 \end{center}
 
-
-
-
 \ldots
 
 %% ==============================
 \section{Improvements by Preprocessing}
 %% ==============================
 \label{ch:Analysis:sec:Improvements by Preprocessing}
-- First improvements due to byte remapping\\
-- burrows wheeler transformation\\
+\subsection{Burrows-Wheeler-Transformation}
+- conflicting results \\
+- most corpus data not useable because of use characters \\
+- even further increases size
 \ldots
 
-%% ==============================
-\section{Further Improvements}
-%% ==============================
-\label{ch:Analysis:sec:Further Improvements}
-- combining different compression techniques\\
-\ldots
+\begin{center}
+	\begin{tabular}[p]{r|r|r}
+		\label{tab:t5 run length eval}
+		
+		bits per rle number & compression ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		\hline
+		3 & 231 & 18\\
+		2 & 206 & 16.5\\
+	\end{tabular}
+\end{center}
+
+
+\subsection{Vertical byte reading}
+\par{
+Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in example X.
+}
+
+\par{
+
+}
 
 
 %% ==============================
