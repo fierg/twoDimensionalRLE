@@ -35,8 +35,8 @@ class MixedEncoder : Encoder {
     companion object {
         private const val byteSize = 8
         private const val bitsPerRLENumber = 4
-        val BIN_RLE_BIT_RANGE = IntRange(7, 7)
-        val HUFF_BIT_RANGE = IntRange(0, 6)
+        val BIN_RLE_BIT_RANGE = IntRange(0, 7)
+        val HUFF_BIT_RANGE = IntRange(-1, -1)
         val RLE_RANGE = IntRange(-1, -1)
     }
 

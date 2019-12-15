@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
+import java.nio.file.Files
 
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -15,7 +16,7 @@ class StringRLECorpusTest {
     private var log = Log.kotlinInstance()
     private val applyByteMapping = true
     private val applyBWT = true
-    private val bitsPerRleNumber = 1
+    private val bitsPerRleNumber = 2
 
     init {
         log.newFormat {
@@ -335,9 +336,18 @@ class StringRLECorpusTest {
     @Test
     @Order(28)
     fun size() {
+        val sizeOriginal = Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile().length() }
+            .reduce { t: Long, u: Long -> t + u }.get()
+        val sizeEncoded =
+            Files.walk(File("$encodeFolder/CalgaryCorpus").toPath()).map { mapper -> mapper.toFile().length() }
+                .reduce { t: Long, u: Long -> t + u }.get()
+        val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
-      //  long size = Files.walk(path).mapToLong( p -> p.toFile().length() ).sum();
+        log.info("Galgary Corpus size original: ${sizeOriginal / 1000000.0} Mb")
+        log.info("Galgary Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
 
+        log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
+        log.info("with $bitsPerSymbol bits/symbol")
     }
 
 
