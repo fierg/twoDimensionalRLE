@@ -9,19 +9,36 @@
 The following chapter contains a detailed analysis of the problem and some fundamental requirements for the algorithm. 
 }
 
-\ldots
-
-%% ==============================
-\section{Prerequisites}
-%% ==============================
-\label{ch:Analysis:sec:Prerequisites}
-- prerequisites
-\ldots
-
 %% ==============================
 \section{Initial Findings}
 %% ==============================
 \label{ch:Analysis:sec:Initial Findings}
+
+\par{
+To have a comparison to some extent, the initial analysis was performed on the Galgary Corpus as well as the other well known compression methods. The results where very underwhelming as expeced, as shown in the table below.
+}
+
+\begin{center}
+	\begin{tabular}[p]{r|r|r}
+		%	\caption{Beschreibung der Tabelle}
+		
+		file &  original size & run length encoded size\\
+		\hline
+		0 &  00110101 & 0000110111\\
+		1 & 000111 & 010\\
+		2 & 0111 & 11\\
+		3 & 1000 & 10\\
+		4 & 1011 & 011\\
+		... &  & \\
+		20 & 0001000 & 00001101000\\
+		... & & \\
+		64+ & 11011 & 0000001111\\
+		128+ & 10010 & 000011001000
+		\label{tab:t4 run length Huffman codes}
+	\end{tabular}
+\end{center}
+
+
 
 \par{
 	Early findings\\

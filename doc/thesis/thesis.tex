@@ -21,6 +21,15 @@
 \usepackage{hyperref}
 \usepackage{csquotes}
 \usepackage[english]{babel}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\tikzset{
+	treenode/.style = {align=center, inner sep=0pt, text centered,
+		font=\sffamily},
+	arn_n/.style = {treenode, circle, white, font=\sffamily\bfseries, draw=black,
+		fill=black, text width=1.5em},% arbre rouge noir, noeud noir
+}
 
 % \usepackage{varioref}
 % \usepackage{verbatim}
