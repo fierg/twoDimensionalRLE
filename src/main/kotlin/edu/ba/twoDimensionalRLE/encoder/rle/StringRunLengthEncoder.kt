@@ -4,10 +4,17 @@ package edu.ba.twoDimensionalRLE.encoder.rle
 import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
+import edu.ba.twoDimensionalRLE.extensions.getSize
+import edu.ba.twoDimensionalRLE.extensions.pow
+import loggersoft.kotlin.streams.BitStream
+import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.nio.charset.Charset
 
+@ExperimentalUnsignedTypes
 class StringRunLengthEncoder : Encoder {
 
     private val log = Log.kotlinInstance()
@@ -101,7 +108,68 @@ class StringRunLengthEncoder : Encoder {
         log.info("Finished encoding.")
     }
 
-    @ExperimentalUnsignedTypes
+    fun encodeVarLength(
+        inputFile: String, outputFile: String,
+        bitPerRun: Int,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
+        log.info("Starting to encode file $inputFile with regular rle and $bitPerRun. Output file will be at $outputFile")
+        val input = File(inputFile)
+        val output = File(outputFile)
+        output.createNewFile()
+        var lastSeenByte = 0.toByte()
+        var counter = 0
+        val maxLength = 2.pow(bitPerRun) - 1
+
+        BitStream(output.openBinaryStream(false)).use { stream ->
+            FileInputStream(input).buffered().readBytes().forEach { byte ->
+                if (lastSeenByte == byte) {
+                    if (++counter == maxLength) {
+                        writeByteToStream(lastSeenByte, stream)
+                        writeRunToStream(counter, stream, bitPerRun)
+                        counter = 0
+                    }
+                } else {
+                    if (counter > 0) {
+                        writeByteToStream(lastSeenByte, stream)
+                        writeRunToStream(counter, stream, bitPerRun)
+                        counter = 1
+                        lastSeenByte = byte
+                    } else {
+                        counter++
+                        lastSeenByte = byte
+                    }
+                }
+            }
+            if (counter != 0){
+                writeByteToStream(lastSeenByte, stream)
+                writeRunToStream(counter, stream, bitPerRun)
+            }
+        }
+        log.info("Finished encoding.")
+    }
+
+    private fun writeRunToStream(counter: Int, stream: BitStream, bitPerRun: Int) {
+        counter.toString(2).padStart(bitPerRun, '0').reversed().forEach {
+            stream += when (it) {
+                '0' -> false
+                '1' -> true
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
+
+    private fun writeByteToStream(char: Byte, stream: BitStream) {
+        char.toUByte().toInt().toString(2).padStart(8, '0').reversed().forEach {
+            stream += when (it) {
+                '0' -> false
+                '1' -> true
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
+
     override fun decode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
@@ -128,6 +196,37 @@ class StringRunLengthEncoder : Encoder {
 
 
             }
+        }
+        log.info("Finished decoding $input to $output.")
+    }
+
+
+    fun decodeVarLength(
+        inputFile: String,
+        outputFile: String,
+        bitPerRun: Int,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean
+    ) {
+        val input = File(inputFile)
+        val output = File(outputFile)
+
+        log.info("Starting to decode $input with  $bitPerRun rle bits per number ...")
+        FileOutputStream(output, true).bufferedWriter(Charset.defaultCharset()).use { writer ->
+            var counter = 0
+            var char: Char
+            BitStream(input.openBinaryStream(true)).use { stream ->
+                while (stream.bitPosition < (stream.size - 1) * 8) {
+
+                    char = stream.readBits(8, false).toChar()
+                    counter = stream.readBits(bitPerRun, false).toInt()
+
+                    for (i in 0 until counter) {
+                        writer.write(char.toString())
+                    }
+                }
+            }
+
         }
         log.info("Finished decoding $input to $output.")
     }

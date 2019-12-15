@@ -4,6 +4,7 @@ import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
 
+@ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLETest {
     companion object {
@@ -45,6 +46,7 @@ class StringRLETest {
         )
     }
 
+
     @Test
     @Order(4)
     fun encodeStringRLE_long() {
@@ -72,6 +74,28 @@ class StringRLETest {
             "$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
+        )
+    }
+
+    @Test
+    @Order(7)
+    fun encodeStringRLEVar_short() {
+        strRLE.encodeVarLength(
+            "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle_var",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true,
+            bitPerRun = 4
+        )
+    }
+
+    @Test
+    @Order(8)
+    fun decodeStringRLEVar_short() {
+        strRLE.decodeVarLength(
+            "$encodeFolder/$fileToEncodeSmall.rle_var", "$decodeFolder/${fileToEncodeSmall}_var",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true,
+            bitPerRun = 4
         )
     }
 
