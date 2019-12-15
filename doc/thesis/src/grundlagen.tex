@@ -97,11 +97,11 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 	Run length coding might count as the simplest coding scheme that makes use of context and repeating occurrences as described in the Section \ref{ch:Introduction:sec:Motivation}. While the example made earlier was in textual representation, it is best suited and mostly used for pallet based bitmap images \cite{palette-image} such as fax transmissions or computer icons.
 }
 
-\subsection{The history of run length coding}
+\subsection{The history}
 \par{
  The ITU-T T4 (Group 3) standard for Facsimile (fax) machines \cite{ITU} is still in force for all devices used over regular phone lines. Each transmission sends a black and white image, where each pixel is called a \textit{pel} and with a horizontal resolution of $8.05 \: \frac{pels}{mm}$ and the vertical resolution depending on the mode. To encode each sequence of black and white pixels, the T4 standard uses RLE to encode each sequence of black and white pixels and since there are only two values, only the run length itself has to be encoded. It is assumed that the first run is always a white run, so there is a dummy white pel at the beginning of each sequence. For example, the sequence $bbbbwwbbbbb$ can be encoded as 1,4,2,5 with the leading white dummy pixel.
 }
-
+	
 \par{
 To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding can be used do code the sequence, since shorter runs like lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of these run lengths, the T4 defined a set of static Huffman codes, using a different codes for the black and white pixels.
 }
@@ -132,7 +132,7 @@ A small subset of the static T4 Huffman codes are given in Table \ref{tab:t4 run
 \par{
 By combining RLE with a probabilistic approach, the ratio of compression rises because we no longer have to encode a run of length 1 or 2 with a fixed size of bits each instead we can write a recognizable Huffman code of varying length, which will be explored in grater detail later on as well as the decoding of the shown Huffman codes.}
 
-\subsection{Limits of rle}
+\subsection{Limitations}
 \par{
 As mentioned in the Section \ref{ch:Introduction:sec:Problem statement}, run length encoding is rarely used for regular text or continuous tone images because its potentially increase in size, due to non repetitive characters or bytes. To reduce this problem there are several approaches known, partly implemented and used some of which will be addressed like a Burrows-Wheeler-Transformation.
 }
@@ -150,7 +150,9 @@ One way to address this problem is by adding extra stop symbols or encoding a le
 
 
 \subsection{Huffman Coding}
-
+\par{
+Huffman coding 
+}
 \begin{center}
 	\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1,
 		level distance = 1.5cm}] 
@@ -176,6 +178,11 @@ One way to address this problem is by adding extra stop symbols or encoding a le
 \end{center}
 ...
 
+\section{Other methods}
+\label{ch:Principles of compression:sec:Other}
+...
+\subsection{Burrows-Wheeler-Transformation}
+...
 %% ==============================
 \section{State of the Art}
 %% ==============================
