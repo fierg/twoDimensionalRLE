@@ -13,13 +13,21 @@ The following chapter contains a detailed analysis of the problem and some funda
 \section{Initial Findings}
 %% ==============================
 \label{ch:Analysis:sec:Initial Findings}
+\par{
+ Originally developed and used on black and white pallet images containing only two values, on a binary level so to speak, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. And this is the case for most printable characters as they al have a value between 32 and 127 (or 255 for the extended ASCII).
+}
 
 \par{
-To have a comparison to some extent, the initial analysis was performed on the Galgary Corpus as well as the other well known compression methods. The results where very underwhelming as expeced, as shown in the table below.
+RLE could also work on a byte level, because there should be repetitions of any kind. Byte level RLE encodes runs of identical byte values, ignoring individual bits and word boundaries. The most common byte level RLE scheme encodes runs of bytes into 2-byte packets. The first byte contains the run count of 1 to 256, and the second byte contains the value of the byte run. If a run exceeds a count of 256, it has to be encoded twice, one with count 256 and one with any further runs.
+}
+
+\par{
+ However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty, which is also shown in Table \ref{tab:t5 run length eval}.
+To have a comparison to some extent, the initial performance analysis was performed on the Calgary Corpus but the results where very underwhelming as expected, as shown in the table below. Even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line.
 }
 
 \begin{center}
-	\begin{tabular}[p]{r|r|r|r|r}
+	\begin{tabular}[p]{r|r|r}
 				\label{tab:t5 run length eval}
 		
 		bits per rle number & compression ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
@@ -35,21 +43,6 @@ To have a comparison to some extent, the initial analysis was performed on the G
 \end{center}
 
 
-
-\par{
-	Early findings\\
-- no matrix representation but chunks of type byteArray\\
-- static encoding difficulties\\
-}
-
-\par{
-Binary RLE on bits of same significance\\
-- similar to regular rle\\ 
-}
-
-\par{
-Only combination kinda effective
-}
 
 
 \ldots
