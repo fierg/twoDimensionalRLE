@@ -142,12 +142,16 @@ class StringRunLengthEncoder : Encoder {
                     }
                 }
             }
+            if (counter != 0){
+                writeByteToStream(lastSeenByte, stream)
+                writeRunToStream(counter, stream, bitPerRun)
+            }
         }
         log.info("Finished encoding.")
     }
 
     private fun writeRunToStream(counter: Int, stream: BitStream, bitPerRun: Int) {
-        counter.toString(2).padStart(bitPerRun, '0').forEach {
+        counter.toString(2).padStart(bitPerRun, '0').reversed().forEach {
             stream += when (it) {
                 '0' -> false
                 '1' -> true
@@ -157,7 +161,7 @@ class StringRunLengthEncoder : Encoder {
     }
 
     private fun writeByteToStream(char: Byte, stream: BitStream) {
-        char.toInt().toString(2).padStart(8, '0').forEach {
+        char.toUByte().toInt().toString(2).padStart(8, '0').reversed().forEach {
             stream += when (it) {
                 '0' -> false
                 '1' -> true
@@ -217,7 +221,7 @@ class StringRunLengthEncoder : Encoder {
                     char = stream.readBits(8, false).toChar()
                     counter = stream.readBits(bitPerRun, false).toInt()
 
-                    for (i in 0..counter) {
+                    for (i in 0 until counter) {
                         writer.write(char.toString())
                     }
                 }

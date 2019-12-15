@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 
+@ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLECorpusTest {
 
     private var log = Log.kotlinInstance()
+    private val applyByteMapping = true
+    private val applyBWT = true
+    private val bitsPerRleNumber = 1
 
     init {
         log.newFormat {
@@ -46,261 +50,294 @@ class StringRLECorpusTest {
     @Test
     @Order(2)
     fun encodeStringRLE_book1() {
-        strRLE.encode(
+        strRLE.encodeVarLength(
             "$folderToEncode/book1", "$encodeFolder/CalgaryCorpus/book1.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(3)
     fun decodeStringRLE_book1() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/book1.rle", "${decodeFolder}/CalgaryCorpus/book1",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/book1.rle",
+            "${decodeFolder}/CalgaryCorpus/book1",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(4)
     fun encodeStringRLE_book2() {
-        strRLE.encode(
-            "$folderToEncode/book2", "$encodeFolder/CalgaryCorpus/book2.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/book2", "$encodeFolder/CalgaryCorpus/book2.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(5)
     fun decodeStringRLE_book2() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/book2.rle", "${decodeFolder}/CalgaryCorpus/book2",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/book2.rle",
+            "${decodeFolder}/CalgaryCorpus/book2",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(6)
     fun encodeStringRLE_bib() {
-        strRLE.encode(
-            "$folderToEncode/bib", "$encodeFolder/CalgaryCorpus/bib.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/bib", "$encodeFolder/CalgaryCorpus/bib.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(7)
     fun decodeStringRLE_bib() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/bib.rle", "${decodeFolder}/CalgaryCorpus/bib",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/bib.rle",
+            "${decodeFolder}/CalgaryCorpus/bib",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(8)
     fun encodeStringRLE_geo() {
-        strRLE.encode(
-            "$folderToEncode/geo", "$encodeFolder/CalgaryCorpus/geo.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/geo", "$encodeFolder/CalgaryCorpus/geo.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(9)
     fun decodeStringRLE_geo() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/geo.rle", "${decodeFolder}/CalgaryCorpus/geo",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/geo.rle",
+            "${decodeFolder}/CalgaryCorpus/geo",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(10)
     fun encodeStringRLE_news() {
-        strRLE.encode(
-            "$folderToEncode/news", "$encodeFolder/CalgaryCorpus/news.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/news", "$encodeFolder/CalgaryCorpus/news.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(11)
     fun decodeStringRLE_news() {
-        strRLE.decode(
+        strRLE.decodeVarLength(
             "$encodeFolder/CalgaryCorpus/news.rle", "${decodeFolder}/CalgaryCorpus/news",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(12)
     fun encodeStringRLE_obj1() {
-        strRLE.encode(
-            "$folderToEncode/obj1", "$encodeFolder/CalgaryCorpus/obj1.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/obj1", "$encodeFolder/CalgaryCorpus/obj1.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(13)
     fun decodeStringRLE_obj1() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/obj1.rle", "${decodeFolder}/CalgaryCorpus/obj",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/obj1.rle",
+            "${decodeFolder}/CalgaryCorpus/obj",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(14)
     fun encodeStringRLE_paper1() {
-        strRLE.encode(
-            "$folderToEncode/paper1", "$encodeFolder/CalgaryCorpus/paper1.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/paper1", "$encodeFolder/CalgaryCorpus/paper1.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(15)
     fun decodeStringRLE_paper1() {
-        strRLE.decode(
+        strRLE.decodeVarLength(
             "$encodeFolder/CalgaryCorpus/paper1.rle", "${decodeFolder}/CalgaryCorpus/paper1",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(16)
     fun encodeStringRLE_paper2() {
-        strRLE.encode(
-            "$folderToEncode/paper2", "$encodeFolder/CalgaryCorpus/paper2.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/paper2", "$encodeFolder/CalgaryCorpus/paper2.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(17)
     fun decodeStringRLE_paper2() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/paper2.rle", "${decodeFolder}/CalgaryCorpus/paper2",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/paper2.rle",
+            "${decodeFolder}/CalgaryCorpus/paper2",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(18)
     fun encodeStringRLE_pic() {
-        strRLE.encode(
-            "$folderToEncode/pic", "$encodeFolder/CalgaryCorpus/pic.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/pic", "$encodeFolder/CalgaryCorpus/pic.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(19)
     fun decodeStringRLE_pic() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/pic.rle", "${decodeFolder}/CalgaryCorpus/pic",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/pic.rle",
+            "${decodeFolder}/CalgaryCorpus/pic",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(20)
     fun encodeStringRLE_progc() {
-        strRLE.encode(
-            "$folderToEncode/progc", "$encodeFolder/CalgaryCorpus/progc.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/progc", "$encodeFolder/CalgaryCorpus/progc.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(21)
     fun decodeStringRLE_progc() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/progc.rle", "${decodeFolder}/CalgaryCorpus/progc",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/progc.rle",
+            "${decodeFolder}/CalgaryCorpus/progc",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(22)
     fun encodeStringRLE_progl() {
-        strRLE.encode(
-            "$folderToEncode/progl", "$encodeFolder/CalgaryCorpus/progl.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/progl", "$encodeFolder/CalgaryCorpus/progl.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(23)
     fun decodeStringRLE_progl() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/progl.rle", "${decodeFolder}/CalgaryCorpus/progl",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/progl.rle",
+            "${decodeFolder}/CalgaryCorpus/progl",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(24)
     fun encodeStringRLE_progp() {
-        strRLE.encode(
-            "$folderToEncode/progp", "$encodeFolder/CalgaryCorpus/progp.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/progp", "$encodeFolder/CalgaryCorpus/progp.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(25)
     fun decodeStringRLE_progp() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/progp.rle", "${decodeFolder}/CalgaryCorpus/progp",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/progp.rle",
+            "${decodeFolder}/CalgaryCorpus/progp",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(26)
     fun encodeStringRLE_trans() {
-        strRLE.encode(
-            "$folderToEncode/trans", "$encodeFolder/CalgaryCorpus/trans.rle",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.encodeVarLength(
+            "$folderToEncode/trans", "$encodeFolder/CalgaryCorpus/trans.rle", applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
     }
 
     @Test
     @Order(27)
     fun decodeStringRLE_trans() {
-        strRLE.decode(
-            "$encodeFolder/CalgaryCorpus/trans.rle", "${decodeFolder}/CalgaryCorpus/trans",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+        strRLE.decodeVarLength(
+            "$encodeFolder/CalgaryCorpus/trans.rle",
+            "${decodeFolder}/CalgaryCorpus/trans",
+            applyByteMapping = applyByteMapping,
+            applyBurrowsWheelerTransformation = applyBWT,
+            bitPerRun = bitsPerRleNumber
         )
+    }
+
+    @Test
+    @Order(28)
+    fun size() {
+
+      //  long size = Files.walk(path).mapToLong( p -> p.toFile().length() ).sum();
+
     }
 
 
