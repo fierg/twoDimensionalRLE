@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.rle
 
 import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.*
@@ -21,9 +21,9 @@ class StringRLETest {
     @Test
     @Order(1)
     fun cleanup() {
-        if (File("$encodeFolder/${fileToEncode}.rle").exists()) {
-            File(encodeFolder).deleteRecursively()
-            File(decodeFolder).deleteRecursively()
+        if (File("$encodeFolder/$fileToEncode.rle").exists()) {
+            File(encodeFolder).listFiles().filter { !it.isDirectory }.forEach { it.delete() }
+            File(decodeFolder).listFiles().filter { !it.isDirectory }.forEach { it.delete() }
         }
         File(encodeFolder).mkdirs()
         File(decodeFolder).mkdirs()
@@ -61,7 +61,7 @@ class StringRLETest {
     @Order(5)
     fun decodeStringRLE_long() {
         strRLE.decode(
-            "$encodeFolder/${fileToEncode}.rle", "$decodeFolder/$fileToEncode",
+            "$encodeFolder/$fileToEncode.rle", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
         )

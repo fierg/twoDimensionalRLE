@@ -19,22 +19,18 @@ To have a comparison to some extent, the initial analysis was performed on the G
 }
 
 \begin{center}
-	\begin{tabular}[p]{r|r|r}
-		%	\caption{Beschreibung der Tabelle}
+	\begin{tabular}[p]{r|r|r|r|r}
+				\label{tab:t5 run length eval}
 		
-		file &  original size & run length encoded size\\
+		bits per rle number & compression ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		0 &  00110101 & 0000110111\\
-		1 & 000111 & 010\\
-		2 & 0111 & 11\\
-		3 & 1000 & 10\\
-		4 & 1011 & 011\\
-		... &  & \\
-		20 & 0001000 & 00001101000\\
-		... & & \\
-		64+ & 11011 & 0000001111\\
-		128+ & 10010 & 000011001000
-		\label{tab:t4 run length Huffman codes}
+		8 & 165 & 13.2 \\
+		7 & 154 & 12.38\\
+		6 & 144 & 11.57 \\
+		5 & 134 & 10.77\\
+		4 & 125 & 10.00\\
+		3 & 116 & 9.29\\
+		2 & 109 & 8.74 \\
 	\end{tabular}
 \end{center}
 

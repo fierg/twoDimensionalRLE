@@ -213,9 +213,9 @@ class StringRunLengthEncoder : Encoder {
 
         log.info("Starting to decode $input with  $bitPerRun rle bits per number ...")
         FileOutputStream(output, true).bufferedWriter(Charset.defaultCharset()).use { writer ->
-            var counter = 0
-            var char: Char
             BitStream(input.openBinaryStream(true)).use { stream ->
+                var counter = 0
+                var char: Char
                 while (stream.bitPosition < (stream.size - 1) * 8) {
 
                     char = stream.readBits(8, false).toChar()
