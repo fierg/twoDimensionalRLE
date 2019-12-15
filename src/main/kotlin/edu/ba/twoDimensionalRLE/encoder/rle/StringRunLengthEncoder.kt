@@ -7,6 +7,8 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
 import edu.ba.twoDimensionalRLE.extensions.getSize
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.model.DataChunk
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -112,39 +114,52 @@ class StringRunLengthEncoder : Encoder {
         inputFile: String, outputFile: String,
         bitPerRun: Int,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean,
+        chunkSize: Int
     ) {
         log.info("Starting to encode file $inputFile with regular rle and $bitPerRun. Output file will be at $outputFile")
         val input = File(inputFile)
         val output = File(outputFile)
         output.createNewFile()
+
+        var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
+
+        if (applyBurrowsWheelerTransformation) {
+            val bwt = BurrowsWheelerTransformation()
+            log.info("Performing burrows wheeler transformation on all chunks...")
+            chunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
+        }
+
         var lastSeenByte = 0.toByte()
         var counter = 0
         val maxLength = 2.pow(bitPerRun) - 1
 
         BitStream(output.openBinaryStream(false)).use { stream ->
-            FileInputStream(input).buffered().readBytes().forEach { byte ->
-                if (lastSeenByte == byte) {
-                    if (++counter == maxLength) {
-                        writeByteToStream(lastSeenByte, stream)
-                        writeRunToStream(counter, stream, bitPerRun)
-                        counter = 0
-                    }
-                } else {
-                    if (counter > 0) {
-                        writeByteToStream(lastSeenByte, stream)
-                        writeRunToStream(counter, stream, bitPerRun)
-                        counter = 1
-                        lastSeenByte = byte
+
+            chunks.forEach { chunk ->
+                chunk.bytes.forEach { byte ->
+                    if (lastSeenByte == byte) {
+                        if (++counter == maxLength) {
+                            writeByteToStream(lastSeenByte, stream)
+                            writeRunToStream(counter, stream, bitPerRun)
+                            counter = 0
+                        }
                     } else {
-                        counter++
-                        lastSeenByte = byte
+                        if (counter > 0) {
+                            writeByteToStream(lastSeenByte, stream)
+                            writeRunToStream(counter, stream, bitPerRun)
+                            counter = 1
+                            lastSeenByte = byte
+                        } else {
+                            counter++
+                            lastSeenByte = byte
+                        }
+                    }
+                    if (counter != 0) {
+                        writeByteToStream(lastSeenByte, stream)
+                        writeRunToStream(counter, stream, bitPerRun)
                     }
                 }
-            }
-            if (counter != 0){
-                writeByteToStream(lastSeenByte, stream)
-                writeRunToStream(counter, stream, bitPerRun)
             }
         }
         log.info("Finished encoding.")
@@ -193,8 +208,6 @@ class StringRunLengthEncoder : Encoder {
                 } else {
                     count = byte.toUByte().toInt()
                 }
-
-
             }
         }
         log.info("Finished decoding $input to $output.")
@@ -206,28 +219,45 @@ class StringRunLengthEncoder : Encoder {
         outputFile: String,
         bitPerRun: Int,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean,
+        chunkSize: Int
     ) {
         val input = File(inputFile)
         val output = File(outputFile)
+        var currentBytes = mutableListOf<Byte>()
+        var chunks = mutableListOf<DataChunk>()
 
         log.info("Starting to decode $input with  $bitPerRun rle bits per number ...")
-        FileOutputStream(output, true).bufferedWriter(Charset.defaultCharset()).use { writer ->
-            BitStream(input.openBinaryStream(true)).use { stream ->
-                var counter = 0
-                var char: Char
-                while (stream.bitPosition < (stream.size - 1) * 8) {
+        BitStream(input.openBinaryStream(true)).use { stream ->
+            var counter = 0
+            var char: Byte
+            while (stream.bitPosition < (stream.size - 1) * 8) {
 
-                    char = stream.readBits(8, false).toChar()
-                    counter = stream.readBits(bitPerRun, false).toInt()
+                char = stream.readBits(8, false).toByte()
+                counter = stream.readBits(bitPerRun, false).toInt()
 
-                    for (i in 0 until counter) {
-                        writer.write(char.toString())
+                for (i in 0 until counter) {
+                    currentBytes.add(char)
+                    if (currentBytes.size == chunkSize) {
+                        chunks.add(DataChunk(currentBytes.toByteArray()))
+                        currentBytes = mutableListOf()
                     }
                 }
             }
-
+            if (currentBytes.size > 0) {
+                chunks.add(DataChunk(currentBytes.toByteArray()))
+            }
         }
+        log.info("Decoded into ${chunks.size} chunks of size $chunkSize bytes.")
+
+
+        if (applyBurrowsWheelerTransformation) {
+            val bwt = BurrowsWheelerTransformation()
+            log.info("Performing inverse burrows wheeler transformation on all chunks...")
+            chunks = bwt.invertTransformationParallel(chunks).toMutableList()
+        }
+
+        chunks.forEach { it.appendCurrentChunkToFile(outputFile) }
         log.info("Finished decoding $input to $output.")
     }
 

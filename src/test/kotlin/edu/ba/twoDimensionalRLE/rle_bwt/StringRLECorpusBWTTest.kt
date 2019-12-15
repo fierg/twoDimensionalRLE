@@ -12,10 +12,11 @@ import java.nio.file.Files
 
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class StringRLECorpus2BitTest {
+class StringRLECorpusBWTTest {
 
     private var log = Log.kotlinInstance()
     private val strRLE = StringRunLengthEncoder()
+    private val chunksize = 512
 
 
     init {
@@ -33,8 +34,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 2
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/2bit"
-        val decodeFolder = "data/decoded/rle/2bit"
+        val encodeFolder = "data/encoded/rle_bwt/2bit"
+        val decodeFolder = "data/decoded/rle_bwt/2bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -52,13 +53,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 
@@ -86,8 +88,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 3
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/3bit"
-        val decodeFolder = "data/decoded/rle/3bit"
+        val encodeFolder = "data/encoded/rle_bwt/3bit"
+        val decodeFolder = "data/decoded/rle_bwt/3bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -105,13 +107,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 
@@ -129,6 +132,7 @@ class StringRLECorpus2BitTest {
         log.info("with $bitsPerSymbol bits/symbol")
 
     }
+
     @Test
     @Order(4)
     fun encodeAndDecodeCorpus4BitRle_bwt() {
@@ -138,8 +142,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 4
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/3bit"
-        val decodeFolder = "data/decoded/rle/3bit"
+        val encodeFolder = "data/encoded/rle_bwt/3bit"
+        val decodeFolder = "data/decoded/rle_bwt/3bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -157,13 +161,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 
@@ -191,8 +196,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 5
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/5bit"
-        val decodeFolder = "data/decoded/rle/5bit"
+        val encodeFolder = "data/encoded/rle_bwt/5bit"
+        val decodeFolder = "data/decoded/rle_bwt/5bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -210,13 +215,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 
@@ -234,6 +240,7 @@ class StringRLECorpus2BitTest {
         log.info("with $bitsPerSymbol bits/symbol")
 
     }
+
     @Test
     @Order(6)
     fun encodeAndDecodeCorpus6BitRle_bwt() {
@@ -243,8 +250,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 6
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/6bit"
-        val decodeFolder = "data/decoded/rle/6bit"
+        val encodeFolder = "data/encoded/rle_bwt/6bit"
+        val decodeFolder = "data/decoded/rle_bwt/6bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -262,13 +269,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 
@@ -286,6 +294,7 @@ class StringRLECorpus2BitTest {
         log.info("with $bitsPerSymbol bits/symbol")
 
     }
+
     @Test
     @Order(7)
     fun encodeAndDecodeCorpus7BitRle_bwt() {
@@ -295,8 +304,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 7
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/7bit"
-        val decodeFolder = "data/decoded/rle/7bit"
+        val encodeFolder = "data/encoded/rle_bwt/7bit"
+        val decodeFolder = "data/decoded/rle_bwt/7bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -314,13 +323,13 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
         }
 
@@ -338,6 +347,7 @@ class StringRLECorpus2BitTest {
         log.info("with $bitsPerSymbol bits/symbol")
 
     }
+
     @Test
     @Order(8)
     fun encodeAndDecodeCorpus8BitRle_bwt() {
@@ -347,8 +357,8 @@ class StringRLECorpus2BitTest {
         val bitsPerRleNumber = 8
 
         val folderToEncode = "data/corpus/CalgaryCorpus"
-        val encodeFolder = "data/encoded/rle/8bit"
-        val decodeFolder = "data/decoded/rle/8bit"
+        val encodeFolder = "data/encoded/rle_bwt/8bit"
+        val decodeFolder = "data/decoded/rle_bwt/8bit"
 
         if (File("$encodeFolder/CalgaryCorpus").exists()) {
             log.info("deleting directory: $encodeFolder/CalgaryCorpus")
@@ -366,13 +376,14 @@ class StringRLECorpus2BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber, chunkSize =chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
+                , chunkSize = chunksize
             )
         }
 

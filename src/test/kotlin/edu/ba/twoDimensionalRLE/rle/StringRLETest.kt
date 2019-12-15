@@ -84,7 +84,7 @@ class StringRLETest {
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle_var",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
-            bitPerRun = 4
+            bitPerRun = 4 , chunkSize = 256
         )
     }
 
@@ -96,7 +96,7 @@ class StringRLETest {
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
             bitPerRun = 4
-        )
+            , chunkSize = 256)
     }
 
 

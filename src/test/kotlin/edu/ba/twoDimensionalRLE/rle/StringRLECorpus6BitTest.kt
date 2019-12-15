@@ -58,14 +58,14 @@ class StringRLECorpus6BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber
+                bitPerRun = bitsPerRleNumber , chunkSize = 256
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
-            )
+                , chunkSize = 256)
         }
 
     }

@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 class BurrowsWheelerTransformation {
 
     private var log = Log.kotlinInstance()
-    private val DEBUG = true
+    private val DEBUG = false
 
     init {
         log.newFormat {
