@@ -17,13 +17,13 @@ interface Encoder {
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
     )
     fun decode(
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
     )
 
     fun writeDecodedLengthHeaderToFile(count: Long, stream: BitStream, log: Logger): Long {

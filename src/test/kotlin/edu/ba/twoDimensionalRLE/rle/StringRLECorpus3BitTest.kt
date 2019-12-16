@@ -80,8 +80,8 @@ class StringRLECorpus3BitTest {
                 .reduce { t: Long, u: Long -> t + u }.get()
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
-        log.info("Galgary Corpus size original: ${sizeOriginal / 1000000.0} Mb")
-        log.info("Galgary Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
+        log.info("Calgary Corpus size original: ${sizeOriginal / 1000000.0} Mb")
+        log.info("Calgary Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
 
         log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
         log.info("with $bitsPerSymbol bits/symbol")

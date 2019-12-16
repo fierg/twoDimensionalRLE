@@ -7,6 +7,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BinaryRLETest {
+    private val byteArraySize = 256
 
     companion object {
         private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
@@ -36,6 +37,7 @@ class BinaryRLETest {
         binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
+        , byteArraySize = byteArraySize
         )
     }
 
@@ -47,7 +49,7 @@ class BinaryRLETest {
             "$encodeFolder/${fileToEncodeSmall}.bin_rle_nr",
             "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
         )
     }
 
@@ -55,11 +57,11 @@ class BinaryRLETest {
     @Test
     @Order(7)
     fun encodeAndDecodeFileMapped() {
-        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp")
+        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncode}", "$encodeFolder/${fileToEncode}.mp", byteArraySize = byteArraySize)
         binaryRunLengthEncoder.decodeMapped(
             "$encodeFolder/$fileToEncode.mp_nr",
             "$decodeFolder/${fileToEncode}.mp",
-            mapping
+            mapping, byteArraySize = byteArraySize
         )
 
     }
@@ -67,11 +69,11 @@ class BinaryRLETest {
     @Test
     @Order(8)
     fun encodeAndDecodeFileMappedSmall() {
-        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp")
+        val mapping = binaryRunLengthEncoder.encodeMapped("data/${fileToEncodeSmall}", "$encodeFolder/${fileToEncodeSmall}.mp", byteArraySize = byteArraySize)
         binaryRunLengthEncoder.decodeMapped(
             "$encodeFolder/$fileToEncodeSmall.mp_nr",
             "$decodeFolder/${fileToEncodeSmall}.mp",
-            mapping
+            mapping, byteArraySize = byteArraySize
         )
 
     }
