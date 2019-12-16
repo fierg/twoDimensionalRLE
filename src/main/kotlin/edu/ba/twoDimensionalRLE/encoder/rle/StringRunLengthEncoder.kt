@@ -4,8 +4,6 @@ package edu.ba.twoDimensionalRLE.encoder.rle
 import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.encoder.Encoder
-import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
-import edu.ba.twoDimensionalRLE.extensions.getSize
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
@@ -14,7 +12,6 @@ import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.nio.charset.Charset
 
 @ExperimentalUnsignedTypes
 class StringRunLengthEncoder : Encoder {
@@ -78,7 +75,7 @@ class StringRunLengthEncoder : Encoder {
     override fun encode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
     ) {
         log.info("Starting to encode file $inputFile with regular rle. Output file will be at $outputFile")
         val input = File(inputFile)
@@ -121,6 +118,10 @@ class StringRunLengthEncoder : Encoder {
         val input = File(inputFile)
         val output = File(outputFile)
         output.createNewFile()
+        var chunkSize = chunkSize
+        if (applyBurrowsWheelerTransformation) {
+            chunkSize -= 2
+        }
 
         var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
 
@@ -155,11 +156,12 @@ class StringRunLengthEncoder : Encoder {
                             lastSeenByte = byte
                         }
                     }
-                    if (counter != 0) {
-                        writeByteToStream(lastSeenByte, stream)
-                        writeRunToStream(counter, stream, bitPerRun)
-                    }
+
                 }
+            }
+            if (counter != 0) {
+                writeByteToStream(lastSeenByte, stream)
+                writeRunToStream(counter, stream, bitPerRun)
             }
         }
         log.info("Finished encoding.")
@@ -188,7 +190,7 @@ class StringRunLengthEncoder : Encoder {
     override fun decode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
     ) {
         val input = File(inputFile)
         val output = File(outputFile)

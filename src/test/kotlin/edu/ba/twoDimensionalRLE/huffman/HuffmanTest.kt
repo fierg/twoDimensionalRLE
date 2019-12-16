@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.huffman
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class HuffmanTest {
     private var log = Log.kotlinInstance()
+    private val byteArraySize = 256
 
     init {
         log.newFormat {
@@ -39,9 +40,9 @@ class HuffmanTest {
     @Order(3)
     fun encodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncodeSmall}", "${encodeFolder}/${fileToEncodeSmall}",
+        encoder.encode("data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
 
@@ -50,9 +51,9 @@ class HuffmanTest {
     @Order(5)
     fun decodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.decode("${encodeFolder}/${fileToEncodeSmall}", "${decodeFolder}/${fileToEncodeSmall}",
+        encoder.decode("$encodeFolder/$fileToEncodeSmall", "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
 
@@ -61,9 +62,9 @@ class HuffmanTest {
     @Order(4)
     fun encodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/${fileToEncode}", "${encodeFolder}/${fileToEncode}",
+        encoder.encode("data/$fileToEncode", "$encodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @ExperimentalUnsignedTypes
@@ -71,8 +72,8 @@ class HuffmanTest {
     @Order(6)
     fun decodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.decode( "${encodeFolder}/${fileToEncode}", "${decodeFolder}/${fileToEncode}",
+        encoder.decode( "$encodeFolder/$fileToEncode", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 }

@@ -24,19 +24,18 @@ import kotlin.math.log2
 @ExperimentalUnsignedTypes
 class MixedEncoder : Encoder {
 
-    private val byteArraySize = 254
     private val bwt = BurrowsWheelerTransformation()
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-    private val DEBUG = true
+    private val DEBUG = false
 
     private val log = Log.kotlinInstance()
 
     companion object {
         private const val byteSize = 8
         private const val bitsPerRLENumber = 4
-        val BIN_RLE_BIT_RANGE = IntRange(0, 7)
-        val HUFF_BIT_RANGE = IntRange(-1, -1)
+        val BIN_RLE_BIT_RANGE = IntRange(2, 7)
+        val HUFF_BIT_RANGE = IntRange(0, 1)
         val RLE_RANGE = IntRange(-1, -1)
     }
 
@@ -50,16 +49,16 @@ class MixedEncoder : Encoder {
 
     override fun encode(
         inputFile: String, outputFile: String, applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean , byteArraySize: Int
     ) {
-        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation)
+        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation, byteArraySize)
     }
 
     override fun decode(
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean) {
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int) {
         val input = File(inputFile)
         val huff = HuffmanEncoder()
         val binRLE = BinaryRunLengthEncoder()
@@ -127,7 +126,7 @@ class MixedEncoder : Encoder {
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
     ) {
         val input = File(inputFile)
         var totalSize = input.length()
@@ -399,7 +398,7 @@ class MixedEncoder : Encoder {
                     rleNumbers.add(stream.readBits(bitsPerRLENumber, false).toInt())
                 }
 
-                rle.decodeChunkBinRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers)
+                rle.decodeChunkBinRLE(currentChunk, rleRange, bitsPerRLENumber, byteSize, rleNumbers, byteArraySize)
                 huff.decodeChunkHuffman(
                     currentChunk,
                     HUFF_BIT_RANGE,

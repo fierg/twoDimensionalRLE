@@ -25,7 +25,6 @@ import kotlin.math.sqrt
 class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     private val log = Log.kotlinInstance()
-    private val byteArraySize = 256
     private val analyzer = Analyzer()
     private val defaultLastBit = false
     private val DEBUG = true
@@ -126,18 +125,18 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         range: IntRange,
         bitsPerNumber: Int,
         byteSize: Int,
-        rleNumbers: List<Int>
+        rleNumbers: List<Int>, byteArraySize: Int
     ): DataChunk {
         assert(rleNumbers.isNotEmpty())
         val lines = createDecodedLinesFromNumbers(rleNumbers)
-        mapLineToDecodedLinesInChunk(range, chunk, lines)
+        mapLineToDecodedLinesInChunk(range, chunk, lines, byteArraySize)
         return chunk
     }
 
     private fun mapLineToDecodedLinesInChunk(
         range: IntRange,
         chunk: DataChunk,
-        lines: ByteArray
+        lines: ByteArray, byteArraySize: Int
     ) {
         val expectedRange = (byteArraySize / 8) - 1
         var start = 0
@@ -171,7 +170,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     override fun encode(inputFile: String, outputFile: String,
                         applyByteMapping: Boolean,
-                        applyBurrowsWheelerTransformation: Boolean) {
+                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int) {
         val input = File(inputFile)
         val stream = input.inputStream()
         val bytes = ByteArray(byteArraySize)
@@ -219,7 +218,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         analyzer.printFileComparison(input, fileBinRLEbitEncoded)
     }
 
-    fun encodeMapped(file: String, outputFile: String): Map<Byte, Byte> {
+    fun encodeMapped(file: String, outputFile: String, byteArraySize: Int): Map<Byte, Byte> {
         val analyzer = Analyzer()
         val inputFile = File(file)
         val stream = inputFile.inputStream()
@@ -305,7 +304,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         }
     }
 
-    fun decodeMapped(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>?) {
+    fun decodeMapped(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>?, byteArraySize: Int) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
@@ -418,7 +417,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     override fun decode(inputFile: String, outputFile: String,
                         applyByteMapping: Boolean,
-                        applyBurrowsWheelerTransformation: Boolean) {
+                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")
@@ -591,7 +590,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
         return stringBuilder.toString()
     }
 
-    private fun encodeBitsAsByteArray(listOfBits: List<BitSet>): UByteArray {
+    private fun encodeBitsAsByteArray(listOfBits: List<BitSet>, byteArraySize: Int): UByteArray {
         val bitLength = 7
         val byteList = mutableListOf<UByte>()
         for (i in bitLength downTo 0) {

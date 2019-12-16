@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.huffman
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
@@ -16,6 +16,7 @@ class HuffmanCorpusTest {
 
 
     private var log = Log.kotlinInstance()
+    private val byteArraySize = 256
 
     init {
         log.newFormat {
@@ -52,15 +53,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_book1() {
         huffmanEncoder.encode("$folderToEncode/book1", "$encodeFolder/CalgaryCorpus/book1.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(3)
     fun decodeHuffman_book1() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/book1.huff", "${decodeFolder}/CalgaryCorpus/book1",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/book1.huff", "$decodeFolder/CalgaryCorpus/book1",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -68,15 +69,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_book2() {
         huffmanEncoder.encode("$folderToEncode/book2", "$encodeFolder/CalgaryCorpus/book2.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(5)
     fun decodeHuffman_book2() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/book2.huff", "${decodeFolder}/CalgaryCorpus/book2",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/book2.huff", "$decodeFolder/CalgaryCorpus/book2",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -84,15 +85,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_bib() {
         huffmanEncoder.encode("$folderToEncode/bib", "$encodeFolder/CalgaryCorpus/bib.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(7)
     fun decodeHuffman_bib() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/bib.huff", "${decodeFolder}/CalgaryCorpus/bib",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/bib.huff", "$decodeFolder/CalgaryCorpus/bib",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -100,15 +101,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_geo() {
         huffmanEncoder.encode("$folderToEncode/geo", "$encodeFolder/CalgaryCorpus/geo.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(9)
     fun decodeHuffman_geo() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/geo.huff", "${decodeFolder}/CalgaryCorpus/geo",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/geo.huff", "$decodeFolder/CalgaryCorpus/geo",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -116,15 +117,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_news() {
         huffmanEncoder.encode("$folderToEncode/news", "$encodeFolder/CalgaryCorpus/news.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(11)
     fun decodeHuffman_news() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/news.huff", "${decodeFolder}/CalgaryCorpus/news",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/news.huff", "$decodeFolder/CalgaryCorpus/news",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -132,15 +133,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_obj1() {
         huffmanEncoder.encode("$folderToEncode/obj1", "$encodeFolder/CalgaryCorpus/obj1.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(13)
     fun decodeHuffman_obj1() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/obj1.huff", "${decodeFolder}/CalgaryCorpus/obj",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/obj1.huff", "$decodeFolder/CalgaryCorpus/obj",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -148,15 +149,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_paper1() {
         huffmanEncoder.encode("$folderToEncode/paper1", "$encodeFolder/CalgaryCorpus/paper1.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(15)
     fun decodeHuffman_paper1() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/paper1.huff", "${decodeFolder}/CalgaryCorpus/paper1",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/paper1.huff", "$decodeFolder/CalgaryCorpus/paper1",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -164,15 +165,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_paper2() {
         huffmanEncoder.encode("$folderToEncode/paper2", "$encodeFolder/CalgaryCorpus/paper2.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(17)
     fun decodeHuffman_paper2() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/paper2.huff", "${decodeFolder}/CalgaryCorpus/paper2",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/paper2.huff", "$decodeFolder/CalgaryCorpus/paper2",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -180,15 +181,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_pic() {
         huffmanEncoder.encode("$folderToEncode/pic", "$encodeFolder/CalgaryCorpus/pic.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(19)
     fun decodeHuffman_pic() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/pic.huff", "${decodeFolder}/CalgaryCorpus/pic",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/pic.huff", "$decodeFolder/CalgaryCorpus/pic",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -196,15 +197,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_progc() {
         huffmanEncoder.encode("$folderToEncode/progc", "$encodeFolder/CalgaryCorpus/progc.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(21)
     fun decodeHuffman_progc() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progc.huff", "${decodeFolder}/CalgaryCorpus/progc",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progc.huff", "$decodeFolder/CalgaryCorpus/progc",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -212,15 +213,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_progl() {
         huffmanEncoder.encode("$folderToEncode/progl", "$encodeFolder/CalgaryCorpus/progl.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(23)
     fun decodeHuffman_progl() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progl.huff", "${decodeFolder}/CalgaryCorpus/progl",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progl.huff", "$decodeFolder/CalgaryCorpus/progl",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -228,15 +229,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_progp() {
         huffmanEncoder.encode("$folderToEncode/progp", "$encodeFolder/CalgaryCorpus/progp.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(25)
     fun decodeHuffman_progp() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progp.huff", "${decodeFolder}/CalgaryCorpus/progp",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/progp.huff", "$decodeFolder/CalgaryCorpus/progp",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
@@ -244,15 +245,15 @@ class HuffmanCorpusTest {
     fun encodeHuffman_trans() {
         huffmanEncoder.encode("$folderToEncode/trans", "$encodeFolder/CalgaryCorpus/trans.huff",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
     @Test
     @Order(27)
     fun decodeHuffman_trans() {
-        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/trans.huff", "${decodeFolder}/CalgaryCorpus/trans",
+        huffmanEncoder.decode("$encodeFolder/CalgaryCorpus/trans.huff", "$decodeFolder/CalgaryCorpus/trans",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
 }

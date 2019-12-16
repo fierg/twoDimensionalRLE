@@ -10,7 +10,7 @@ interface RangedEncoder : Encoder {
         range: IntRange,
         bitsPerNumber: Int,
         byteSize: Int,
-        rleNumbers: List<Int>
+        rleNumbers: List<Int>, byteArraySize: Int
     ): DataChunk
 
     fun decodeChunkHuffman(

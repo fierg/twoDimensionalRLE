@@ -7,6 +7,8 @@ import java.io.File
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLETest {
+    private val byteArraySize = 256
+
     companion object {
         private const val fileToEncodeSmall = "testFile_small.txt"
         private const val fileToEncode = "t8.shakespeare.txt"
@@ -43,6 +45,7 @@ class StringRLETest {
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
+            , byteArraySize = byteArraySize
         )
     }
 
@@ -53,7 +56,7 @@ class StringRLETest {
         strRLE.encode(
             "data/$fileToEncode", "$encodeFolder/$fileToEncode.rle",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
         )
     }
 
@@ -63,7 +66,7 @@ class StringRLETest {
         strRLE.decode(
             "$encodeFolder/$fileToEncode.rle", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
         )
     }
 
@@ -73,7 +76,7 @@ class StringRLETest {
         strRLE.decode(
             "$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
         )
     }
 
@@ -84,7 +87,7 @@ class StringRLETest {
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle_var",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
-            bitPerRun = 4 , chunkSize = 256
+            bitPerRun = 4, chunkSize = 256
         )
     }
 
@@ -96,7 +99,8 @@ class StringRLETest {
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
             bitPerRun = 4
-            , chunkSize = 256)
+            , chunkSize = 256
+        )
     }
 
 
