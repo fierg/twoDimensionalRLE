@@ -153,6 +153,8 @@ One way to address this problem is by adding extra stop symbols or encoding a le
 \par{
 Huffman coding 
 }
+
+TODO: fix dang tree to be able to have only one child node
 \begin{center}
 	\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1,
 		level distance = 1.5cm}] 
@@ -176,40 +178,93 @@ Huffman coding
 	; 
 	\end{tikzpicture}
 \end{center}
+
+\par{
+TODO: explain stuff
+}
 ...
 
 \section{Other methods}
 \label{ch:Principles of compression:sec:Other}
+\par{
+There are other well known methods like \\
+- move to front\\
+- arithmetic coding\\
+- real world applications are mostly combinations of those\\
+}
 ...
 \subsection{Burrows-Wheeler-Transformation}
 \par{
 \label{ch:PrPrinciples of compression:sec:Other:subSec:bwt}
 The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
 rotations of S, sorting them lexicographically, and extracting the last
-character of each of the rotations. A string L is formed from these characters, where
-the $i$'th character of L is the last character of the $i$'th sorted rotation. In addition to
-L, the algorithm computes the index $I$ of the original string S in the sorted list of
-rotations. Surprisingly, there is an efficient algorithm to compute the original string
-S given only L and $I$ \cite{Burrows-linear-time}.}
+character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of
+rotations. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string S given only L and the Index $I$ \cite{Burrows-linear-time}.
+}
 
-\par{}
+\par {
+As an example of the creation of L, given the input string S = ‘abraca’, $n = 6$, and the alphabet
+$X = \{a,b,c,r\}$. Create a $N \times N$ matrix $M$ whose elements are characters, and
+whose rows are rotations of S. Sort all rotations in lexicographical order.
+}
 
-...
+\par{
+In this example, the index is $I = 1$ and the matrix $M$ is
+
+\begin{center}
+	\begin{tabular}[p]{r|l|l|l|l|l|l}
+		%	\caption{Beschreibung der Tabelle}
+		
+		row 0 & a & a & b & r & a & c\\
+		\hline
+		row 1 & a & b & r & a & c & a\\
+		\hline
+		row 2 & a & c & a & a & b & r\\
+		\hline
+		row 3 & b & r & a & c & a & a\\
+		\hline
+		row 4 & c & a & a & b & r & a\\
+		\hline
+		row 5 & r & a & c & a & a & b
+
+		\label{tab:t10 bwt-example}
+	\end{tabular}
+\end{center}
+
+
+The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which result in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
+}
+
 %% ==============================
 \section{State of the Art}
 %% ==============================
 \label{ch:Principles of compression:sec:SOTA}
-Die Literaturrecherche soll so vollständig wie möglich sein und bereits existierende relevante Ansätze (Verwandte Arbeiten / State of the Art / Stand der Technik) beschreiben bzw. kurz vorstellen.
-Es soll aufgezeigt werden, wo diese Ansätze Defizite aufweisen oder nicht anwendbar sind, z.B. weil sie von anderen Umgebungen oder Voraussetzungen ausgehen.
-
-Je nach Art der Abschlussarbeit kann es auch sinnvoll sein, diesen Abschnitt in die Einleitung zu integrieren oder als eigenes Kapitel aufzuführen.
-
-
-
 State of the art compression\\
 - techniques\\
 - use cases\\
+- limits\\
 
+\par{
+	
+	\begin{center}
+		\begin{tabular}[p]{r|l|l|l}
+			%	\caption{Beschreibung der Tabelle}
+			
+			method &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
+			\hline
+			uncompressed & 3,141,622 & 100\% & 8.00\\
+			compress & 1,272,772 & 40.0\% & 3.24\\
+			ZIP v2.32 & 1,020,781 & 32.4\% & 2.59\\
+			gzip v1.3.5 & 1,017,624 & 32.3\% & 2.58\\
+			bzip2 v9.12b & 828,347 & 26.3\% & 2.10 \\
+			ppmd & 740,737 & 23.5\% & 1.88\\
+			ZPAQ v7.15& 659,709 & 20.9\% & 1.67 
+			
+			\label{tab:t20 stat of the art}
+		\end{tabular}
+	\end{center}
+
+}
 
 %% ==============================
 \section{Limits of compression}

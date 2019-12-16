@@ -50,7 +50,7 @@ class SimpleStringRLECorpusTest {
 
     @Test
     @Order(2)
-    fun encodeAndDecodeCorpus8BitRle() {
+    fun encodeSimpleRLE() {
         for (i in 2..8) {
             File("$encodeFolder/CalgaryCorpus/${i}bit").mkdirs()
             File(folderToEncode).listFiles().forEach {

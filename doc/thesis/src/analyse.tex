@@ -72,11 +72,19 @@ Interestingly the binary implementation performs better on 2 bits per RLE number
 %% ==============================
 \label{ch:Analysis:sec:Improvements by Preprocessing}
 
-The broad idea of preprocessing is to manipulate the input data in a way that results in data which can be compressed more efficiently than the original data. This can be done in various ways, some of them will be explored in greater detail to find out if it is implementable or not.
+The broad idea of preprocessing is to manipulate the input data in a way that results in data which can be compressed more efficiently than the original data. This can be done in various ways, some of them will be explored in greater detail to find out if it is implementable or not. One way of doing so is a Burrows-Wheeler-Transformation.
 
 \subsection{Burrows-Wheeler-Transformation}
+\label{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}
+\par{
+To understand how a Burrows-Wheeler-Transformation improves the effectiveness of compression, consider the effect in a common word in English text. Examine the letter ‘t’ in the word ‘the’, in an input string holding multiple instances of this word.
+Sorting all rotations of a string results in all rotations starting with ‘he ’ will be sorted together and most of them are going to to end in the letter ‘t’. This implies that the transformed string L has a large number of the letter t, combined with some other characters, such as space, ‘s’, ‘T’, and ‘S’. This is true for all characters, so any substring of L is likely to contain a large number of a some distinct characters. \enquote{The overall effect is that the probability that given character $c$ will occur at a given
+point in L is very high if $c$ occurs near that point in L, and is low otherwise.} \cite{Burrows94}
+}
 
-
+\par{
+It is obvious that this should always improve the performance of byte level RLE because the transformation is taking place at character level but it should not effect the binary implementations. 
+}
 
 \subsection{Vertical byte reading}
 \par{

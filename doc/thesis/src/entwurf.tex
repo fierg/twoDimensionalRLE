@@ -5,11 +5,8 @@
 \chapter{Conceptual Design}
 \label{ch:Conceptual Design}
 %% ==============================
-In diesem Kapitel erfolgt die ausführliche Beschreibung des eigenen
-Lösungsansatzes. Dabei sollten Lösungsalternativen diskutiert und
-Entwurfsentscheidungen dargelegt werden.
-
-To archive the main objective a few ideas to improve run length encoding where found. The first real difference is the conception of reading the data in chunks and then encode it in parallel, meaning all the most significant bits in one chunk, then all second most significant bits and so on. The second change was to switch between the encoding of runs of characters \/ bytes to count runs of ones and zeros so basically the same mechanism but on bit level.
+\par{
+To archive the main objective a few ideas to improve run length encoding where found. The first real difference is the conception of reading the data in chunks and then encode it in parallel, meaning all the most significant bits in one chunk, then all second most significant bits and so on.}
 
 %% ==============================
 \section{Parallel Byte Reading}
