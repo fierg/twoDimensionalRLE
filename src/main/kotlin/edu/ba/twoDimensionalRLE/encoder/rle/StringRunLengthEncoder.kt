@@ -107,6 +107,38 @@ class StringRunLengthEncoder : Encoder {
         log.info("Finished encoding.")
     }
 
+    fun encodeSimple(inputFile: String, outputFile: String, bitPerRun: Int) {
+        var lastSeenBit = false
+        var currentBit = false
+        var counter = 0
+        val maxLength = 2.pow(bitPerRun) - 1
+
+        log.info("Encoding $inputFile with simple rle and $bitPerRun bits per run...")
+
+        BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
+            File(inputFile).readBytes().forEach { byte ->
+                byte.toUByte().toInt().toString(2).padStart(8, '0').forEach {char ->
+                    currentBit = char == '1'
+
+                    if (lastSeenBit == currentBit) {
+                        if (++counter == maxLength) {
+                            writeRunToStream(counter, stream, bitPerRun)
+                            counter = 0
+                        }
+                    } else {
+                        if (counter > 0) {
+                            writeRunToStream(counter, stream, bitPerRun)
+                            counter = 1
+                        } else {
+                            counter++
+                        }
+                        lastSeenBit = !lastSeenBit
+                    }
+                }
+            }
+        }
+    }
+
     fun encodeVarLength(
         inputFile: String, outputFile: String,
         bitPerRun: Int,
@@ -286,5 +318,3 @@ class StringRunLengthEncoder : Encoder {
 
 
 }
-
-

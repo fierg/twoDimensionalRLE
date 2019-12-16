@@ -182,6 +182,18 @@ Huffman coding
 \label{ch:Principles of compression:sec:Other}
 ...
 \subsection{Burrows-Wheeler-Transformation}
+\par{
+\label{ch:PrPrinciples of compression:sec:Other:subSec:bwt}
+The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
+rotations of S, sorting them lexicographically, and extracting the last
+character of each of the rotations. A string L is formed from these characters, where
+the $i$'th character of L is the last character of the $i$'th sorted rotation. In addition to
+L, the algorithm computes the index $I$ of the original string S in the sorted list of
+rotations. Surprisingly, there is an efficient algorithm to compute the original string
+S given only L and $I$ \cite{Burrows-linear-time}.}
+
+\par{}
+
 ...
 %% ==============================
 \section{State of the Art}

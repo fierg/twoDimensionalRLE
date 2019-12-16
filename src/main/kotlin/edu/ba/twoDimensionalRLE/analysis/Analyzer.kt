@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.analysis
 import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
 import java.io.File
+import java.nio.file.Files
 
 class Analyzer() {
     private var log = Log.kotlinInstance()
@@ -85,6 +86,21 @@ class Analyzer() {
     fun incrementEncodingOccMap(counter: Int) {
         encodingOccurrenceMap[counter] = encodingOccurrenceMap.getOrDefault(counter, 0) + 1
 
+    }
+
+    fun sizeCompare(folderToEncode : String, encodedFolder : String) {
+        val sizeOriginal = Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile().length() }
+            .reduce { t: Long, u: Long -> t + u }.get()
+        val sizeEncoded =
+            Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile().length() }
+                .reduce { t: Long, u: Long -> t + u }.get()
+        val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
+
+        log.info("Corpus size original: ${sizeOriginal / 1000000.0} Mb")
+        log.info("Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
+
+        log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
+        log.info("with $bitsPerSymbol bits/symbol")
     }
 
 }

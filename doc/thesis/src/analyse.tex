@@ -6,7 +6,7 @@
 %% ==============================
 
 \par{
-The following chapter contains a detailed analysis of the problem and some fundamental requirements for the algorithm. 
+The following chapter contains a detailed analysis of the problem and some fundamental requirements for the algorithm. To have a comparison to some extent, the initial performance analysis was performed on the Calgary Corpus but the results of the unmodified run length coding algorithm where very underwhelming as expected.
 }
 
 %% ==============================
@@ -14,21 +14,36 @@ The following chapter contains a detailed analysis of the problem and some funda
 %% ==============================
 \label{ch:Analysis:sec:Initial Findings}
 \par{
- Originally developed and used on black and white pallet images containing only two values, on a binary level so to speak, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. And this is the case for most printable characters as they al have a value between 32 and 127 (or 255 for the extended ASCII).
-}
-
-\par{
-RLE could also work on a byte level, because there should be repetitions of any kind. Byte level RLE encodes runs of identical byte values, ignoring individual bits and word boundaries. The most common byte level RLE scheme encodes runs of bytes into 2-byte packets. The first byte contains the run count of 1 to 256, and the second byte contains the value of the byte run. If a run exceeds a count of 256, it has to be encoded twice, one with count 256 and one with any further runs.
-}
-
-\par{
- However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty, which is also shown in Table \ref{tab:t5 run length eval}.
-To have a comparison to some extent, the initial performance analysis was performed on the Calgary Corpus but the results where very underwhelming as expected, as shown in the table below. Even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line.
+ Originally developed and used on black and white pallet images containing only two values, on a binary level so to speak, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. As you can see, there are no runs of a considerable size and this is the case for most printable characters as they all have a value between 32 and 127 (or 255 for the extended ASCII). Applied to the Calgary Corpus in this simple implementation, there should be an increase in size expected or \textit{negative compression} as one might say.
 }
 
 \begin{center}
-	\begin{tabular}[p]{r|r|r}
-				\label{tab:t5 run length eval}
+	\begin{tabular}[p]{l|r|r}
+		\label{tab:t4 simple run length eval}
+		
+		bits per rle number &  expansion ratio & bits per symbol in $\frac{bits}{symbol}$\\
+		\hline
+		8 & 3.298046423741734& 26.38437138993387 \\
+		7 & 2.8897459975751163& 23.11796798060093\\
+		6 & 2.4839251325134675& 19.87140106010774 \\
+		5 & 2.0825541259578895 & 16.66043300766311\\
+		4 & 1.6895640359371056 & 13.516512287496845\\
+		3 & 1.3130541262757818 & 10.504433010206254\\
+		2 & 1.04555716691706 & 8.36445733533648 \\
+	\end{tabular}
+\end{center}
+
+\par{
+The results in Table \ref{tab:t4 simple run length eval} depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1.
+}
+
+\par{
+RLE is also applicable on a byte level, because there should be repetitions of any kind like consecutive letters or line endings (EOL). Byte level RLE encodes runs of identical byte values, ignoring individual bits and word boundaries. The most common byte level RLE scheme encodes runs of bytes into 2-byte packets. The first byte contains the run count of 1 to 256, and the second byte contains the value of the byte run. If a run exceeds a count of 256, it has to be encoded twice, one with count 256 and one with any further runs.
+}
+
+\begin{center}
+	\begin{tabular}[p]{l|r|r}
+		\label{tab:t5 run length eval}
 		
 		bits per rle number &  ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
@@ -42,24 +57,25 @@ To have a comparison to some extent, the initial performance analysis was perfor
 	\end{tabular}
 \end{center}
 
-\ldots
+
+\par{
+ However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty, which is also shown in Table \ref{tab:t5 run length eval}.
+ Even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line.
+}
+
+\par{
+Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed.
+}
 
 %% ==============================
 \section{Improvements by Preprocessing}
 %% ==============================
 \label{ch:Analysis:sec:Improvements by Preprocessing}
+
+The broad idea of preprocessing is to manipulate the input data in a way that results in data which can be compressed more efficiently than the original data. This can be done in various ways, some of them will be explored in greater detail to find out if it is implementable or not.
+
 \subsection{Burrows-Wheeler-Transformation}
 
-\begin{center}
-	\begin{tabular}[p]{r|r|r}
-		\label{tab:t6 run length eval bwt}
-		
-		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
-		\hline
-		3 & 95.4169856525027 & 7.633358852200216\\
-		2 & 91.391 & 7.311309412577118 \\
-	\end{tabular}
-\end{center}
 
 
 \subsection{Vertical byte reading}
@@ -67,16 +83,6 @@ To have a comparison to some extent, the initial performance analysis was perfor
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in the example below.
 }
 
-\begin{center}
-	\begin{tabular}[p]{r|r|r}
-		\label{tab:t7 rle vertical reading}
-		
-		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
-		\hline
-		3 & 95.4169856525027 & 7.633358852200216\\
-		2 & 91.391 & 7.311309412577118 \\
-	\end{tabular}
-\end{center}
 
 \par{
 
