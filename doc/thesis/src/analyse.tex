@@ -61,14 +61,16 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 \par{
  However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty, which is also shown in Table \ref{tab:t5 run length eval}.
  Even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line.
-}
-
-\par{
 Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed.
 }
 
+\par{
+If we take a more detailed look, we can see that while most files expand with larger RLE numbers, some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding. The file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ using 6 bits per run. The benefit of the byte wise RLE is the better worst case performance of $1.5$ up to $1.7$ times the original size.
+}
+
+
 %% ==============================
-\section{Improvements by Preprocessing}
+\section{Possible Improvements by Preprocessing}
 %% ==============================
 \label{ch:Analysis:sec:Improvements by Preprocessing}
 
@@ -94,7 +96,23 @@ Instead of performing compute intense operation on the data, we could also inter
 TODO: example
 
 \par{
-It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression.
+It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression. Without any further action, no performance improvements will be made.
+}
+
+\subsection{Byte remapping}
+\par{
+One idea might be a dynamic byte remapping as the input data is read in parts. Some sections have more specific characters or bytes than others, or this idea can be applied to the whole file. This way the values are not alternating in the whole range of 0 to 255 but rather in a smaller subset and the most frequent ones should be mapped to the smallest values.
+}
+
+TODO: Example
+
+\par{
+
+}
+
+\subsection{Combined approaches}
+\par{
+The idea of combining different compression methods into a superior method is not new and was also performed on RLE as mentioned in Section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}. While the idea of encoding the RLE numbers with Huffman codes is already known and analyzed well, the vertical byte reading enables new approaches, even more in combination with the idea of byte remapping.
 }
 
 

@@ -5,8 +5,8 @@
 \chapter{Principles of compression}
 \label{ch:Principles of compression}
 %% ==============================
-
-To understand compression, one first has to understand some basic principles of information theory like Entropy and different approaches to compress different types of data with different encoding and entropy. I will also show the key differences between probability coding and dictionary coding and a few comments on lossy compression.
+\par{
+The basic idea of compression is to remove redundancy in data. Compression can be broken down into two broad categories: Lossless and lossy compression. Lossless compression makes it possible to reproduce the original data exactly while lossy compression allows the some degradation in the encoded data to gain even higher compression at the cost of some of the original information. To understand compression, one first has to understand some basic principles of information theory like Entropy and different approaches to compress different types of data with different encoding. We will also show the key differences between probability coding and dictionary coding.}
 
 %% ==============================
 \section{Compression and Encoding fundamentals}
@@ -98,6 +98,7 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 }
 
 \subsection{The history}
+\label{ch:Principles of compression:sec:Run Length Encoding:subSec:History}
 \par{
  The ITU-T T4 (Group 3) standard for Facsimile (fax) machines \cite{ITU} is still in force for all devices used over regular phone lines. Each transmission sends a black and white image, where each pixel is called a \textit{pel} and with a horizontal resolution of $8.05 \: \frac{pels}{mm}$ and the vertical resolution depending on the mode. To encode each sequence of black and white pixels, the T4 standard uses RLE to encode each sequence of black and white pixels and since there are only two values, only the run length itself has to be encoded. It is assumed that the first run is always a white run, so there is a dummy white pel at the beginning of each sequence. For example, the sequence $bbbbwwbbbbb$ can be encoded as 1,4,2,5 with the leading white dummy pixel.
 }
@@ -135,6 +136,12 @@ By combining RLE with a probabilistic approach, the ratio of compression rises b
 \subsection{Limitations}
 \par{
 As mentioned in the Section \ref{ch:Introduction:sec:Problem statement}, run length encoding is rarely used for regular text or continuous tone images because its potentially increase in size, due to non repetitive characters or bytes. To reduce this problem there are several approaches known, partly implemented and used some of which will be addressed like a Burrows-Wheeler-Transformation.
+}
+
+\subsection{Run Length Encoding today}
+\par{
+While it is still in use by fax transmission or other highly specific tasks, it is mostly used in combination with other approaches. 
+TODO: give more references
 }
 %% ==============================
 \section{Prefix Coding}
