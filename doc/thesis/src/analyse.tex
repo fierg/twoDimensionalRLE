@@ -91,9 +91,10 @@ It is obvious that this should always improve the performance of byte level RLE 
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in the example below.
 }
 
+TODO: example
 
 \par{
-
+It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression.
 }
 
 
