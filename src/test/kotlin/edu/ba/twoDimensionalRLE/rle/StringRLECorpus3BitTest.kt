@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE.rle
 
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -68,6 +69,8 @@ class StringRLECorpus3BitTest {
             )
         }
 
+        val analyzer = Analyzer()
+        analyzer.sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus")
     }
 
     @Test

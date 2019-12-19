@@ -2,6 +2,7 @@ package edu.ba.twoDimensionalRLE.rle
 
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -58,34 +59,19 @@ class StringRLECorpus5BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber , chunkSize = 256
+                bitPerRun = bitsPerRleNumber, chunkSize = 256
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
                 bitPerRun = bitsPerRleNumber
-                , chunkSize = 256)
+                , chunkSize = 256
+            )
         }
+        val analyzer = Analyzer()
+        analyzer.sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus")
 
     }
-
-    @Test
-    @Order(3)
-    fun size() {
-        val sizeOriginal = Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile().length() }
-            .reduce { t: Long, u: Long -> t + u }.get()
-        val sizeEncoded =
-            Files.walk(File("$encodeFolder/CalgaryCorpus").toPath()).map { mapper -> mapper.toFile().length() }
-                .reduce { t: Long, u: Long -> t + u }.get()
-        val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
-
-        log.info("Calgary Corpus size original: ${sizeOriginal / 1000000.0} Mb")
-        log.info("Calgary Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
-
-        log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
-        log.info("with $bitsPerSymbol bits/symbol")
-    }
-
 
 }

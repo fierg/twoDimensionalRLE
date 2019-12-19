@@ -88,12 +88,20 @@ class Analyzer() {
 
     }
 
-    fun sizeCompare(folderToEncode : String, encodedFolder : String) {
-        val sizeOriginal = Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile().length() }
-            .reduce { t: Long, u: Long -> t + u }.get()
-        val sizeEncoded =
-            Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile().length() }
-                .reduce { t: Long, u: Long -> t + u }.get()
+    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
+        val originalFiles = mutableMapOf<File, Long>()
+        Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
+            .forEach {
+                originalFiles[it.first] = it.second
+            }
+        val sizeOriginal = originalFiles.map { it.value }.reduce { l: Long?, l2: Long? -> l!! + l2!! }
+
+        val encodedFiles = mutableMapOf<File, Long>()
+        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.forEach {
+            encodedFiles[it.first] = it.second
+        }
+        val sizeEncoded = encodedFiles.map { it.value }.reduce { t: Long, u: Long -> t + u }
+
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
         log.info("Corpus size original: ${sizeOriginal / 1000000.0} Mb")
@@ -101,6 +109,14 @@ class Analyzer() {
 
         log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
         log.info("with $bitsPerSymbol bits/symbol")
+
+
+        originalFiles.filter { it.key.isFile }.forEach { original ->
+            val encodedFile = encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+            val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
+
+            log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${encodedFile.values.first().toDouble() / original.value.toDouble()}, bps: $bitsPerSymbolFile")
+        }
     }
 
 }
