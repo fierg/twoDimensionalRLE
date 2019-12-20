@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.other
 
 import edu.ba.twoDimensionalRLE.extensions.toBinStringBuffer
 import edu.ba.twoDimensionalRLE.extensions.toBitSet

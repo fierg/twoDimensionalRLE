@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.other
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
@@ -46,8 +46,8 @@ class MappingTest {
         val analyzer = Analyzer()
 
         log.info("Reading file and generating byte mapping...")
-        analyzer.analyzeFile(File("data/${fileToEncodeSmall}"))
-        val chunks = DataChunk.readChunksFromFile("data/${fileToEncodeSmall}", 256, log)
+        analyzer.analyzeFile(File("data/$fileToEncodeSmall"))
+        val chunks = DataChunk.readChunksFromFile("data/$fileToEncodeSmall", 256, log)
         val mappedChunks = mutableListOf<DataChunk>()
         val reMappedChunks = mutableListOf<DataChunk>()
 
@@ -58,8 +58,8 @@ class MappingTest {
         log.info("Finished mapping.")
 
         if (DEBUG) {
-            log.debug("Writing mapped chunks to ${encodeFolder}/${fileToEncodeSmall}_mapped")
-            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncodeSmall}_mapped") }
+            log.debug("Writing mapped chunks to $encodeFolder/${fileToEncodeSmall}_mapped")
+            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("$encodeFolder/${fileToEncodeSmall}_mapped") }
         }
 
         log.info("Invert mapping of all chunks...")
@@ -69,8 +69,8 @@ class MappingTest {
         }
 
         if (DEBUG) {
-            log.debug("Writing mapped chunks to ${decodeFolder}/${fileToEncodeSmall}")
-            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncodeSmall}") }
+            log.debug("Writing mapped chunks to $decodeFolder/$fileToEncodeSmall")
+            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("$decodeFolder/$fileToEncodeSmall") }
         }
 
         log.info("Validating equality of input and output...")
@@ -86,8 +86,8 @@ class MappingTest {
         val analyzer = Analyzer()
 
         log.info("Reading file and generating byte mapping...")
-        analyzer.analyzeFile(File("data/${fileToEncode}"))
-        val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", 256, log)
+        analyzer.analyzeFile(File("data/$fileToEncode"))
+        val chunks = DataChunk.readChunksFromFile("data/$fileToEncode", 256, log)
         val mappedChunks = mutableListOf<DataChunk>()
         val reMappedChunks = mutableListOf<DataChunk>()
 
@@ -98,8 +98,8 @@ class MappingTest {
         log.info("Finished mapping.")
 
         if (DEBUG) {
-            log.debug("Writing mapped chunks to ${encodeFolder}/${fileToEncode}_mapped")
-            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_mapped") }
+            log.debug("Writing mapped chunks to $encodeFolder/${fileToEncode}_mapped")
+            mappedChunks.stream().forEach { it.appendCurrentChunkToFile("$encodeFolder/${fileToEncode}_mapped") }
         }
 
         log.info("Invert mapping of all chunks...")
@@ -108,8 +108,8 @@ class MappingTest {
             reMappedChunks.add(it.applyByteMapping(reversedMapping))
         }
         if (DEBUG) {
-            log.debug("Writing remapped chunks to ${decodeFolder}/${fileToEncode}")
-            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
+            log.debug("Writing remapped chunks to $decodeFolder/$fileToEncode")
+            reMappedChunks.stream().forEach { it.appendCurrentChunkToFile("$decodeFolder/$fileToEncode") }
         }
 
         log.info("Validating equality of input and output...")
