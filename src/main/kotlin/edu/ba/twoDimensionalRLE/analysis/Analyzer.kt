@@ -83,6 +83,16 @@ class Analyzer() {
         byteMapping = createByteMapping()
     }
 
+    fun analyzeString(string : String) {
+
+        string.forEach { byte ->
+            byteOccurrenceMap[byte.toByte()] = byteOccurrenceMap.getOrDefault(byte.toByte(), 0) + 1
+        }
+        printByteOccurrence()
+        byteMapping = createByteMapping()
+    }
+
+
     fun incrementEncodingOccMap(counter: Int) {
         encodingOccurrenceMap[counter] = encodingOccurrenceMap.getOrDefault(counter, 0) + 1
 
