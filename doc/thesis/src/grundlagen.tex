@@ -151,7 +151,7 @@ TODO: give more references
 Prefix codes make use of an untypical idea in computer science. Usually we deal with fixed length codes like 7 bit ASCII or 32 bit Integer representations which map each possible value into that fixed amount of bits. For compression it would be a benefit if we could write codes of variable length. The problem with these varying length codes is that as soon as they are part of a sequence, it becomes very hard to tell where one code starts and finishes, resulting in ambiguous encoding. For example the set of codes $ \{(a,1),(b,01),(c,101),(d,011)\}$ and the encoded message is $1011$, there is no way to tell which message was encoded.
 }
 \par{
-One way to address this problem is by adding extra stop symbols or encoding a length before each code but those just add additional data. Another approach is to use so called prefix codes and make no code which is prefix of another code, which makes them uniquely decodable.
+One way to address this problem is by adding extra stop symbols or encoding a length before each code but those just add additional data. Another approach is to use so called prefix codes and make no code which is prefix of another code, which makes them uniquely decodable as show in the next section.
 }
 
 
@@ -240,6 +240,10 @@ In this example, the index is $I = 1$ and the matrix $M$ is
 
 
 The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which result in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
+}
+
+\par{
+TODO: explain reversing a bwt
 }
 
 %% ==============================
