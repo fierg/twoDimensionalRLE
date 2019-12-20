@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE
+package edu.ba.twoDimensionalRLE.transformation
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.model.DataChunk
@@ -91,7 +91,7 @@ class BurrowsWheelerTransformationTest {
     @Test
     @Order(4)
     fun transformChunk() {
-        val chunks = DataChunk.readChunksFromFile("data/${fileToEncodeSmall}", byteArraySize, log)
+        val chunks = DataChunk.readChunksFromFile("data/$fileToEncodeSmall", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks = mutableListOf<DataChunk>()
         val bwt = BurrowsWheelerTransformation()
@@ -131,7 +131,7 @@ class BurrowsWheelerTransformationTest {
     @Test
     @Order(5)
     fun transformsChunkLargeFileSync() {
-        val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
+        val chunks = DataChunk.readChunksFromFile("data/$fileToEncode", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks = mutableListOf<DataChunk>()
         val bwt = BurrowsWheelerTransformation()
@@ -163,7 +163,7 @@ class BurrowsWheelerTransformationTest {
     @Test
     @Order(6)
     fun transformChunksLargeFileAsync() {
-        val chunks = DataChunk.readChunksFromFile("data/${fileToEncode}", byteArraySize, log)
+        val chunks = DataChunk.readChunksFromFile("data/$fileToEncode", byteArraySize, log)
         val transformedChunks = mutableListOf<DataChunk>()
         val reversedChunks: List<DataChunk>
         val bwt = BurrowsWheelerTransformation()
@@ -175,17 +175,17 @@ class BurrowsWheelerTransformationTest {
         log.info("Finished burrows wheeler transformation.")
 
         if (DEBUG) {
-            log.debug("Writing transformed chunks to ${encodeFolder}/${fileToEncode}_transformed")
+            log.debug("Writing transformed chunks to $encodeFolder/${fileToEncode}_transformed")
             transformedChunks.stream()
-                .forEach { it.appendCurrentChunkToFile("${encodeFolder}/${fileToEncode}_transformed") }
+                .forEach { it.appendCurrentChunkToFile("$encodeFolder/${fileToEncode}_transformed") }
         }
 
         reversedChunks = bwt.invertTransformationParallel(transformedChunks)
 
         log.info("Finished inverse transformation on all ${chunks.size} chunks.")
-        log.info("Writing reversed chunks to ${decodeFolder}/${fileToEncode}")
+        log.info("Writing reversed chunks to $decodeFolder/$fileToEncode")
 
-        reversedChunks.stream().forEach { it.appendCurrentChunkToFile("${decodeFolder}/${fileToEncode}") }
+        reversedChunks.stream().forEach { it.appendCurrentChunkToFile("$decodeFolder/$fileToEncode") }
 
         log.info("Validating equality of input and output...")
 
