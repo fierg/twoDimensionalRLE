@@ -165,7 +165,26 @@ class MixedEncoderCorpusTest {
     @Order(13)
     fun decodeMixed_obj1() {
         mixedEncoder.decode(
-            "$encodeFolder/CalgaryCorpus/obj1.mixed", "${decodeFolder}/CalgaryCorpus/obj",
+            "$encodeFolder/CalgaryCorpus/obj1.mixed", "${decodeFolder}/CalgaryCorpus/obj1",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
+        )
+    }
+    @Test
+    @Order(12)
+    fun encodeMixed_obj2() {
+        mixedEncoder.encode(
+            "$folderToEncode/obj1", "$encodeFolder/CalgaryCorpus/obj2.mixed",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
+        )
+    }
+
+    @Test
+    @Order(13)
+    fun decodeMixed_obj2() {
+        mixedEncoder.decode(
+            "$encodeFolder/CalgaryCorpus/obj2.mixed", "${decodeFolder}/CalgaryCorpus/obj2",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
         )
