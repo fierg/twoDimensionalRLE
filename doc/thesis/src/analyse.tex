@@ -88,26 +88,36 @@ point in L is very high if $c$ occurs near that point in L, and is low otherwise
 It is obvious that this should always improve the performance of byte level RLE because the transformation is taking place at character level but it should not effect the binary implementations. 
 }
 
-\subsection{Vertical byte reading}
+\subsection{Horizontal byte reading}
 \par{
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in the example below.
 }
 
-TODO: example
-
 \par{
-It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression. Without any further action, no performance improvements will be made.
+The binary UTF-8 interpretation of the example string from earlier S = ‘abraca’ results in 8 runs of length 1, 9 runs of length 2 as well as 3 runs of length 3 and 4.  
+\scalardump\dataA
+
+Reading the data in a different way, all most significant bits, then al second most significant bits and so forth, it results in much longer runs as shown below.
+\arraydump\dataA
+
+Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 6 runs of length 1 as opposed by the simple interpretation. This is because the binary similarity between the used characters, as the character for a and b only differ in one bit. It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression. 
 }
 
 \subsection{Byte remapping}
 \par{
-One idea might be a dynamic byte remapping as the input data is read in parts. Some sections have more specific characters or bytes than others, or this idea can be applied to the whole file. This way the values are not alternating in the whole range of 0 to 255 but rather in a smaller subset and the most frequent ones should be mapped to the smallest values.
+The effect of very long runs in the last example was mainly because the binary representations of the used characters are very similar, so the range of byte values used was very small (between a = 97 and r = 114). Introducing other used symbols like uppercase letters, space or new lines, the used range expands.
 }
 
-TODO: Example
+\par{
+The binary representation of a String like S' = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", results in a worse result as shown below.
+
+\arraydump\dataB
+
+The usage of other characters expanded the used byte range to between 32 and 117 which results in shorter average runs. Interestingly the most significant bit is always 0, a fragment from the backwards compatibility with standard ASCII encoding. 
+}
 
 \par{
-
+One idea to solve the shorter runs might be a dynamic byte remapping, as the input data is read in parts, where the most frequently used bytes are mapped to the lowest value. This way the values are not alternating in the whole range of 0 to 255 but rather in a smaller subset and the most frequent ones will be the smallest values, so in theory our average runs should increase because we should encounter more consecutive zeros. Some sections have more specific characters or bytes than others but this idea can also be applied to the whole file however it is unclear at this point what method outperforms which. A single map for each block of data should result in lower average values used but also creates a kind of overhead because the mapping has to be stored in the encoded file as well.
 }
 
 \subsection{Combined approaches}
@@ -115,11 +125,17 @@ TODO: Example
 The idea of combining different compression methods into a superior method is not new and was also performed on RLE as mentioned in Section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}. While the idea of encoding the RLE numbers with Huffman codes is already known and analyzed well, the vertical byte reading enables new approaches, even more in combination with the idea of byte remapping.
 }
 
+\par{
+It might be interesting to see how well the appliance performs using the horizontal binary encoding, in combination with the byte mapping.
+}
+
 
 %% ==============================
 \section{Summary}
 %% ==============================
 \label{ch:Analyse:sec:Summary}
+
+TODO\\
 
 Am Ende sollten ggf. die wichtigsten Ergebnisse nochmal in \emph{einem}
 kurzen Absatz zusammengefasst werden.
