@@ -6,7 +6,13 @@
 \label{ch:Conceptual Design}
 %% ==============================
 \par{
-To archive the main objective a few ideas to improve run length encoding where found. The first real difference is the conception of reading the data in chunks and then encode it in parallel, meaning all the most significant bits in one chunk, then all second most significant bits and so on.}
+Without further ado, design and implementation of the initial ideas began. As Section \ref{ch:Analysis} showed, there are some potentially promising improvements to be made to run length encoding, but how well they scale and work on a larger input with versatile symbols or bytes has to be determined.
+}
+
+\section{Burrows-Wheeler-Transformation Appliance}
+\par{
+By mistake a very simple transformation implementation was chosen, working by adding additional start and stop symbols to the input string (0x02 as STX, start of text and 0x03 as ETX, end of text). Some basic testing and playing around worked great but later on it revealed some major issues. For example the Calgary corpus does consist of more than textual data, in fact the files geo, obj1, obj2 and pic contain of some binary data of include the symbols STX or ETX so we wont be able to apply the transformation to these. Another shortcoming was the very poor time complexity of almost $O (n^2)$ because under the hood, it uses a dual pivot Quicksort algorithm from the JDK 10, which is typically faster than traditional one pivot Quicksort. This algorithm offers $\Theta (n \: log(n))$ average time complexity but in the worst case, its time complexity is cubic. This problem was partially solved by reading the input data in parts and performing the transformation on each part, result in a much smaller length $n$ and thus better run time at the expense of a slightly worse transformation result. As all chunks are individual transformations, they can also pe computed in parallel without much effort.
+}
 
 %% ==============================
 \section{Parallel Byte Reading}
@@ -23,9 +29,6 @@ To archive the main objective a few ideas to improve run length encoding where f
 \section{Preprocessing}
 %% ==============================
 \label{ch:Conceptual Design:sec:Preprocessing}
-...
-
-\subsection{Burrows Wheeler Transformation}
 ...
 \subsection{Byte Mapping to reduce Input space}
 ...
