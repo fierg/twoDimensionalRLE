@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.encoder
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import loggersoft.kotlin.streams.BitStream
 
+@ExperimentalUnsignedTypes
 interface RangedEncoder : Encoder {
     fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk
     fun decodeChunkBinRLE(

@@ -13,6 +13,7 @@ import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import edu.ba.twoDimensionalRLE.extensions.writeToBinaryStream
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationLinearTime
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import loggersoft.kotlin.streams.toIntUnsigned
@@ -25,6 +26,8 @@ import kotlin.math.log2
 class MixedEncoder : Encoder {
 
     private val bwt = BurrowsWheelerTransformation()
+    private val bwtLinear = BurrowsWheelerTransformationLinearTime()
+
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
     private val DEBUG = false
