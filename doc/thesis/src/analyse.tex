@@ -88,7 +88,7 @@ point in L is very high if $c$ occurs near that point in L, and is low otherwise
 It is obvious that this should always improve the performance of byte level RLE because the transformation is taking place at character level but it should not effect the binary implementations. 
 }
 
-\subsection{Horizontal byte reading}
+\subsection{Vertical byte reading}
 \par{
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in the example below.
 }

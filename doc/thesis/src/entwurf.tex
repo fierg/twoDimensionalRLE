@@ -2,7 +2,7 @@
 %% $Id: entwurf.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Conceptual Design}
+\chapter{Conceptual Design and Implementation}
 \label{ch:Conceptual Design}
 %% ==============================
 \par{
@@ -34,13 +34,15 @@ TODO: change impl \& describe actual impl and its benefits
 }
 
 %% ==============================
-\section{Parallel Byte Reading}
+\section{Vertical Byte Reading}
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
-...
-\subsection{First Ideas}
 
-...
+Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on. By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier, nonetheless both ways of collecting all bits of identical significance are implemented.
+
+\subsection{First Ideas}
+Initially some other ideas have been followed with very poor results. One idea was arranging all input bits in a Matrix or square Matrix in a way it would still be receivable later on. This way other methods from linear algebra would have been applicable to the input data, so that the construction of a triangular matrix or other preprocessing would result in long runs of zeros. Difficulties in the construction and transformation of the Data lead to the abandonment of this approach and the already described vertical interpretation was used further on.
+
 \subsection{New Perspective}
 ...
 \subsection{Performance Improvements}
@@ -60,6 +62,41 @@ TODO: change impl \& describe actual impl and its benefits
 ...
 \subsection{Huffman Coding}
 ...
+
+%% ==============================
+\section{Implementation Decisions}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Decisions}
+- why kotlin\\
+- performance improvements with the graalvm\\
+- other decisions\\
+\ldots
+
+%% ==============================
+\section{Implementation Detail}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Detail}
+- detailed information about specific modules and classes\\
+\ldots
+
+
+\subsection{Parsing}
+- explain universal parsing\\
+\subsection{Burrows Wheeler Transformation}
+- TBD\\
+\subsection{Byte Remapping}
+- show use case \\
+\subsection{Dynamic Encoding}
+- different sizes and optima for different files and chunk sizes \\
+
+
+%% ==============================
+\section{Implementation Evaluation}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Evaluation}
+- evaluation of implementation choices made
+
+
 %% ==============================
 \section{Summary}
 %% ==============================
