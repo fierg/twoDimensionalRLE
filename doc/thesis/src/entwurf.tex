@@ -2,30 +2,60 @@
 %% $Id: entwurf.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Conceptual Design}
+\chapter{Conceptual Design and Implementation}
 \label{ch:Conceptual Design}
 %% ==============================
 \par{
-To archive the main objective a few ideas to improve run length encoding where found. The first real difference is the conception of reading the data in chunks and then encode it in parallel, meaning all the most significant bits in one chunk, then all second most significant bits and so on.}
+Without further ado, design and implementation of the initial ideas began. As Section \ref{ch:Analysis} showed, there are some potentially promising improvements to be made to run length encoding, but how well they scale and work on a larger input with versatile symbols or bytes has to be determined.
+}
+
+\section{Burrows-Wheeler-Transformation Appliance}
+\par{
+By mistake a very simple transformation implementation was chosen, working by adding additional start and stop symbols to the input string (0x02 as STX, start of text and 0x03 as ETX, end of text). Some basic testing and playing around worked great but later on it revealed some major issues. For example the Calgary Corpus does consist of more than textual data, in fact the files geo, obj1, obj2 and pic contain of some binary data of include the symbols STX or ETX so we wont be able to apply the transformation to these. Another shortcoming was the very poor time complexity of almost $O (n^2)$ because under the hood, it uses a dual pivot Quicksort algorithm from the JDK 11, which is typically faster than traditional one pivot Quicksort. This algorithm offers $\Theta (n \: log(n))$ average time complexity but in the worst case, its time complexity is cubic. This problem was partially solved by reading the input data in parts and performing the transformation on each part, result in a much smaller length $n$ and thus better run time at the expense of a slightly worse transformation result. As all chunks are individual transformations, they can also be computed in parallel without much effort.
+}
+
+\par{
+TODO: show \& describe native bwt results for binary and byte wise RLE
+
+\begin{center}
+	\begin{tabular}[p]{r|r|r}
+		\label{tab:t7 rle vertical reading}
+		
+		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		\hline
+		3 & 95.4169856525027 & 7.633358852200216\\
+		2 & 91.391 & 7.311309412577118 \\
+	\end{tabular}
+\end{center}
+}
+
+\par{
+TODO: \deleted{change impl} (almost done) \& describe actual impl
+}
+
+\par{
+TODO: describe performance improvements}
 
 %% ==============================
-\section{Parallel Byte Reading}
+\section{Vertical Byte Reading}
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
-...
+
+Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on. By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier, nonetheless both ways of collecting all bits of identical significance are implemented.
+
 \subsection{First Ideas}
-...
-\subsection{New Perspective}
-...
+Initially some other ideas have been followed with very poor results. One idea was arranging all input bits in a Matrix or square Matrix in a way it would still be receivable later on. This way other methods from linear algebra would have been applicable to the input data, so that the construction of a triangular matrix or other preprocessing would result in long runs of zeros. Difficulties in the construction and transformation of the Data lead to the abandonment of this approach and the already described vertical interpretation was used further on.
+
 \subsection{Performance Improvements}
+
+
+
+
 ...
 %% ==============================
 \section{Preprocessing}
 %% ==============================
 \label{ch:Conceptual Design:sec:Preprocessing}
-...
-
-\subsection{Burrows Wheeler Transformation}
 ...
 \subsection{Byte Mapping to reduce Input space}
 ...
@@ -37,6 +67,41 @@ To archive the main objective a few ideas to improve run length encoding where f
 ...
 \subsection{Huffman Coding}
 ...
+
+%% ==============================
+\section{Implementation Decisions}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Decisions}
+- why kotlin\\
+- performance improvements with the graalvm\\
+- other decisions\\
+\ldots
+
+%% ==============================
+\section{Implementation Detail}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Detail}
+- detailed information about specific modules and classes\\
+\ldots
+
+
+\subsection{Parsing}
+- explain universal parsing\\
+\subsection{Burrows Wheeler Transformation}
+- TBD\\
+\subsection{Byte Remapping}
+- show use case \\
+\subsection{Dynamic Encoding}
+- different sizes and optima for different files and chunk sizes \\
+
+
+%% ==============================
+\section{Implementation Evaluation}
+%% ==============================
+\label{ch:Conceptual Design:sec:Implementation Evaluation}
+- evaluation of implementation choices made
+
+
 %% ==============================
 \section{Summary}
 %% ==============================

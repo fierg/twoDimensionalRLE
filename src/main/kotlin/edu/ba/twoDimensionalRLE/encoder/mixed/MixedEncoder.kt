@@ -30,15 +30,15 @@ class MixedEncoder : Encoder {
 
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-    private val DEBUG = false
+    private val DEBUG = true
 
     private val log = Log.kotlinInstance()
 
     companion object {
         private const val byteSize = 8
         private const val bitsPerRLENumber = 4
-        val BIN_RLE_BIT_RANGE = IntRange(2, 7)
-        val HUFF_BIT_RANGE = IntRange(0, 1)
+        val BIN_RLE_BIT_RANGE = IntRange(0, 7)
+        val HUFF_BIT_RANGE = IntRange(-1, -1)
         val RLE_RANGE = IntRange(-1, -1)
     }
 
@@ -298,6 +298,7 @@ class MixedEncoder : Encoder {
         byteMapping: MutableMap<Byte, Byte>,
         totalFileSize: Long
     ) {
+        // TODO: only write headders if value is provided
         log.info("Writing headers to file...")
         //TODO check if counter contains 0x00 and if so -> increase numberOfZerosAfter!
         val numbersOfZerosAfter = 2
