@@ -9,4 +9,9 @@ class BurrowsWheelerTransformationLinearTime {
         val index = table.indexOfFirst { it == input }
         return Pair(String(table.map { it[it.lastIndex] }.toCharArray()), index)
     }
+
+    fun inverseTransform(input: String, index: Int) {
+
+
+    }
 }
