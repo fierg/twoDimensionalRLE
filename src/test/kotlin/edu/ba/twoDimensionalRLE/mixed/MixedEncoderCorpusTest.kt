@@ -336,7 +336,7 @@ class MixedEncoderCorpusTest {
         val sizeOriginal = Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile().length() }
             .reduce { t: Long, u: Long -> t + u }.get()
         val sizeEncoded =
-            Files.walk(File("${encodeFolder}/CalgaryCorpus").toPath()).map { mapper -> mapper.toFile().length() }
+            Files.walk(File("${encodeFolder}/CalgaryCorpus").toPath()).filter{!it.endsWith(".mixed")}.map { mapper -> mapper.toFile().length() }
                 .reduce { t: Long, u: Long -> t + u }.get()
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
