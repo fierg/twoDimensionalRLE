@@ -39,19 +39,19 @@ Combining those approaches, you will find that $\sum$ being a finite alphabet, a
 \]
 So the entropy 	also describes the theoretical amount of bits needed to persist a message from $\sum$, calculated in $bps$ as Bits per Symbol.
 
-TODO: fix caption
-
-\begin{center}
+\begin{table}
+	\centering
 \begin{tabular}[p]{l|l|l|l|l|l|r}
-%	\caption{Beschreibung der Tabelle}
-	
 	& $P(a)$ & $P(b)$ & $P(c)$ & $P(d)$ & $P(e)$ & $H$ \\
 	\hline
 	1. & 0.2 & 0.2 & 0.2 & 0.2 & 0.2 & 2.322 \\
 	2. & 0.94 & 0.01 & 0.01 & 0.01 & 0.01 & 0.322
 	\label{tab:heisetabelle}
 \end{tabular}
-\end{center}
+	\caption{Entropy in relation to the Probability of Symbols}
+\end{table}
+
+
 TODO: describe some relations between probability and entropy of information source
 }
 \subsection{General Analysis}
@@ -68,7 +68,7 @@ Consulting newer sources we will find that, up to 500 character long symbol base
 
 \subsection{Probabilistic Coding}
 \par{
-The general idea behind Probability Coding is to analyze probabilities for messages and the encode them in bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the Analyzer module by the algorithm and will be discussed later on (chap: design, chap: impl). Probability coding compression can be discerned into fixed unique coding, which will represent each message with a bit string with the amount of bits being an integer, for example Huffman coding as type of prefix coding. In contrast to Huffman coding there are also arithmetic codes which can represent a message with a floating point number of bits in the corresponding bit string. By doing so they can \enquote{fuse} messages together and need less space to represent a set of messages.
+The general idea behind Probability Coding is to analyze probabilities for messages and the encode them in bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the Analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding compression can be discerned into fixed unique coding, which will represent each message with a bit string with the amount of bits being an integer, for example Huffman coding as type of prefix coding. In contrast to Huffman coding there are also arithmetic codes which can represent a message with a floating point number of bits in the corresponding bit string. By doing so they can \enquote{fuse} messages together and need less space to represent a set of messages.
 }
 ...
 
@@ -106,10 +106,9 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 \par{
 To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding can be used do code the sequence, since shorter runs like lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of these run lengths, the T4 defined a set of static Huffman codes, using a different codes for the black and white pixels.
 }
-\begin{center}
+\begin{table}
+	\centering
 	\begin{tabular}[p]{r|l|l}
-		%	\caption{Beschreibung der Tabelle}
-		
 		run length &  white codeword & black codeword\\
 		\hline
 		0 &  00110101 & 0000110111\\
@@ -124,7 +123,8 @@ To further reduce the RLE encoded sequence, a probability coding procedure like 
 		128+ & 10010 & 000011001000
 		\label{tab:t4 run length Huffman codes}
 	\end{tabular}
-\end{center}
+	\caption{T4 static Huffman codes}
+\end{table}
 
 \par{
 A small subset of the static T4 Huffman codes are given in Table \ref{tab:t4 run length Huffman
@@ -161,8 +161,8 @@ One way to address this problem is by adding extra stop symbols or encoding a le
 Huffman coding 
 }
 
-TODO: fix dang tree to be able to have only one child node
-\begin{center}
+\begin{figure}[h]
+	\centering
 	\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1,
 		level distance = 1.5cm}] 
 	\node [arn_n] {}
@@ -175,16 +175,11 @@ TODO: fix dang tree to be able to have only one child node
 		}                            
 	}
 	child{ node [arn_n] {0}
-		child{ node [arn_n] {1} 
 			child{ node [arn_n] {c}}
-		}
-		child{ node [arn_n] {0}
-			child{ node [arn_n] {d}}
-		}
-	}
-	; 
+		}; 
 	\end{tikzpicture}
-\end{center}
+	\caption{Simple Example Huffman Tree with 3 Leaf Nodes} \label{fig:M1}
+\end{figure}
 
 \par{
 TODO: explain stuff
@@ -201,8 +196,9 @@ There are other well known methods like \\
 }
 ...
 \subsection{Burrows-Wheeler-Transformation}
+\label{ch:Principles of compression:sec:Other:subSec:bwt}
+
 \par{
-\label{ch:PrPrinciples of compression:sec:Other:subSec:bwt}
 The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
 rotations of S, sorting them lexicographically, and extracting the last
 character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of
@@ -218,10 +214,9 @@ whose rows are rotations of S. Sort all rotations in lexicographical order.
 \par{
 In this example, the index is $I = 1$ and the matrix $M$ is
 
-\begin{center}
-	\begin{tabular}[p]{r|l|l|l|l|l|l}
-		%	\caption{Beschreibung der Tabelle}
-		
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r|l|l|l|l|l|l}
 		row 0 & a & a & b & r & a & c\\
 		\hline
 		row 1 & a & b & r & a & c & a\\
@@ -233,10 +228,10 @@ In this example, the index is $I = 1$ and the matrix $M$ is
 		row 4 & c & a & a & b & r & a\\
 		\hline
 		row 5 & r & a & c & a & a & b
-
 		\label{tab:t10 bwt-example}
 	\end{tabular}
-\end{center}
+	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
+\end{table}
 
 
 The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which result in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
@@ -257,10 +252,8 @@ State of the art compression\\
 
 \par{
 	
-	\begin{center}
+	\begin{table}
 		\begin{tabular}[p]{r|l|l|l}
-			%	\caption{Beschreibung der Tabelle}
-			
 			method &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
 			\hline
 			uncompressed & 3,141,622 & 100\% & 8.00\\
@@ -270,10 +263,10 @@ State of the art compression\\
 			bzip2 v9.12b & 828,347 & 26.3\% & 2.10 \\
 			ppmd & 740,737 & 23.5\% & 1.88\\
 			ZPAQ v7.15& 659,709 & 20.9\% & 1.67 
-			
-			\label{tab:t20 stat of the art}
 		\end{tabular}
-	\end{center}
+				\label{tab:t20 stat of the art}
+			\caption{State of the Art compression ratios}
+	\end{table}
 
 }
 
