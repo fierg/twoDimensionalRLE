@@ -196,8 +196,9 @@ There are other well known methods like \\
 }
 ...
 \subsection{Burrows-Wheeler-Transformation}
+\label{ch:Principles of compression:sec:Other:subSec:bwt}
+
 \par{
-\label{ch:PrPrinciples of compression:sec:Other:subSec:bwt}
 The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
 rotations of S, sorting them lexicographically, and extracting the last
 character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of

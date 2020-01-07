@@ -22,6 +22,20 @@ class BurrowsWheelerTransformationLinearTime {
         }
     }
 
+    /*
+
+    This Implementation is partially aligned with the modified version by Burrows and Wheeler:
+
+    see http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.121.6177&rep=rep1&type=pdf
+
+    The Transformation could also be improved.
+    Instead of creating the Matrix M with all cyclic rotations, this can also be done in linear time and space by building a suffix tree,
+    which then can be walked in lexicographical order to recover the sorted suffixes.
+    See McCreight’s suffix tree construction algorithm:
+
+    E.M. McCreight. A space economical suffix tree construction algorithm. Journal of the ACM, Vol. 32, No. 2, April 1976, pp. 262–272.
+
+     */
 
 
     fun transform(input: String): Pair<String, Int> {
@@ -51,7 +65,7 @@ class BurrowsWheelerTransformationLinearTime {
         val P = IntArray(L.length)
         val C = mutableMapOf<Byte, Int>()
 
-        for (i in 0 until L.length) {
+        for (i in 0 .. L.length) {
             P[i] = C.getOrDefault(L[i].toByte(), 0)
             C[L[i].toByte()] = C.getOrDefault(L[i].toByte(), 0) + 1
         }
@@ -86,7 +100,7 @@ class BurrowsWheelerTransformationLinearTime {
         val P = IntArray(L.size)
         val C = mutableMapOf<Byte, Int>()
 
-        for (i in 0 until L.size) {
+        for (i in 0 .. L.size) {
             P[i] = C.getOrDefault(L[i], 0)
             C[L[i]] = C.getOrDefault(L[i], 0) + 1
         }
@@ -102,6 +116,7 @@ class BurrowsWheelerTransformationLinearTime {
 
         val S = ByteArray(L.size)
 
+        // D3. [form output S]
         var i = index
         for (j in L.size-1 downTo 0){
             S[j] = L[i]

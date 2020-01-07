@@ -15,7 +15,7 @@ By mistake a very simple transformation implementation was chosen, working by ad
 }
 
 \par{
-While it was very slow, even when chunked into small pieces and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start.
+While it was very slow, even when chunked into small pieces and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start. Still this implementation had to be dropped and switched against one that could handy arbitrary input.
 
 \begin{table}[h]
 	\centering
@@ -31,7 +31,7 @@ While it was very slow, even when chunked into small pieces and computed in para
 }
 
 \par{
-TODO: \deleted{change impl} (almost done) \& describe actual impl
+In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicografic order. 
 }
 
 \par{
