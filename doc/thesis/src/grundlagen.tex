@@ -200,7 +200,7 @@ There are other well known methods like \\
 
 \par{
 The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
-rotations of S, sorting them lexicographically, and extracting the last
+rotations of S, sorting them lexicographical, and extracting the last
 character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of
 rotations. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string S given only L and the Index $I$ \cite{Burrows-linear-time}.
 }
@@ -236,6 +236,9 @@ In this example, the index is $I = 1$ and the matrix $M$ is
 
 The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which result in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
 }
+
+\subsection{Inverse Burrows-Wheeler-Transformation}
+\label{ch:Principles of compression:sec:Other:subSec:bwtInverse}
 
 \par{
 TODO: explain reversing a bwt
