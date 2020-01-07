@@ -12,7 +12,7 @@ import java.lang.IllegalArgumentException
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-class BurrowsWheelerTransformationLinearTime {
+class BurrowsWheelerTransformationModified {
 
     private var log = Log.kotlinInstance()
 

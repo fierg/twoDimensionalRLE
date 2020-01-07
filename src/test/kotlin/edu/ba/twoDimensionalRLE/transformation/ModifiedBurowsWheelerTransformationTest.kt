@@ -1,7 +1,7 @@
 package edu.ba.twoDimensionalRLE.transformation
 
 import de.jupf.staticlog.Log
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationLinearTime
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class LinearBurowsWheelerTransformationTest {
+class ModifiedBurowsWheelerTransformationTest {
     private var log = Log.kotlinInstance()
     private val word ="abraca"
     private val longWord = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
@@ -27,7 +27,7 @@ class LinearBurowsWheelerTransformationTest {
     @Test
     @Order(1)
     fun simpleTest() {
-        val bwtl = BurrowsWheelerTransformationLinearTime()
+        val bwtl = BurrowsWheelerTransformationModified()
         log.info("Starting transformation on $word ...")
         val result = bwtl.transform(word)
 
@@ -37,7 +37,7 @@ class LinearBurowsWheelerTransformationTest {
     @Test
     @Order(2)
     fun simpleTestDecode() {
-        val bwtl = BurrowsWheelerTransformationLinearTime()
+        val bwtl = BurrowsWheelerTransformationModified()
         val result = bwtl.transform(word)
         log.info("Starting inverse transformation on ${result.first} ...")
 
@@ -49,7 +49,7 @@ class LinearBurowsWheelerTransformationTest {
     @Test
     @Order(3)
     fun longTestDecode() {
-        val bwtl = BurrowsWheelerTransformationLinearTime()
+        val bwtl = BurrowsWheelerTransformationModified()
         log.info("Starting transformation on $longWord ...")
         val result = bwtl.transform(longWord)
         log.info("Result: ${result.first}")
@@ -65,7 +65,7 @@ class LinearBurowsWheelerTransformationTest {
     @Test
     @Order(4)
     fun byteArrayTestDecode() {
-        val bwtl = BurrowsWheelerTransformationLinearTime()
+        val bwtl = BurrowsWheelerTransformationModified()
         log.info("Starting bwt on byteArray $byteArray (${byteArray.decodeToString()})")
         val result = bwtl.transformByteArray(byteArray)
 
