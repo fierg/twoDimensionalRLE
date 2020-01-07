@@ -7,12 +7,14 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationLinearTime
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 class StringRunLengthEncoder : Encoder {
 
@@ -109,16 +111,15 @@ class StringRunLengthEncoder : Encoder {
 
     fun encodeSimple(inputFile: String, outputFile: String, bitPerRun: Int) {
         var lastSeenBit = false
-        var currentBit = false
         var counter = 0
         val maxLength = 2.pow(bitPerRun) - 1
 
-        log.info("Encoding $inputFile with simple rle and $bitPerRun bits per run...")
+        log.info("Encoding $inputFile with simple binary rle and $bitPerRun bits per run...")
 
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
             File(inputFile).readBytes().forEach { byte ->
                 byte.toUByte().toInt().toString(2).padStart(8, '0').forEach {char ->
-                    currentBit = char == '1'
+                    val currentBit = char == '1'
 
                     if (lastSeenBit == currentBit) {
                         if (++counter == maxLength) {
@@ -146,7 +147,7 @@ class StringRunLengthEncoder : Encoder {
         applyBurrowsWheelerTransformation: Boolean,
         chunkSize: Int
     ) {
-        log.info("Starting to encode file $inputFile with regular rle and $bitPerRun. Output file will be at $outputFile")
+        log.info("Starting to encode file $inputFile with byte wise rle and $bitPerRun. Output file will be at $outputFile")
         val input = File(inputFile)
         val output = File(outputFile)
         output.createNewFile()
@@ -158,9 +159,9 @@ class StringRunLengthEncoder : Encoder {
         var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
 
         if (applyBurrowsWheelerTransformation) {
-            val bwt = BurrowsWheelerTransformation()
+            val bwt = BurrowsWheelerTransformationLinearTime()
             log.info("Performing burrows wheeler transformation on all chunks...")
-            chunks = bwt.performBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
+            chunks = bwt.performLinearBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
         }
 
         var lastSeenByte = 0.toByte()
@@ -168,7 +169,6 @@ class StringRunLengthEncoder : Encoder {
         val maxLength = 2.pow(bitPerRun) - 1
 
         BitStream(output.openBinaryStream(false)).use { stream ->
-
             chunks.forEach { chunk ->
                 chunk.bytes.forEach { byte ->
                     if (lastSeenByte == byte) {
@@ -188,7 +188,6 @@ class StringRunLengthEncoder : Encoder {
                             lastSeenByte = byte
                         }
                     }
-
                 }
             }
             if (counter != 0) {

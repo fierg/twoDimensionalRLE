@@ -11,13 +11,14 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 import java.nio.file.Files
 
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLECorpus2BitTest {
 
     private var log = Log.kotlinInstance()
     private val applyByteMapping = false
-    private val applyBWT = false
+    private val applyBWT = true
     private val bitsPerRleNumber = 2
 
     init {
@@ -52,7 +53,7 @@ class StringRLECorpus2BitTest {
 
     @Test
     @Order(2)
-    fun encodeAndDecodeCorpus8BitRle() {
+    fun encodeAndDecodeCorpus() {
 
         File(folderToEncode).listFiles().forEach {
             strRLE.encodeVarLength(
