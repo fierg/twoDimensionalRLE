@@ -249,7 +249,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                 assert(currentMappingSize <= largesMapping, lazyMessage = {"No mapping found!"})
             }
         }
-        if (decodingResult.size != expectedSize.toInt()) {
+        if (decodingResult.size != expectedSize) {
             log.warn("Decoded result has unexpected size!")
             log.warn("decoded ${decodingResult.size} bytes but expected $expectedSize bytes")
         }

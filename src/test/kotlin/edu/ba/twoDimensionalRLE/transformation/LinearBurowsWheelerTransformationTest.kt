@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
 
+@ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class LinearBurowsWheelerTransformationTest {

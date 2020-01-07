@@ -1,11 +1,27 @@
 package edu.ba.twoDimensionalRLE.tranformation
 
+import com.google.common.primitives.SignedBytes
+import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.extensions.shift
+import edu.ba.twoDimensionalRLE.model.DataChunk
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
-import java.math.BigInteger
 
+@ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
 class BurrowsWheelerTransformationLinearTime {
+
+    private var log = Log.kotlinInstance()
+
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+    }
+
 
 
     fun transform(input: String): Pair<String, Int> {
@@ -16,12 +32,10 @@ class BurrowsWheelerTransformationLinearTime {
     }
 
 
-    @Deprecated("currently broken due to comparison method!")
     fun transformByteArray(input: ByteArray): Pair<ByteArray, Int> {
         val table = Array(input.size) { input.shift(it)}
         
-        //TODO fix!!!!
-        table.sortWith(Comparator { o1, o2 -> (BigInteger(o1) - BigInteger(o2)).toInt() })
+        table.sortWith(SignedBytes.lexicographicalComparator())
         val index = table.indexOfFirst { it.contentEquals(input) }
 
         return Pair(table.map { it[it.lastIndex] }.toByteArray(), index)
@@ -95,5 +109,52 @@ class BurrowsWheelerTransformationLinearTime {
         }
 
         return S
+    }
+    fun invertTransformationParallel(transformedChunks:List<DataChunk>): List<DataChunk> {
+        val reversedChunksDeferred = mutableListOf<Deferred<DataChunk>>()
+
+        log.info("Performing inverse burrows wheeler transformation on all chunks in parallel...")
+        transformedChunks.forEachIndexed { index, it ->
+            reversedChunksDeferred.add(GlobalScope.async {
+                if (index % 1000 == 0) {
+                    log.info("reversing chunk nr $index of ${transformedChunks.size}...")
+                }
+                return@async invertTransformDataChunk(it)
+            })
+
+        }
+        log.info("Started all coroutines...")
+        log.info("Awaiting termination of all coroutines...")
+        return runBlocking {
+            return@runBlocking reversedChunksDeferred.map { it.await() }
+        }
+
+    }
+
+    private fun invertTransformDataChunk(chunk: DataChunk): DataChunk {
+        val result = inverseTransformByteArray(chunk.bytes, chunk.bwtIndex)
+        return DataChunk(result)
+    }
+
+
+    fun performLinearBurrowsWheelerTransformationOnAllChunks(
+        chunks: MutableList<DataChunk>,
+        outputFile: String
+    ): MutableList<DataChunk> {
+        val transformedChunks = mutableListOf<DataChunk>()
+        log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
+        chunks.forEach {
+            transformedChunks.add(transformDataChunk(it))
+        }
+        log.info("Finished burrows wheeler transformation.")
+
+        return transformedChunks
+    }
+
+    private fun transformDataChunk(chunk: DataChunk): DataChunk {
+        val result = transformByteArray(chunk.bytes)
+        val newChunk = DataChunk(result.first)
+        newChunk.bwtIndex = result.second
+        return newChunk
     }
 }

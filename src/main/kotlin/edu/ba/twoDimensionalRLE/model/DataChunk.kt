@@ -18,6 +18,7 @@ open class DataChunk(val input: ByteArray) {
     var binRleEncodedNumbers = mutableListOf<Int>()
     var binRleEncodedNumbersFromBuffer = mutableListOf<Int>()
     var bytes = input.clone()
+    var bwtIndex = 0
 
 
     companion object {
