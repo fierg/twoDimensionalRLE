@@ -9,7 +9,35 @@
 Without further ado, design and implementation of the initial ideas began. As Section \ref{ch:Analysis} showed, there are some potentially promising improvements to be made to run length encoding, but how well they scale and work on a larger input with versatile symbols or bytes has to be determined.
 }
 
-\section{Burrows-Wheeler-Transformation Appliance}
+
+%% ==============================
+\section{Preprocessing}
+%% ==============================
+\label{ch:Conceptual Design:sec:Preprocessing}
+
+%% ==============================
+\subsection{Vertical Byte Reading}
+%% ==============================
+\label{ch:Conceptual Design:sec:Parallel Byte Reading}
+\par{
+Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on. By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier, nonetheless both ways of collecting all bits of identical significance are implemented.}
+
+\subsubsection{First Ideas}
+\par{
+Initially some other ideas have been followed with very poor results. One idea was arranging all input bits in a Matrix or square Matrix in a way it would still be receivable later on. This way other methods from linear algebra would have been applicable to the input data, so that the construction of a triangular matrix or other preprocessing would result in long runs of zeros. Difficulties in the construction and transformation of the Data lead to the abandonment of this approach and the already described vertical interpretation was used further on.}
+
+\subsubsection{Other Difficulties}
+\par{
+Other difficulties arose while performing bit operations, because it became slow on larger workloads. \\
+
+TODO: explain used lib}
+
+\subsubsection{Performance improvements}
+\par{
+TODO: show results
+}
+
+\subsection{Burrows-Wheeler-Transformation Appliance}
 \par{
 By mistake a very simple transformation implementation was chosen, working by adding additional start and stop symbols to the input string (0x02 as STX, start of text and 0x03 as ETX, end of text). Some basic testing and playing around worked great but later on it revealed some major issues. For example the Calgary Corpus consists of more than textual data, in fact the files geo, obj1, obj2 and pic contain of some binary data of include the symbols STX or ETX so we wont be able to apply the transformation to these. Another shortcoming was the very poor time complexity of almost $O (n^2)$ because under the hood, it uses a dual pivot Quick-sort algorithm from the JDK 11, which is typically faster than traditional one pivot Quick-sort. This algorithm offers $\Theta (n \: log(n))$ average time complexity but in the worst case, its time complexity is cubic. This problem was partially solved by reading the input data in parts and performing the transformation on each part, result in a much smaller length $n$ and thus better run time at the expense of a slightly worse transformation result. As all chunks are individual transformations, they can also be computed in parallel without much effort.
 
@@ -41,40 +69,22 @@ While it was only applicable to textual data and very slow, even when chunked in
 \end{table}
 }
 \par{
-In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. 
+In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation ind inversion was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. However this is has a bad complexity and the inverting process does not even has access to this Matrix M.\\
+
+TODO: explain creation using suffix array \\
+
+TODO: create inversion using lyndon words\\
 }
 
-%% ==============================
-\section{Vertical Byte Reading}
-%% ==============================
-\label{ch:Conceptual Design:sec:Parallel Byte Reading}
-
-Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on. By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier, nonetheless both ways of collecting all bits of identical significance are implemented.
-
-\subsection{First Ideas}
-Initially some other ideas have been followed with very poor results. One idea was arranging all input bits in a Matrix or square Matrix in a way it would still be receivable later on. This way other methods from linear algebra would have been applicable to the input data, so that the construction of a triangular matrix or other preprocessing would result in long runs of zeros. Difficulties in the construction and transformation of the Data lead to the abandonment of this approach and the already described vertical interpretation was used further on.
-
-\subsection{Other Difficulties}
-...
-
-\subsection{Performance Improvements}
-On regular textual data 
 
 %% ==============================
-\section{Preprocessing}
+\section{Other Processing Options}
 %% ==============================
-\label{ch:Conceptual Design:sec:Preprocessing}
-...
-\subsection{Byte Mapping to reduce Input space}
-...
-\subsection{Dynamic Encoding}
-...
+\label{ch:Conceptual Design:sec:Postprocessing}
+- encoding with huffman codes\\
+\ldots
 
-\section{Alternative Compression for partial data}
-\label{ch:Conceptual Design:sec:Alternative Encoding}
-...
-\subsection{Huffman Coding}
-...
+\subsection{Performance improvements}
 
 %% ==============================
 \section{Implementation Decisions}
