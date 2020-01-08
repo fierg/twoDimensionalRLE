@@ -13,7 +13,6 @@ import java.nio.file.Files
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLECorpus3BitTest {
 

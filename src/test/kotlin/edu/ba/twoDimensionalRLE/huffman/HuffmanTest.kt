@@ -45,18 +45,6 @@ class HuffmanTest {
             applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
     }
 
-
-    @ExperimentalUnsignedTypes
-    @Test
-    @Order(5)
-    fun decodeFileSmall() {
-        val encoder = HuffmanEncoder()
-        encoder.decode("$encodeFolder/$fileToEncodeSmall", "$decodeFolder/$fileToEncodeSmall",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
-    }
-
-
     @ExperimentalUnsignedTypes
     @Test
     @Order(4)
