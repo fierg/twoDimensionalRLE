@@ -54,7 +54,7 @@ By mistake a very simple transformation implementation was chosen, working by ad
 \end{table}
 }
 \par{
-While it was only applicable to textual data and very slow, even when chunked into small pieces and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start. Still this implementation had to be dropped and switched against one that could handy arbitrary input to be able to transform all files. This time all files could be processed and the resulting compression with byte wise RLE improved further.
+While it was only applicable to textual data and very slow, even when divided into smaller parts and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start. Still this implementation had to be dropped and switched against one that could handy arbitrary input to be able to transform all files. This time all files could be processed and the resulting compression with byte wise RLE improved further.
 
 \begin{table}[h]
 	\centering
@@ -69,11 +69,11 @@ While it was only applicable to textual data and very slow, even when chunked in
 \end{table}
 }
 \par{
-In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation ind inversion was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. However this is has a bad complexity and the inverting process does not even has access to this Matrix M.\\
+In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation inversion was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. However this is has a bad complexity and the inverting process does not even has access to this Matrix M.\\
 
 TODO: explain creation using suffix array \\
 
-TODO: create inversion using lyndon words\\
+TODO: create inversion using Lyndon words\\
 }
 
 
