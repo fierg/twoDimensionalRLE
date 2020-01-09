@@ -10,20 +10,20 @@ import kotlin.math.log2
 interface Encoder {
 
     private val DEBUG: Boolean
-        get() = true
+        get() = false
 
 
     fun encode(
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     )
     fun decode(
         inputFile: String,
         outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber : Int
     )
 
     fun writeDecodedLengthHeaderToFile(count: Long, stream: BitStream, log: Logger): Long {

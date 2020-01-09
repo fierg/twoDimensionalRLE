@@ -77,7 +77,7 @@ class StringRunLengthEncoder : Encoder {
     override fun encode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         log.info("Starting to encode file $inputFile with regular rle. Output file will be at $outputFile")
         val input = File(inputFile)
@@ -161,7 +161,7 @@ class StringRunLengthEncoder : Encoder {
         if (applyBurrowsWheelerTransformation) {
             val bwt = BurrowsWheelerTransformationModified()
             log.info("Performing burrows wheeler transformation on all chunks...")
-            chunks = bwt.performLinearBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
+            chunks = bwt.performModifiedBurrowsWheelerTransformationOnAllChunks(chunks)
         }
 
         var lastSeenByte = 0.toByte()
@@ -213,7 +213,7 @@ class StringRunLengthEncoder : Encoder {
     override fun decode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         val input = File(inputFile)
         val output = File(outputFile)

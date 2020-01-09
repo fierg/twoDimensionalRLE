@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder
 class HuffmanTest {
     private var log = Log.kotlinInstance()
     private val byteArraySize = 256
+    private val bitsPerRLENumber = 0
 
     init {
         log.newFormat {
@@ -40,19 +41,37 @@ class HuffmanTest {
     @Order(3)
     fun encodeFileSmall() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall",
+        encoder.encode(
+            "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
+        )
     }
+
+
+    @ExperimentalUnsignedTypes
+    @Test
+    @Order(5)
+    fun decodeFileSmall() {
+        val encoder = HuffmanEncoder()
+        encoder.decode(
+            "$encodeFolder/$fileToEncodeSmall", "$decodeFolder/$fileToEncodeSmall",
+            applyByteMapping = true,
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
+        )
+    }
+
 
     @ExperimentalUnsignedTypes
     @Test
     @Order(4)
     fun encodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.encode("data/$fileToEncode", "$encodeFolder/$fileToEncode",
+        encoder.encode(
+            "data/$fileToEncode", "$encodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
+        )
     }
 
     @ExperimentalUnsignedTypes
@@ -60,8 +79,10 @@ class HuffmanTest {
     @Order(6)
     fun decodeFileLarge() {
         val encoder = HuffmanEncoder()
-        encoder.decode( "$encodeFolder/$fileToEncode", "$decodeFolder/$fileToEncode",
+        encoder.decode(
+            "$encodeFolder/$fileToEncode", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize)
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
+        )
     }
 }

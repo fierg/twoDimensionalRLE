@@ -8,6 +8,7 @@ import java.io.File
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class BinaryRLETest {
     private val byteArraySize = 256
+    private val bitsPerRLENumber = 0
 
     companion object {
         private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
@@ -37,7 +38,7 @@ class BinaryRLETest {
         binaryRunLengthEncoder.encode("data/${fileToEncodeSmall}", "$encodeFolder/$fileToEncodeSmall.bin_rle",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
-        , byteArraySize = byteArraySize
+        , byteArraySize = byteArraySize, bitsPerRLENumber =bitsPerRLENumber
         )
     }
 
@@ -49,7 +50,7 @@ class BinaryRLETest {
             "$encodeFolder/${fileToEncodeSmall}.bin_rle_nr",
             "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber =bitsPerRLENumber
         )
     }
 

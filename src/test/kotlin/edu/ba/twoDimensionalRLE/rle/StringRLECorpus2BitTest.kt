@@ -18,7 +18,7 @@ class StringRLECorpus2BitTest {
 
     private var log = Log.kotlinInstance()
     private val applyByteMapping = false
-    private val applyBWT = true
+    private val applyBWT = false
     private val bitsPerRleNumber = 2
 
     init {

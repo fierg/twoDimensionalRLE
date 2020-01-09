@@ -59,12 +59,16 @@ open class DataChunk(val input: ByteArray) {
             binRleBuffer: StringBuffer,
             log: Logger
         ): List<DataChunk> {
+
             log.info("Starting to reconstruct DataChunks from parsed buffers...")
             var currentLinesOfChunk = mutableMapOf<Int, String>()
             var remainingSize = totalSize
 
-            log.info("Building buffer from bytes...")
-            val remainingHuffmanBuffer = huffDecodedBytes.toBinStringBuffer().append("00")
+            var remainingHuffmanBuffer = StringBuffer()
+            if (huffRange.getSize() > 0) {
+                log.info("Building buffer from bytes...")
+                remainingHuffmanBuffer = huffDecodedBytes.toBinStringBuffer().append("00")
+            }
             var currentLength = 1
 
             log.info("Reconstructing lines of all chunks...")
@@ -84,6 +88,7 @@ open class DataChunk(val input: ByteArray) {
                         binRleBuffer.delete(0, currentLength)
                     }
 
+                    if (huffRange.getSize() > 0)
                     //huff decoded lines
                     huffRange.forEach { line ->
                         currentLinesOfChunk[line] = remainingHuffmanBuffer.substring(0, currentLength)
@@ -188,13 +193,13 @@ open class DataChunk(val input: ByteArray) {
 
         this.bytes.forEach { it ->
             var line = 0
-            it.toUByte().toString(2).padStart(8,'0').forEach {
+            it.toUByte().toString(2).padStart(8, '0').forEach {
                 lines[line++]!!.append(it)
             }
         }
 
         FileOutputStream(fileOut, true).use { writer ->
-            lines.toSortedMap().forEach{
+            lines.toSortedMap().forEach {
                 writer.write(it.value.toByteArray())
             }
         }

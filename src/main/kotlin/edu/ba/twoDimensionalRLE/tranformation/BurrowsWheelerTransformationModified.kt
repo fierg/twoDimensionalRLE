@@ -152,12 +152,9 @@ class BurrowsWheelerTransformationModified {
     }
 
 
-    fun performLinearBurrowsWheelerTransformationOnAllChunks(
-        chunks: MutableList<DataChunk>,
-        outputFile: String
-    ): MutableList<DataChunk> {
+    fun performModifiedBurrowsWheelerTransformationOnAllChunks(chunks: MutableList<DataChunk>): MutableList<DataChunk> {
         val transformedChunks = mutableListOf<DataChunk>()
-        log.info("Performing burrows wheeler transformation on all chunks, adding 2 Byte...")
+        log.info("Performing burrows wheeler transformation on all chunks, adding bwt index to chunk...")
         chunks.forEach {
             transformedChunks.add(transformDataChunk(it))
         }
