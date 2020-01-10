@@ -7,7 +7,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationLinearTime
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -77,7 +77,7 @@ class StringRunLengthEncoder : Encoder {
     override fun encode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         log.info("Starting to encode file $inputFile with regular rle. Output file will be at $outputFile")
         val input = File(inputFile)
@@ -159,9 +159,9 @@ class StringRunLengthEncoder : Encoder {
         var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
 
         if (applyBurrowsWheelerTransformation) {
-            val bwt = BurrowsWheelerTransformationLinearTime()
+            val bwt = BurrowsWheelerTransformationModified()
             log.info("Performing burrows wheeler transformation on all chunks...")
-            chunks = bwt.performLinearBurrowsWheelerTransformationOnAllChunks(chunks, outputFile)
+            chunks = bwt.performModifiedBurrowsWheelerTransformationOnAllChunks(chunks)
         }
 
         var lastSeenByte = 0.toByte()
@@ -213,7 +213,7 @@ class StringRunLengthEncoder : Encoder {
     override fun decode(
         inputFile: String, outputFile: String,
         applyByteMapping: Boolean,
-        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int
+        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         val input = File(inputFile)
         val output = File(outputFile)

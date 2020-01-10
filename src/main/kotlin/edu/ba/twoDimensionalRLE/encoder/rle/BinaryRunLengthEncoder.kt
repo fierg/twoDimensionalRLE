@@ -37,15 +37,10 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
     }
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
-        var linesToEncode = ByteArray(0)
         val currentLinesAsStrBuffer = StringBuffer()
         for (index in range) {
             currentLinesAsStrBuffer.append(chunk.getLineFromChunkAsStringBuffer(index))
-            val currentLine = chunk.getLineFromChunk(index, byteSize)
-            linesToEncode += currentLine
-            if (DEBUG) chunk.encodedLines[index] = encodeLineOfChunkAsByteArray(currentLine, byteSize, bitsPerNumber)
         }
-        chunk.binRleEncodedNumbers = encodeLineOfChunkAsListOfNumbers(linesToEncode, byteSize, bitsPerNumber)
         chunk.binRleEncodedNumbersFromBuffer = encodeLineOfChunkAsListOfNumbers(currentLinesAsStrBuffer.toByteArray(), byteSize, bitsPerNumber)
         return chunk
     }
@@ -170,7 +165,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     override fun encode(inputFile: String, outputFile: String,
                         applyByteMapping: Boolean,
-                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int) {
+                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int) {
         val input = File(inputFile)
         val stream = input.inputStream()
         val bytes = ByteArray(byteArraySize)
@@ -417,7 +412,7 @@ class BinaryRunLengthEncoder : Encoder, RangedEncoder {
 
     override fun decode(inputFile: String, outputFile: String,
                         applyByteMapping: Boolean,
-                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int) {
+                        applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int) {
         val input = File(inputFile)
         val tempRLEFile = File("${outputFile}_rle_tmp")
         val tempBinFile = File("${outputFile}_bin_tmp")

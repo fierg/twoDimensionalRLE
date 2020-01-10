@@ -16,6 +16,7 @@ class MixedEncoderTest {
 
     private var log = Log.kotlinInstance()
     private val byteArraySize = 256
+    private val bitsPerRLENumber = 0
 
     init {
         log.newFormat {
@@ -48,9 +49,12 @@ class MixedEncoderTest {
     @Order(2)
     fun encodeFileSmall() {
         encoder.encode(
-            "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
+            "data/$fileToEncodeSmall",
+            "$encodeFolder/$fileToEncodeSmall",
+            applyByteMapping = false,
+            applyBurrowsWheelerTransformation = false,
+            byteArraySize = byteArraySize,
+            bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -58,9 +62,12 @@ class MixedEncoderTest {
     @Order(7)
     fun decodeFileSmall() {
         encoder.decode(
-            "$encodeFolder/$fileToEncodeSmall", "$decodeFolder/$fileToEncodeSmall",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
+            "$encodeFolder/$fileToEncodeSmall",
+            "$decodeFolder/$fileToEncodeSmall",
+            applyByteMapping = false,
+            applyBurrowsWheelerTransformation = false,
+            byteArraySize = byteArraySize,
+            bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -68,9 +75,12 @@ class MixedEncoderTest {
     @Order(3)
     fun encodeFileSmall2() {
         encoder.encode(
-            "data/$fileToEncodeSmall2", "$encodeFolder/$fileToEncodeSmall2",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = false, byteArraySize = byteArraySize
+            "data/$fileToEncodeSmall2",
+            "$encodeFolder/$fileToEncodeSmall2",
+            applyByteMapping = false,
+            applyBurrowsWheelerTransformation = false,
+            byteArraySize = byteArraySize,
+            bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -80,8 +90,8 @@ class MixedEncoderTest {
     fun encodeFile() {
         encoder.encode(
             "data/$fileToEncode", "$encodeFolder/$fileToEncode",
-            applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyByteMapping = false,
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -103,7 +113,7 @@ class MixedEncoderTest {
                 log,
                 MixedEncoder.BIN_RLE_BIT_RANGE,
                 MixedEncoder.HUFF_BIT_RANGE,
-                emptyMap()
+                emptyMap(), 0
             )
         }
     }
@@ -115,7 +125,7 @@ class MixedEncoderTest {
         encoder.decode(
             "$encodeFolder/$fileToEncodeSmall2", "$decodeFolder/$fileToEncodeSmall2",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -126,7 +136,7 @@ class MixedEncoderTest {
         encoder.decode(
             "$encodeFolder/$fileToEncode", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 

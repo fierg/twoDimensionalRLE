@@ -10,7 +10,7 @@ class Analyzer() {
     private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
     private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
     private var byteMapping = mutableMapOf<Byte, Byte>()
-    private val DEBUG = true
+    private val DEBUG = false
 
     init {
         log.newFormat {
@@ -83,7 +83,7 @@ class Analyzer() {
         byteMapping = createByteMapping()
     }
 
-    fun analyzeString(string : String) {
+    fun analyzeString(string: String) {
 
         string.forEach { byte ->
             byteOccurrenceMap[byte.toByte()] = byteOccurrenceMap.getOrDefault(byte.toByte(), 0) + 1
@@ -98,7 +98,11 @@ class Analyzer() {
 
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
+    fun sizeCompare(folderToEncode: String, encodedFolder: String){
+        sizeCompare(folderToEncode,encodedFolder, "")
+    }
+
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?) {
         val originalFiles = mutableMapOf<File, Long>()
         Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .forEach {
@@ -110,10 +114,19 @@ class Analyzer() {
         Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.forEach {
             encodedFiles[it.first] = it.second
         }
-        val sizeEncoded = encodedFiles.map { it.value }.reduce { t: Long, u: Long -> t + u }
+
+
+        val sizeEncoded: Long
+        if (filterExtension.isNullOrEmpty()) {
+            sizeEncoded = encodedFiles.map { it.value }.reduce { t: Long, u: Long -> t + u }
+        } else {
+            sizeEncoded = encodedFiles.map { it.value }.reduce { t: Long, u: Long -> t + u }
+        }
+
 
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
+        log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
         log.info("Corpus size original: ${sizeOriginal / 1000000.0} Mb")
         log.info("Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
 
@@ -121,12 +134,13 @@ class Analyzer() {
         log.info("with $bitsPerSymbol bits/symbol")
 
 
-        originalFiles.filter { it.key.isFile }.forEach { original ->
+        originalFiles.filter{ it.key.isFile }.forEach{ original ->
             val encodedFile = encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
             val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
             log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${encodedFile.values.first().toDouble() / original.value.toDouble()}, bps: $bitsPerSymbolFile")
         }
+        log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
     }
 
 }

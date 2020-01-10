@@ -8,6 +8,7 @@ import java.io.File
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLETest {
     private val byteArraySize = 256
+    private val bitsPerRLENumber = 0
 
     companion object {
         private const val fileToEncodeSmall = "testFile_small.txt"
@@ -45,7 +46,7 @@ class StringRLETest {
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true
-            , byteArraySize = byteArraySize
+            , byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -56,7 +57,7 @@ class StringRLETest {
         strRLE.encode(
             "data/$fileToEncode", "$encodeFolder/$fileToEncode.rle",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -66,7 +67,7 @@ class StringRLETest {
         strRLE.decode(
             "$encodeFolder/$fileToEncode.rle", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
@@ -76,7 +77,7 @@ class StringRLETest {
         strRLE.decode(
             "$encodeFolder/$fileToEncodeSmall.rle", "$decodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
-            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize
+            applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
 
