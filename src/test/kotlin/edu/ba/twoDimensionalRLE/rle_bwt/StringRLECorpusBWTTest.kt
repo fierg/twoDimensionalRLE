@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 import java.nio.file.Files
 
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLECorpusBWTTest {
@@ -376,7 +377,7 @@ class StringRLECorpusBWTTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
-                bitPerRun = bitsPerRleNumber, chunkSize =chunksize
+                bitPerRun = bitsPerRleNumber, chunkSize = chunksize
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
