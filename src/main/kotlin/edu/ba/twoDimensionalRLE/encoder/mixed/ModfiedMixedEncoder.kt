@@ -17,7 +17,8 @@ class ModfiedMixedEncoder : Encoder {
         outputFile: String,
         bitsPerRLENumber1: Int,
         bitsPerRLENumber2: Int,
-        applyByteMapping: Boolean
+        applyByteMapping: Boolean,
+        splitPosition: Int
     ) {
 
         val analyzer = Analyzer()
@@ -34,7 +35,7 @@ class ModfiedMixedEncoder : Encoder {
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
 
                 for (bitPosition in 0..7) {
-                    if (bitPosition > 6) {
+                    if (bitPosition > splitPosition) {
                         encodeBitPositionOfStreamRLE(bitsPerRLENumber1, bitPosition, streamIn, streamOut, lineMaps)
                     } else {
                         encodeBitPositionOfStreamRLE(bitsPerRLENumber2, bitPosition, streamIn, streamOut, lineMaps)
@@ -95,7 +96,7 @@ class ModfiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        encodeInternal(inputFile,outputFile,5, bitsPerRLENumber, applyByteMapping)
+        encodeInternal(inputFile,outputFile,5, bitsPerRLENumber, applyByteMapping, 6)
     }
 
     override fun decode(

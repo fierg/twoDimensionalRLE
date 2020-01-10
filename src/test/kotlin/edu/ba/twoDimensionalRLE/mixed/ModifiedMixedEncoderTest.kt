@@ -50,7 +50,10 @@ class ModifiedMixedEncoderTest {
                     mixedEncoder.encodeInternal(
                         "${folderToEncode}/${it.name}",
                         "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber, bitsPerRLENumber2 = bitsPerRleNumber, applyByteMapping = false
+                        bitsPerRLENumber1 = bitsPerRleNumber,
+                        bitsPerRLENumber2 = bitsPerRleNumber,
+                        applyByteMapping = false,
+                        splitPosition = 6
                     )
                 } catch (e: Exception) {
                     log.error(e.toString(), e)
@@ -68,40 +71,42 @@ class ModifiedMixedEncoderTest {
     @Order(2)
     fun encodeVertReadingRLEVaryingNrs() {
 
-        log.info("Encoding with vertical byte reading and binary RLE, no transformations, using more bits per rle nr for higher order bits.")
+        log.info("Encoding with vertical byte reading and binary RLE, with byte remapping, using more bits per rle nr for higher order bits.")
 
-        for (bitsPerRleNumber in 2..8) {
-            for (bitsPerRleNumber2 in 2..8) {
-                if (bitsPerRleNumber2 != bitsPerRleNumber) {
-                    if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                        log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                        File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                        File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
+        for (splitPosition in 3..6) {
+            for (bitsPerRleNumber in 2..4) {
+                for (bitsPerRleNumber2 in 2..8) {
+                    if (bitsPerRleNumber2 != bitsPerRleNumber) {
+                        if (File("${encodeFolder}/CalgaryCorpus").exists()) {
+                            log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
+                            File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
+                            File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
 
 
-                    }
-                    log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-                    File("${encodeFolder}/CalgaryCorpus").mkdirs()
-                    File("${decodeFolder}/CalgaryCorpus").mkdirs()
-
-                    File(folderToEncode).listFiles().forEach {
-                        try {
-                            log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number for the lower significance bits and $bitsPerRleNumber2 for the highest...")
-                            mixedEncoder.encodeInternal(
-                                "${folderToEncode}/${it.name}",
-                                "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                                bitsPerRLENumber1 = bitsPerRleNumber2,
-                                bitsPerRLENumber2 = bitsPerRleNumber,
-                                applyByteMapping = true
-                            )
-                        } catch (e: Exception) {
-                            log.error(e.toString(), e)
                         }
+                        log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
+                        File("${encodeFolder}/CalgaryCorpus").mkdirs()
+                        File("${decodeFolder}/CalgaryCorpus").mkdirs()
+
+                        File(folderToEncode).listFiles().forEach {
+                            try {
+                                log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number for the lower significance bits and $bitsPerRleNumber2 for the highest ${7-splitPosition} bits...")
+                                mixedEncoder.encodeInternal(
+                                    "${folderToEncode}/${it.name}",
+                                    "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
+                                    bitsPerRLENumber1 = bitsPerRleNumber2,
+                                    bitsPerRLENumber2 = bitsPerRleNumber,
+                                    applyByteMapping = true, splitPosition = splitPosition
+                                )
+                            } catch (e: Exception) {
+                                log.error(e.toString(), e)
+                            }
+                        }
+
+                        log.info("Finished encoding of corpus.")
+
+                        Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
                     }
-
-                    log.info("Finished encoding of corpus.")
-
-                    Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
                 }
             }
         }
