@@ -31,6 +31,8 @@ class ModifiedMixedEncoderTest {
     @Order(2)
     fun encodeFileSmall() {
 
+        log.info("Encoding with vertical byte reading and binary RLE, no transformations or preprocessing.")
+
         for (bitsPerRleNumber in 2..8) {
             if (File("${encodeFolder}/CalgaryCorpus").exists()) {
                 log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
@@ -56,6 +58,8 @@ class ModifiedMixedEncoderTest {
                 }
             }
 
+            log.info("Finished encoding of corpus.")
+            
             Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
         }
 

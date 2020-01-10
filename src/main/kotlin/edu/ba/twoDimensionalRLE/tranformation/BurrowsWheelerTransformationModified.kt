@@ -47,8 +47,8 @@ class BurrowsWheelerTransformationModified {
 
 
     fun transformByteArray(input: ByteArray): Pair<ByteArray, Int> {
-        val table = Array(input.size) { input.shift(it)}
-        
+        val table = Array(input.size) { input.shift(it) }
+
         table.sortWith(SignedBytes.lexicographicalComparator())
         val index = table.indexOfFirst { it.contentEquals(input) }
 
@@ -65,7 +65,7 @@ class BurrowsWheelerTransformationModified {
         val P = IntArray(L.length)
         val C = mutableMapOf<Byte, Int>()
 
-        for (i in 0 .. L.length) {
+        for (i in L.indices) {
             P[i] = C.getOrDefault(L[i].toByte(), 0)
             C[L[i].toByte()] = C.getOrDefault(L[i].toByte(), 0) + 1
         }
@@ -83,9 +83,9 @@ class BurrowsWheelerTransformationModified {
 
         // D3. [form output S]
         var i = index
-        for (j in L.length -1 downTo 0){
+        for (j in L.length - 1 downTo 0) {
             S[j] = L[i]
-            i = P[i] + C.getOrElse(L[i].toByte()) {throw IllegalArgumentException("Unexpected index!")}
+            i = P[i] + C.getOrElse(L[i].toByte()) { throw IllegalArgumentException("Unexpected index!") }
         }
 
         return S.concatToString()
@@ -100,7 +100,7 @@ class BurrowsWheelerTransformationModified {
         val P = IntArray(L.size)
         val C = mutableMapOf<Byte, Int>()
 
-        for (i in 0 .. L.size) {
+        for (i in L.indices) {
             P[i] = C.getOrDefault(L[i], 0)
             C[L[i]] = C.getOrDefault(L[i], 0) + 1
         }
@@ -118,14 +118,15 @@ class BurrowsWheelerTransformationModified {
 
         // D3. [form output S]
         var i = index
-        for (j in L.size-1 downTo 0){
+        for (j in L.size - 1 downTo 0) {
             S[j] = L[i]
-            i = P[i] + C.getOrElse(L[i]) {throw IllegalArgumentException("Unexpected index!")}
+            i = P[i] + C.getOrElse(L[i]) { throw IllegalArgumentException("Unexpected index!") }
         }
 
         return S
     }
-    fun invertTransformationParallel(transformedChunks:List<DataChunk>): List<DataChunk> {
+
+    fun invertTransformationParallel(transformedChunks: List<DataChunk>): List<DataChunk> {
         val reversedChunksDeferred = mutableListOf<Deferred<DataChunk>>()
 
         log.info("Performing inverse burrows wheeler transformation on all chunks in parallel...")
