@@ -70,8 +70,24 @@ Interestingly the binary implementation performs better on 2 bits per RLE number
 
 \par{
 If we take a more detailed look, we can see that while most files expand with larger RLE numbers, some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding. However the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run.
-}
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r|r|r|r}	
+		file & size original & $\frac{bits}{RLE number}$ & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		\hline
+		pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
+		 & & 3 & 235067 & 45.80 & 3.66\\
+		 & & 4 & 165745 & 32.29 & 2.58\\
+		 & & 5 & 126349 & 24.61 & 1.96\\
+		 & & 6 & 106773 & 20.80 & 1.66\\
+		 & & 7 & 100098 & 19.50 & 1.56\\
+		 & & 8 & 101014 & 19.68 & 1.57\\		 
+	\end{tabular}
+	\caption{The file \textit{pic} with increasing bits per RLE encoded number}
+	\label{tab:t40 The file pic with increasing bits per RLE encoded number}
+\end{table}	
+}
 
 %% ==============================
 \section{Possible Improvements by Preprocessing}

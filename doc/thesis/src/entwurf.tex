@@ -8,8 +8,6 @@
 \par{
 Without further ado, design and implementation of the initial ideas began. As Section \ref{ch:Analysis} showed, there are some potentially promising improvements to be made to run length encoding, but how well they scale and work on a larger input with versatile symbols or bytes has to be determined.
 }
-
-
 %% ==============================
 \section{Preprocessing}
 %% ==============================
@@ -20,7 +18,7 @@ Without further ado, design and implementation of the initial ideas began. As Se
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
 \par{
-Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on. By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier, nonetheless both ways of collecting all bits of identical significance are implemented.}
+Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
 
 \subsubsection{First Ideas}
 \par{
@@ -30,11 +28,60 @@ Initially some other ideas have been followed with very poor results. One idea w
 \par{
 Other difficulties arose while performing bit operations, because it became slow on larger workloads. \\
 
-TODO: explain used lib}
+TODO: explain used \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{lib}}
 
-\subsubsection{Performance improvements}
+\subsubsection{Compression improvements trough vertical reading}
 \par{
-TODO: show results
+First results of just plain binary RLE on the vertical interpretation improved its overall performance and archived a small edge over regular RLE with a reduction in the corpus size of around 3\% with 2 bits per run. 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r}	
+		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		\hline
+		3 & 110.82585915202825 & 8.86606873216226\\
+		2 & 97.14322771462668 & 7.771458217170134 \\
+	\end{tabular}
+	\caption{Binary RLE on vertical interpreted data}
+	\label{tab:t30 binary RLE on vertical interpreted data}
+\end{table}
+}
+
+\par{
+If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of around 1 with 2 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 5 bits per RLE run and only archives a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r|r|r}	
+		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		\hline
+		bib & 111261 & 117287 & 105.41 & 8.43\\
+		book1 & 768771 & 781773 & 101.69 & 8.13 \\
+		book2 & 610856 & 621173 & 101.68 & 8.13\\
+		geo & 102400 & 105454 & 102.98 & 8.23\\
+		news & 377109 & 377779 & 100.17 & 8.01\\
+		obj1 & 21504 & 22003 & 102.32 & 8.18\\
+		obj2& 246814 & 265075 & 107.39 & 8.59\\		 
+		paper1 & 53161 & 54118 & 101.80 & 8.14\\		 
+		paper2& 82199 & 83467 & 101.54 & 8.12\\		 
+		pic & 513216 & 375791 & 73.22 & 5.85\\		 
+		progc & 39611 & 38896 & 98.19 & 7.85\\		 
+		progl & 71646 & 68428 & 95.50 & 7.64\\		 
+		progp & 49379 & 48629 & 98.48 & 7.87\\		 
+		trans & 93695 & 91883 & 98.06 & 7.84\\
+		\hline
+		all files & 3145718 & 3055852 & 97.14 & 7.77
+	\end{tabular}
+	\caption{Calgary Corpus encoded with vertical reading and 2 bits per RLE run}
+	\label{tab:t41 Calgary Corpus encoded with vertical reading and 2 bits per RLE run}
+\end{table}	
+}
+\par{
+These results were already better than the simple binary RLE but they were still quite far from the expected outcome. This mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run.  
+}
+
+\subsection{Varying maximum run lengths}
+\par{
+
 }
 
 \subsection{Burrows-Wheeler-Transformation Appliance}
@@ -68,6 +115,7 @@ While it was only applicable to textual data and very slow, even when divided in
 	\label{tab:t12 Burrows Wheeler Transformation on binary RLE}
 \end{table}
 }
+
 \par{
 In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation inversion was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. However this is has a bad complexity and the inverting process does not even has access to this Matrix M.\\
 

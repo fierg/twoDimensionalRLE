@@ -98,13 +98,17 @@ class Analyzer() {
 
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String){
-        sizeCompare(folderToEncode,encodedFolder, "")
+    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
+        sizeCompare(folderToEncode, encodedFolder, null, null)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?) {
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String) {
+        sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
+    }
+
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?, filterFile: String?) {
         val originalFiles = mutableMapOf<File, Long>()
-        Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
+        Files.walk(File(folderToEncode).toPath()).sorted().map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .forEach {
                 originalFiles[it.first] = it.second
             }
@@ -127,18 +131,29 @@ class Analyzer() {
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-        log.info("Corpus size original: ${sizeOriginal / 1000000.0} Mb")
-        log.info("Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
+        log.info("Corpus size original: $sizeOriginal // ${sizeOriginal / 1000000.0} Mb")
+        log.info("Corpus size encoded: $sizeEncoded // ${sizeEncoded / 1000000.0} Mb")
 
         log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
         log.info("with $bitsPerSymbol bits/symbol")
 
 
-        originalFiles.filter{ it.key.isFile }.forEach{ original ->
-            val encodedFile = encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
-            val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
+        originalFiles.filter { it.key.isFile }.forEach { original ->
+            if (filterFile.isNullOrEmpty()) {
+                val encodedFile =
+                    encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+                val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
-            log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${encodedFile.values.first().toDouble() / original.value.toDouble()}, bps: $bitsPerSymbolFile")
+                log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100 }, bps: $bitsPerSymbolFile")
+            } else {
+                if (original.key.name == filterFile) {
+                    val encodedFile =
+                        encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+                    val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
+
+                    log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
+                }
+            }
         }
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
     }
