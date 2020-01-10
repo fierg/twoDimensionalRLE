@@ -3,7 +3,7 @@ package edu.ba.twoDimensionalRLE.rle
 import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
-
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class StringRLETest {

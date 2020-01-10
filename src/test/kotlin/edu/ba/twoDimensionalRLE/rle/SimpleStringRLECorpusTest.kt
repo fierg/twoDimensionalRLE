@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
 import java.nio.file.Files
 
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class SimpleStringRLECorpusTest {

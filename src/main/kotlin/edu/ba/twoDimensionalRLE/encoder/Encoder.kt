@@ -182,4 +182,14 @@ interface Encoder {
         return mapping
     }
 
+    fun writeRunToStream(counter: Int, stream: BitStream, bitPerRun: Int) {
+        counter.toString(2).padStart(bitPerRun, '0').reversed().forEach {
+            stream += when (it) {
+                '0' -> false
+                '1' -> true
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
+
 }

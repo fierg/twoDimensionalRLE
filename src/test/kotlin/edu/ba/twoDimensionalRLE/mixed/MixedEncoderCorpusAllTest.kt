@@ -12,7 +12,7 @@ class MixedEncoderCorpusAllTest {
 
 
     private var log = Log.kotlinInstance()
-    private val byteArraySize = 510
+    private val byteArraySize = 512
 
     init {
         log.newFormat {
