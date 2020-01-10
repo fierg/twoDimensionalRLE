@@ -1,5 +1,6 @@
 package edu.ba.twoDimensionalRLE.encoder.mixed
 
+import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import loggersoft.kotlin.streams.BitStream
@@ -11,8 +12,23 @@ class ModfiedMixedEncoder : Encoder {
 
     private val DEBUG = false
 
-    fun encode(inputFile: String, outputFile: String, bitsPerRLENumber1: Int, bitsPerRLENumber2: Int) {
-        BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+    fun encodeInternal(
+        inputFile: String,
+        outputFile: String,
+        bitsPerRLENumber1: Int,
+        bitsPerRLENumber2: Int,
+        applyByteMapping: Boolean
+    ) {
+
+        val analyzer = Analyzer()
+        analyzer.analyzeFile(File(inputFile))
+        var mappedFile: String? = null
+        if (applyByteMapping) {
+            mappedFile = "${outputFile}_tmp"
+            analyzer.mapFile(inputFile, mappedFile)
+        }
+
+        BitStream(File(mappedFile ?: inputFile).openBinaryStream(true)).use { streamIn ->
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
 
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
@@ -79,7 +95,7 @@ class ModfiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        encodeInternal(inputFile,outputFile,5, bitsPerRLENumber, applyByteMapping)
     }
 
     override fun decode(

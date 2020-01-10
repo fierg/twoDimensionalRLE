@@ -27,7 +27,6 @@ class ModifiedMixedEncoderTest {
 
     private val mixedEncoder = ModfiedMixedEncoder()
 
-    @Test
     @Order(2)
     fun encodeVertReadingRLEallNrEqual() {
 
@@ -48,10 +47,10 @@ class ModifiedMixedEncoderTest {
             File(folderToEncode).listFiles().forEach {
                 try {
                     log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number...")
-                    mixedEncoder.encode(
+                    mixedEncoder.encodeInternal(
                         "${folderToEncode}/${it.name}",
                         "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber, bitsPerRLENumber2 = bitsPerRleNumber
+                        bitsPerRLENumber1 = bitsPerRleNumber, bitsPerRLENumber2 = bitsPerRleNumber, applyByteMapping = false
                     )
                 } catch (e: Exception) {
                     log.error(e.toString(), e)
@@ -88,10 +87,12 @@ class ModifiedMixedEncoderTest {
                     File(folderToEncode).listFiles().forEach {
                         try {
                             log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number for the lower significance bits and $bitsPerRleNumber2 for the highest...")
-                            mixedEncoder.encode(
+                            mixedEncoder.encodeInternal(
                                 "${folderToEncode}/${it.name}",
                                 "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                                bitsPerRLENumber1 = bitsPerRleNumber2, bitsPerRLENumber2 = bitsPerRleNumber
+                                bitsPerRLENumber1 = bitsPerRleNumber2,
+                                bitsPerRLENumber2 = bitsPerRleNumber,
+                                applyByteMapping = true
                             )
                         } catch (e: Exception) {
                             log.error(e.toString(), e)
@@ -105,4 +106,5 @@ class ModifiedMixedEncoderTest {
             }
         }
     }
+
 }
