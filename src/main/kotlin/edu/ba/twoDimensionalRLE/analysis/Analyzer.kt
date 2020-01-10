@@ -144,7 +144,7 @@ class Analyzer() {
                     encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
                 val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
-                log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100 }, bps: $bitsPerSymbolFile")
+                log.info("File ${original.key.name}, size original: ${original.value}, size encoded: ${encodedFile.values.first()}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100 }, bps: $bitsPerSymbolFile")
             } else {
                 if (original.key.name == filterFile) {
                     val encodedFile =

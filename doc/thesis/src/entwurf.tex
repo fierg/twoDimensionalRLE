@@ -81,7 +81,38 @@ These results were already better than the simple binary RLE but they were still
 
 \subsection{Varying maximum run lengths}
 \par{
+This time the most significant bits have been encoded with more bits per run than the other ones and after trying out every combination it turned out, with 2 bits per run and 5 bits per run for higher bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio below 8, more specifically all textual files, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall.
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r|r|r}	
+		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		\hline
+		bib & 111261 & 110258 & 99.09 & 7.92\\
+		book1 & 768771 & 733208 & 95.37 & 7.62 \\
+		book2 & 610856 & 582583 & 95.37 & 7.62\\
+		geo & 102400 & 121496 & 118.64 & 9.49\\
+		news & 377109 & 353955 & 93.86 & 7.50\\
+		obj1 & 21504 & 24067 & 111.91 & 8.95\\
+		obj2& 246814 & 292143 & 118.36 & 9.46\\		 
+		paper1 & 53161 & 50758 & 95.47 & 7.63\\		 
+		paper2& 82199 & 78273 & 95.22 & 7.61\\		 
+		pic & 513216 & 356712 & 69.50 & 5.56\\		 
+		progc & 39611 & 36392 & 91.87 & 7.34\\		 
+		progl & 71646 & 63902 & 89.19 & 7.13\\		 
+		progp & 49379 & 45508 & 92.16 & 7.37\\		 
+		trans & 93695 & 85964 & 91.74 & 7.33\\
+		\hline
+		all files & 3145718 & 2939315 & 93.43 & 7.47
+	\end{tabular}
+	\caption{Calgary Corpus encoded with vertical reading and 2 bits per RLE run and 5 for higher significance bits}
+	\label{tab:t42 Calgary Corpus encoded with vertical reading and 2 bits per RLE run and 5 for higher significance bits}
+\end{table}	
+}
+
+\subsection{Byte remapping}
+\par{
+TODO: explain appliance of byte remapping and its performance impact
 }
 
 \subsection{Burrows-Wheeler-Transformation Appliance}
