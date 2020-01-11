@@ -5,12 +5,14 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 
+@ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
-class ModfiedMixedEncoder : Encoder {
+class ModifiedMixedEncoder : Encoder {
 
     private val DEBUG = false
 
@@ -30,14 +32,24 @@ class ModfiedMixedEncoder : Encoder {
         bitsPerRLENumber1: Int,
         bitsPerRLENumber2: Int,
         applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean,
         splitPosition: Int
     ) {
 
         val analyzer = Analyzer()
-        analyzer.analyzeFile(File(inputFile))
+        val bwt = BurrowsWheelerTransformationModified()
         var mappedFile: String? = null
+        var transformedFile: String? = null
+
+        analyzer.analyzeFile(File(inputFile))
+
+        if(applyBurrowsWheelerTransformation){
+            mappedFile = "${outputFile}_bwt_tmp"
+
+        }
+
         if (applyByteMapping) {
-            mappedFile = "${outputFile}_tmp"
+            mappedFile = "${outputFile}_mapped_tmp"
             analyzer.mapFile(inputFile, mappedFile)
         }
 
@@ -113,7 +125,7 @@ class ModfiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        encodeInternal(inputFile, outputFile, 5, bitsPerRLENumber, applyByteMapping, 6)
+        encodeInternal(inputFile, outputFile, 5, bitsPerRLENumber, applyByteMapping, applyBurrowsWheelerTransformation,6)
     }
 
     override fun decode(

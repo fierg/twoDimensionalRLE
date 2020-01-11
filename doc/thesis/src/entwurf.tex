@@ -211,7 +211,7 @@ Another possible preprocessing step which promised an improvement is the mention
 		3 & 95.4169856525027 & 7.633358852200216\\
 		2 & 91.391 & 7.311309412577118 \\
 	\end{tabular}
-	\caption{Simple Burrows Wheeler Transformation (with 0x02 \& 0x03) on byte wise RLE}
+	\caption{Initial BWT implementation on byte wise RLE}
 	\label{tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}
 \end{table}
 }
@@ -240,7 +240,7 @@ TODO: create inversion using Lyndon words\\
 }
 
 \par{
-
+In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Conceptual Design:sec:Parallel Byte Reading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination.
 }
 
 %% ==============================

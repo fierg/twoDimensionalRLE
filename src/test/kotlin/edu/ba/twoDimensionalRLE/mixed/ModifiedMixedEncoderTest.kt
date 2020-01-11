@@ -2,7 +2,7 @@ package edu.ba.twoDimensionalRLE.mixed
 
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
-import edu.ba.twoDimensionalRLE.encoder.mixed.ModfiedMixedEncoder
+import edu.ba.twoDimensionalRLE.encoder.mixed.ModifiedMixedEncoder
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -25,7 +25,7 @@ class ModifiedMixedEncoderTest {
         private const val decodeFolder = "data/decoded/mod_mixed"
     }
 
-    private val mixedEncoder = ModfiedMixedEncoder()
+    private val mixedEncoder = ModifiedMixedEncoder()
 
     @Order(2)
     fun encodeVertReadingRLEallNrEqual() {
@@ -53,6 +53,7 @@ class ModifiedMixedEncoderTest {
                         bitsPerRLENumber1 = bitsPerRleNumber,
                         bitsPerRLENumber2 = bitsPerRleNumber,
                         applyByteMapping = false,
+                        applyBurrowsWheelerTransformation = true,
                         splitPosition = 6
                     )
                 } catch (e: Exception) {
@@ -96,7 +97,8 @@ class ModifiedMixedEncoderTest {
                                     "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
                                     bitsPerRLENumber1 = bitsPerRleNumber2,
                                     bitsPerRLENumber2 = bitsPerRleNumber,
-                                    applyByteMapping = true, splitPosition = splitPosition
+                                    applyByteMapping = false, splitPosition = splitPosition,
+                                    applyBurrowsWheelerTransformation = true
                                 )
                             } catch (e: Exception) {
                                 log.error(e.toString(), e)

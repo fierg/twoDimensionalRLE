@@ -8,6 +8,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.lang.IllegalArgumentException
 
 @ExperimentalUnsignedTypes
@@ -43,6 +44,10 @@ class BurrowsWheelerTransformationModified {
         table.sort()
         val index = table.indexOfFirst { it == input }
         return Pair(String(table.map { it[it.lastIndex] }.toCharArray()), index)
+    }
+
+    fun transform(input: File) {
+        //TODO
     }
 
 
