@@ -73,9 +73,9 @@ class ModifiedMixedEncoderTest {
 
         log.info("Encoding with vertical byte reading and binary RLE, with byte remapping, using more bits per rle nr for higher order bits.")
 
-        for (splitPosition in 3..6) {
-            for (bitsPerRleNumber in 2..4) {
-                for (bitsPerRleNumber2 in 3..8) {
+        for (splitPosition in 4..4) {
+            for (bitsPerRleNumber in 2..2) {
+                for (bitsPerRleNumber2 in 5..5) {
                     if (bitsPerRleNumber2 != bitsPerRleNumber) {
                         if (File("${encodeFolder}/CalgaryCorpus").exists()) {
                             log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")

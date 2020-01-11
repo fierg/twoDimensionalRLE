@@ -89,6 +89,10 @@ If we take a more detailed look, we can see that while most files expand with la
 \end{table}	
 }
 
+\par{
+An additional step of the improvement could be the detection of high efficiency with regular binary RLE to keep files highly suited for this method at its peak.
+}
+
 %% ==============================
 \section{Possible Improvements by Preprocessing}
 %% ==============================
@@ -109,6 +113,7 @@ It is obvious that this should always improve the performance of byte level RLE 
 }
 
 \subsection{Vertical byte reading}
+\label{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}
 \par{
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. This idea is also know for binary RLE on images, where the encoding in the image follows a specific path.\\
  TODO showcase}
@@ -127,6 +132,7 @@ Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 
 }
 
 \subsection{Byte remapping}
+\label{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping}
 \par{
 The effect of very long runs in the last example was mainly because the binary representations of the used characters are very similar, so the range of byte values used was very small (between a = 97 and r = 114). Introducing other used symbols like uppercase letters, space or new lines, the used range expands.
 }

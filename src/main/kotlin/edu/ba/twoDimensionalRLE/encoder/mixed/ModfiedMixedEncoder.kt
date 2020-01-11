@@ -1,5 +1,7 @@
 package edu.ba.twoDimensionalRLE.encoder.mixed
 
+import de.jupf.staticlog.Log
+import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
@@ -11,6 +13,16 @@ import java.io.File
 class ModfiedMixedEncoder : Encoder {
 
     private val DEBUG = false
+
+    private val log = Log.kotlinInstance()
+
+    init {
+        log.newFormat {
+            line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
+        }
+        if (!DEBUG) log.logLevel = LogLevel.INFO
+
+    }
 
     fun encodeInternal(
         inputFile: String,
@@ -31,6 +43,11 @@ class ModfiedMixedEncoder : Encoder {
 
         BitStream(File(mappedFile ?: inputFile).openBinaryStream(true)).use { streamIn ->
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+
+                if (applyByteMapping) {
+                    writeLengthHeaderToFile(analyzer.getByteMapping().size,streamOut,log,1)
+                    writeByteMappingToStream(streamOut, analyzer.getByteMapping(), log)
+                }
 
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
 
@@ -96,7 +113,7 @@ class ModfiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        encodeInternal(inputFile,outputFile,5, bitsPerRLENumber, applyByteMapping, 6)
+        encodeInternal(inputFile, outputFile, 5, bitsPerRLENumber, applyByteMapping, 6)
     }
 
     override fun decode(

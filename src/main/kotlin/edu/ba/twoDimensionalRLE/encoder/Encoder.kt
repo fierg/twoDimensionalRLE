@@ -91,7 +91,7 @@ interface Encoder {
     }
 
     fun parseLengthHeader(stream: BitStream, log: Logger): Long {
-        log.info("Trying to parse length header from encoded file...")
+        log.debug("Trying to parse length header from encoded file...")
         var currentByteSize = 1
         var expectedSize = 0L
         stream.position++
@@ -105,7 +105,7 @@ interface Encoder {
                 expectedSize = stream.readBits(currentByteSize * 8, false)
             }
         }
-        log.info("Expecting $expectedSize bytes of content after decoding.")
+        log.debug("Expecting $expectedSize bytes of content after decoding.")
         return expectedSize
     }
 
@@ -144,7 +144,7 @@ interface Encoder {
         log: Logger
     ): Map<StringBuffer, Byte> {
 
-        log.info("Trying to parse $expectedMappingSize mappings from encoded file...")
+        log.debug("Trying to parse $expectedMappingSize mappings from encoded file...")
         val huffmanMapping = mutableMapOf<StringBuffer, Byte>()
 
         while (stream.position < stream.size && huffmanMapping.size < expectedMappingSize) {
@@ -156,13 +156,13 @@ interface Encoder {
             }
             huffmanMapping[currentPrefix] = byteToMap
         }
-        log.info("Parsed ${huffmanMapping.size} mappings from encoded file.")
+        log.debug("Parsed ${huffmanMapping.size} mappings from encoded file.")
         log.debug("Huffman dictionary found: $huffmanMapping")
         return huffmanMapping
     }
 
     fun writeByteMappingToStream(stream: BitStream, mapping: Map<Byte, Byte>, log: Logger) {
-        log.info("Writing byte mapping to stream...")
+        log.debug("Writing byte mapping to stream...")
         mapping.keys.forEach {
             stream.write(it)
         }
@@ -171,7 +171,7 @@ interface Encoder {
     }
 
     fun readByteMappingFromStream(stream: BitStream, expectedMappingSize: Int, log: Logger): Map<Byte, Byte> {
-        log.info("Expecting $expectedMappingSize mappings from stream...")
+        log.debug("Expecting $expectedMappingSize mappings from stream...")
         val mapping = mutableMapOf<Byte,Byte>()
         var mappingCounter = 0
         while (stream.position < stream.size && mapping.size < expectedMappingSize){
