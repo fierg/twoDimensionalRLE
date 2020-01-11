@@ -18,7 +18,7 @@ Without further ado, design and implementation of the initial ideas began. As Se
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
 \par{
-Implementing the vertical reading of the input shown in Section \ref*{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
+Implementing the vertical reading of the input shown in Section \ref{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
 
 \subsubsection{First Ideas}
 \par{
