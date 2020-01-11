@@ -75,7 +75,7 @@ class ModifiedMixedEncoderTest {
 
         for (splitPosition in 3..6) {
             for (bitsPerRleNumber in 2..4) {
-                for (bitsPerRleNumber2 in 2..8) {
+                for (bitsPerRleNumber2 in 3..8) {
                     if (bitsPerRleNumber2 != bitsPerRleNumber) {
                         if (File("${encodeFolder}/CalgaryCorpus").exists()) {
                             log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")

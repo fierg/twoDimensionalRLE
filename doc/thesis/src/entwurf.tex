@@ -115,6 +115,44 @@ This time the most significant bits have been encoded with more bits per run tha
 TODO: explain appliance of byte remapping and its performance impact
 }
 
+\begin{tikzpicture}
+\begin{axis}[
+title={Performance Improvements depending on different run lengths},
+xlabel={$\frac{bits}{run}$},
+ylabel={Compression ratio},
+xmin=2, xmax=9,
+ymin=70, ymax=100,
+xtick={3,4,5,6,7,8},
+ytick={80,90,100},
+legend pos=north west,
+ymajorgrids=true,
+grid style=dashed,
+]
+\addplot[
+	color=blue,
+	mark=square,
+	]
+	coordinates {
+		(3,87.74)(4,82.74)(5,83.88)(6,86.91)(7,90.93)(8,95.54)
+	};
+\addplot[
+	color=red,
+	mark=square,
+	]
+	coordinates {
+		(3,84.26)(4,80.52)(5,79.01)(6,78.99)(7,79.88)(8,81.34)
+	};
+\addplot[
+	color=green,
+	mark=square,
+	]
+	coordinates {
+		(3,85.82)(4,82.59)(5,80.82)(6,80.06)(7,79.92)(8,80.17)
+	};
+	\legend{4 most sign. bits,3 most sign. bits,2 most sign. bits}
+\end{axis}
+\end{tikzpicture}
+
 \subsection{Burrows-Wheeler-Transformation Appliance}
 \par{
 By mistake a very simple transformation implementation was chosen, working by adding additional start and stop symbols to the input string (0x02 as STX, start of text and 0x03 as ETX, end of text). Some basic testing and playing around worked great but later on it revealed some major issues. For example the Calgary Corpus consists of more than textual data, in fact the files geo, obj1, obj2 and pic contain of some binary data of include the symbols STX or ETX so we wont be able to apply the transformation to these. Another shortcoming was the very poor time complexity of almost $O (n^2)$ because under the hood, it uses a dual pivot Quick-sort algorithm from the JDK 11, which is typically faster than traditional one pivot Quick-sort. This algorithm offers $\Theta (n \: log(n))$ average time complexity but in the worst case, its time complexity is cubic. This problem was partially solved by reading the input data in parts and performing the transformation on each part, result in a much smaller length $n$ and thus better run time at the expense of a slightly worse transformation result. As all chunks are individual transformations, they can also be computed in parallel without much effort.
