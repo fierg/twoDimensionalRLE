@@ -38,8 +38,8 @@ First results of just plain binary RLE on the vertical interpretation improved i
 	\begin{tabular}{r|r|r}	
 		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		3 & 110.82585915202825 & 8.86606873216226\\
-		2 & 97.14322771462668 & 7.771458217170134 \\
+		3 & 110.82 & 8.86\\
+		2 & 97.14 & 7.77 \\
 	\end{tabular}
 	\caption{Binary RLE on vertical interpreted data}
 	\label{tab:t30 binary RLE on vertical interpreted data}
@@ -170,7 +170,7 @@ grid style=dashed,
 \end{figure}
 
 \par{
-Empirically, the combination of 2 bits per run and 5 bits per run for the 3 most significant bits yielded the overall best results with 79\% of its original size and 6.32 $\frac{bits}{symbol}$. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size.
+Empirically found, the combination of 2 bits per run and 5 bits per run for the 3 most significant bits yielded the overall best results with 79\% of its original size and 6.32 $\frac{bits}{symbol}$. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size.
 
 \begin{table}[H]
 	\centering
@@ -208,23 +208,23 @@ Another possible preprocessing step which promised an improvement is the mention
 	\begin{tabular}{r|r|r}	
 		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		3 & 95.4169856525027 & 7.633358852200216\\
-		2 & 91.391 & 7.311309412577118 \\
+		3 & 95.41 & 7.63\\
+		2 & 91.39 & 7.31 \\
 	\end{tabular}
 	\caption{Initial BWT implementation on byte wise RLE}
 	\label{tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}
 \end{table}
 }
 \par{
-While it was only applicable to textual data and very slow, even when divided into smaller parts and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start. Regular binary RLE did not really benefit from this transformation as expected but on vertical interpretation, consecutive characters result in successive bits on every significance. Still this implementation had to be dropped and switched against one that could handy arbitrary input to be able to transform all files. This time all files could be processed and the resulting compression with byte wise RLE improved further.
+While it was only applicable to textual data and very slow, even when divided into smaller parts and computed in parallel, it improved the overall results of byte wise RLE by 16\% to a compression ratio of slightly over 7 $\frac{bits}{symbol}$ which seemed like a good start. Regular binary RLE did not really benefit from this transformation as expected but on vertical interpretation, consecutive characters result in successive bits on every significance. Still this implementation had to be dropped and switched against one that could handle arbitrary input to be able to transform all files. This time all files could be processed and the resulting compression with byte wise RLE improved further.
 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
 		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		3 & 91.62970107301417 & 7.3303760858411335\\
-		2 & 89.46313687368035 & 7.157050949894428
+		3 & 91.62 & 7.33\\
+		2 & 89.46 & 7.15
 	\end{tabular}
 	\caption{Burrows Wheeler Transformation on byte wise RLE}
 	\label{tab:t12 Burrows Wheeler Transformation on byte wise RLE}
@@ -240,7 +240,7 @@ TODO: create inversion using Lyndon words\\
 }
 
 \par{
-In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Conceptual Design:sec:Parallel Byte Reading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination.
+In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination.
 }
 
 %% ==============================

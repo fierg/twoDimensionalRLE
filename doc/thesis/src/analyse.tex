@@ -24,13 +24,13 @@ The following chapter contains a detailed analysis of the problem and some funda
 		
 		bits per rle number &  expansion ratio & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		8 & 3.298046423741734& 26.38437138993387 \\
-		7 & 2.8897459975751163& 23.11796798060093\\
-		6 & 2.4839251325134675& 19.87140106010774 \\
-		5 & 2.0825541259578895 & 16.66043300766311\\
-		4 & 1.6895640359371056 & 13.516512287496845\\
-		3 & 1.3130541262757818 & 10.504433010206254\\
-		2 & 1.04555716691706 & 8.36445733533648 \\
+		8 & 3.29& 26.38\\
+		7 & 2.88& 23.11\\
+		6 & 2.48& 19.87\\
+		5 & 2.08& 16.66\\
+		4 & 1.68 & 13.51\\
+		3 & 1.31& 10.50\\
+		2 & 1.04& 8.36\\
 	\end{tabular}
 	\caption{Binary RLE on the Calgary Corpus}
 \end{table}
@@ -69,7 +69,7 @@ Interestingly the binary implementation performs better on 2 bits per RLE number
 }
 
 \par{
-If we take a more detailed look, we can see that while most files expand with larger RLE numbers, some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding. However the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run.
+If we take a more detailed look, we can see that while most files expand with larger RLE numbers, some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding. However the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run. Now it is quite clear why run length encoding is very suited for monochromatic images where it archives a compression ratio close to the theoretical expected maximum compression.
 
 \begin{table}[h]
 	\centering
@@ -90,7 +90,7 @@ If we take a more detailed look, we can see that while most files expand with la
 }
 
 \par{
-An additional step of the improvement could be the detection of high efficiency with regular binary RLE to keep files highly suited for this method at its peak.
+An additional step of the improvement could be the detection of high efficiency with regular binary RLE to simply apply this to files highly suited for this method.
 }
 
 %% ==============================
