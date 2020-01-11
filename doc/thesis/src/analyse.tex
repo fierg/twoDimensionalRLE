@@ -17,10 +17,11 @@ The following chapter contains a detailed analysis of the problem and some funda
  Originally developed and used on black and white pallet images containing only two values, on a binary level so to speak, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. As you can see, there are no runs of a considerable size and this is the case for most printable characters as they all have a value between 32 and 127 (or 255 for the extended ASCII). Applied to the Calgary Corpus in this simple implementation, there should be an increase in size expected or \textit{negative compression} as one might say.
 }
 
-\begin{center}
+
+	\begin{table}
+				\caption{test}
+				\label{tab:t4 simple run length eval}
 	\begin{tabular}[p]{l|r|r}
-		\label{tab:t4 simple run length eval}
-		
 		bits per rle number &  expansion ratio & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
 		8 & 3.298046423741734& 26.38437138993387 \\
@@ -31,7 +32,8 @@ The following chapter contains a detailed analysis of the problem and some funda
 		3 & 1.3130541262757818 & 10.504433010206254\\
 		2 & 1.04555716691706 & 8.36445733533648 \\
 	\end{tabular}
-\end{center}
+
+\end{table}
 
 \par{
 The results in Table \ref{tab:t4 simple run length eval} depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1. For this reason, many implementations combine RLE with other encoding schemes like Huffman encding to be able to encode runs with variable length.
@@ -95,10 +97,10 @@ Instead of performing compute intense operation on the data, we could also inter
 
 \par{
 The binary UTF-8 interpretation of the example string from earlier S = ‘abraca’ results in 8 runs of length 1, 9 runs of length 2 as well as 3 runs of length 3 and 4.  
-\scalardump\dataA
+%\scalardump\dataA
 
 Reading the data in a different way, all most significant bits, then al second most significant bits and so forth, it results in much longer runs as shown below.
-\arraydump\dataA
+%\arraydump\dataA
 
 Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 6 runs of length 1 as opposed by the simple interpretation. This is because the binary similarity between the used characters, as the character for a and b only differ in one bit. It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression. 
 }
@@ -112,7 +114,7 @@ The effect of very long runs in the last example was mainly because the binary r
 The binary representation of a String like S' = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", results in a worse result as shown below. 
 The usage of other characters expanded the used byte range to between 32 and 117 which results in shorter average runs. Interestingly the most significant bit is always 0, a fragment from the backwards compatibility with standard ASCII encoding.
 
-\arraydump\dataB
+%\arraydump\dataB
 }
 
 \par{
@@ -120,7 +122,7 @@ One idea to solve the shorter runs might be a dynamic byte remapping, as the inp
 }
 
 \par{
-\arraydump\dataC
+%\arraydump\dataC
 
 Using this method, the 4 most significant bits all result in zero columns, even row 5 has long runs while it is worth noting that the mapping itself has to be persisted in the encoded file as well. It is also still unclear if this idea scales well or is applicable to other files.
 }
