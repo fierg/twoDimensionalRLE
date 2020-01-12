@@ -2,10 +2,13 @@ package edu.ba.twoDimensionalRLE.analysis
 
 import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
+import loggersoft.kotlin.streams.BitStream
+import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.nio.file.Files
 
-class Analyzer() {
+@ExperimentalUnsignedTypes
+class Analyzer {
     private var log = Log.kotlinInstance()
     private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
     private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
@@ -98,20 +101,24 @@ class Analyzer() {
 
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String){
-        sizeCompare(folderToEncode,encodedFolder, "")
+    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
+        sizeCompare(folderToEncode, encodedFolder, null, null)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?) {
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String) {
+        sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
+    }
+
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?, filterFile: String?) {
         val originalFiles = mutableMapOf<File, Long>()
-        Files.walk(File(folderToEncode).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
+        Files.walk(File(folderToEncode).toPath()).sorted().map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .forEach {
                 originalFiles[it.first] = it.second
             }
         val sizeOriginal = originalFiles.map { it.value }.reduce { l: Long?, l2: Long? -> l!! + l2!! }
 
         val encodedFiles = mutableMapOf<File, Long>()
-        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.forEach {
+        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.filter { !it.first.name.endsWith("_tmp") }.forEach {
             encodedFiles[it.first] = it.second
         }
 
@@ -127,20 +134,42 @@ class Analyzer() {
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-        log.info("Corpus size original: ${sizeOriginal / 1000000.0} Mb")
-        log.info("Corpus size encoded: ${sizeEncoded / 1000000.0} Mb")
+        log.info("Corpus size original: $sizeOriginal // ${sizeOriginal / 1000000.0} Mb")
+        log.info("Corpus size encoded: $sizeEncoded // ${sizeEncoded / 1000000.0} Mb")
 
         log.info("${sizeEncoded.toDouble() / sizeOriginal.toDouble()} compression ratio")
         log.info("with $bitsPerSymbol bits/symbol")
 
 
-        originalFiles.filter{ it.key.isFile }.forEach{ original ->
-            val encodedFile = encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
-            val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
+        originalFiles.filter { it.key.isFile }.forEach { original ->
+            if (filterFile.isNullOrEmpty()) {
+                val encodedFile =
+                    encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+                val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
-            log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${encodedFile.values.first().toDouble() / original.value.toDouble()}, bps: $bitsPerSymbolFile")
+                log.info("File ${original.key.name}, size original: ${original.value}, size encoded: ${encodedFile.values.first()}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
+            } else {
+                if (original.key.name == filterFile) {
+                    val encodedFile =
+                        encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+                    val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
+
+                    log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
+                }
+            }
         }
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+    }
+
+    fun mapFile(inputFile: String, outputFile: String) {
+        val mapping = getByteMapping()
+        BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+                while (streamIn.position < streamIn.size) {
+                    streamOut.write(mapping[streamIn.readByte()]!!)
+                }
+            }
+        }
     }
 
 }

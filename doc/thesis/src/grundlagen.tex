@@ -70,11 +70,8 @@ Consulting newer sources we will find that, up to 500 character long symbol base
 \par{
 The general idea behind Probability Coding is to analyze probabilities for messages and the encode them in bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the Analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding compression can be discerned into fixed unique coding, which will represent each message with a bit string with the amount of bits being an integer, for example Huffman coding as type of prefix coding. In contrast to Huffman coding there are also arithmetic codes which can represent a message with a floating point number of bits in the corresponding bit string. By doing so they can \enquote{fuse} messages together and need less space to represent a set of messages.
 }
-...
-
 
 \subsection{Dictionary Coding}
-
 \par{
 Dictionary Coding is best suited for Data with a small amount of repeating patterns like a text representing specific words. In this case it is very effective to save the patterns just once and refer to them if the are used later on in the text. If we know a lot about the text itself in advance, a static dictionary is sufficient but in general we want to compress an arbitrary text. This requires a more general approach as used by the well known LZ77 and LZ88 algorithms described by Jacob Ziv and Abraham Lempel \cite{lz}. They use a so called sliding window principle, a buffer moving across the data to encode in the case of LZ77 or a dynamic dictionary in the implementation of LZ78. Both of them are still used in modified versions in real world applications as described in Section \ref{ch:Principles of compression:sec:SOTA}.
 }
@@ -140,8 +137,8 @@ As mentioned in the Section \ref{ch:Introduction:sec:Problem statement}, run len
 
 \subsection{Run Length Encoding today}
 \par{
-While it is still in use by fax transmission or other highly specific tasks, it is mostly used in combination with other approaches. 
-TODO: give more references
+While it is still in use by fax transmission or other highly specific tasks, it is mostly used in combination with other approaches.
+TODO: give more references  \cite{rle-dna}
 }
 %% ==============================
 \section{Prefix Coding}
@@ -153,8 +150,6 @@ Prefix codes make use of an untypical idea in computer science. Usually we deal 
 \par{
 One way to address this problem is by adding extra stop symbols or encoding a length before each code but those just add additional data. Another approach is to use so called prefix codes and make no code which is prefix of another code, which makes them uniquely decodable as show in the next section.
 }
-
-
 
 \subsection{Huffman Coding}
 \par{
@@ -200,7 +195,7 @@ There are other well known methods like \\
 
 \par{
 The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$
-rotations of S, sorting them lexicographically, and extracting the last
+rotations of S, sorting them lexicographical, and extracting the last
 character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of
 rotations. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string S given only L and the Index $I$ \cite{Burrows-linear-time}.
 }
@@ -236,6 +231,9 @@ In this example, the index is $I = 1$ and the matrix $M$ is
 
 The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which result in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
 }
+
+\subsection{Inverse Burrows-Wheeler-Transformation}
+\label{ch:Principles of compression:sec:Other:subSec:bwtInverse}
 
 \par{
 TODO: explain reversing a bwt

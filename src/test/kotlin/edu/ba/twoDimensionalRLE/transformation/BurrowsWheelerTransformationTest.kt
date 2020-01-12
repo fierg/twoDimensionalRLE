@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.transformation
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
+import edu.ba.twoDimensionalRLE.tranformation.bijective.BurrowsWheelerTransformationS
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -15,6 +16,7 @@ import kotlin.test.assertFailsWith
 class BurrowsWheelerTransformationTest {
 
     private var log = Log.kotlinInstance()
+    private val BWTS = BurrowsWheelerTransformationS()
     private val byteArraySize = 126
     private val DEBUG = true
 

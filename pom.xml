@@ -77,6 +77,12 @@
             <artifactId>guava</artifactId>
             <version>28.2-jre</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.flanglet</groupId>
+            <artifactId>kanzi</artifactId>
+            <version>1.6.0</version>
+        </dependency>
     </dependencies>
 
 

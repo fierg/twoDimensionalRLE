@@ -7,7 +7,9 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
+import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
+import kanzi.SliceByteArray
+import kanzi.transform.BWTS
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -118,7 +120,7 @@ class StringRunLengthEncoder : Encoder {
 
         BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
             File(inputFile).readBytes().forEach { byte ->
-                byte.toUByte().toInt().toString(2).padStart(8, '0').forEach {char ->
+                byte.toUByte().toInt().toString(2).padStart(8, '0').forEach { char ->
                     val currentBit = char == '1'
 
                     if (lastSeenBit == currentBit) {
@@ -145,21 +147,43 @@ class StringRunLengthEncoder : Encoder {
         bitPerRun: Int,
         applyByteMapping: Boolean,
         applyBurrowsWheelerTransformation: Boolean,
+        applyBurrowsWheelerTransformationS: Boolean,
         chunkSize: Int
     ) {
         log.info("Starting to encode file $inputFile with byte wise rle and $bitPerRun. Output file will be at $outputFile")
+
+        if (applyBurrowsWheelerTransformation && applyBurrowsWheelerTransformationS) throw IllegalArgumentException("Unable to use both BWT impls at the same time!")
         val input = File(inputFile)
+        var transformedFile: String? = null
         val output = File(outputFile)
         output.createNewFile()
         var chunkSize = chunkSize
+
+        if (applyBurrowsWheelerTransformationS) {
+            log.debug("Applying bijective Burrows Wheeler Transformation to file...")
+            val bwts = BWTS()
+            transformedFile = "${outputFile}_bwt_tmp"
+            val buf1 = File(inputFile).readBytes()
+            val buf2 = ByteArray(buf1.size)
+            val sa1 = SliceByteArray(buf1, 0)
+            val sa2 = SliceByteArray(buf2, 0)
+            bwts.forward(sa1, sa2)
+            File(transformedFile).writeBytes(sa2.array)
+        }
+
         if (applyBurrowsWheelerTransformation) {
             chunkSize -= 2
         }
 
-        var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
+        var chunks = DataChunk.readChunksFromFile(
+            if (applyBurrowsWheelerTransformationS) transformedFile!! else inputFile,
+            chunkSize,
+            log
+        )
 
         if (applyBurrowsWheelerTransformation) {
-            val bwt = BurrowsWheelerTransformationModified()
+            val bwt =
+                BurrowsWheelerTransformationModified()
             log.info("Performing burrows wheeler transformation on all chunks...")
             chunks = bwt.performModifiedBurrowsWheelerTransformationOnAllChunks(chunks)
         }
@@ -197,7 +221,6 @@ class StringRunLengthEncoder : Encoder {
         }
         log.info("Finished encoding.")
     }
-
 
 
     private fun writeByteToStream(char: Byte, stream: BitStream) {
@@ -245,6 +268,7 @@ class StringRunLengthEncoder : Encoder {
         bitPerRun: Int,
         applyByteMapping: Boolean,
         applyBurrowsWheelerTransformation: Boolean,
+        applyBurrowsWheelerTransformationS: Boolean,
         chunkSize: Int
     ) {
         val input = File(inputFile)
@@ -283,7 +307,19 @@ class StringRunLengthEncoder : Encoder {
         }
 
         chunks.forEach { it.appendCurrentChunkToFile(outputFile) }
-        log.info("Finished decoding $input to $output.")
+        var transformedFile: String? = null
+        if(applyBurrowsWheelerTransformationS) {
+            log.debug("Applying inverse Burrows Wheeler Transformation to file...")
+            transformedFile = "${output}_bwt"
+            val bwt = BWTS()
+            val buf1 = File(inputFile).readBytes()
+            val buf2 = ByteArray(buf1.size)
+            val sa1 = SliceByteArray(buf1, 0)
+            val sa2 = SliceByteArray(buf2, 0)
+            bwt.inverse(sa1,sa2)
+            File(transformedFile).writeBytes(sa2.array)
+        }
+        log.info("Finished decoding $input to ${if (transformedFile.isNullOrEmpty()) output else transformedFile}.")
     }
 
     private fun writeAsTwoByte(lastSeenByte: Byte, count: Int): ByteArray {

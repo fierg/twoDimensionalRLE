@@ -12,8 +12,7 @@ import edu.ba.twoDimensionalRLE.extensions.toByteArray
 import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import edu.ba.twoDimensionalRLE.extensions.writeToBinaryStream
 import edu.ba.twoDimensionalRLE.model.DataChunk
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
+import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import loggersoft.kotlin.streams.toIntUnsigned
@@ -25,7 +24,8 @@ import kotlin.math.log2
 @ExperimentalUnsignedTypes
 class MixedEncoder : Encoder {
 
-    private val bwtModified = BurrowsWheelerTransformationModified()
+    private val bwtModified =
+        BurrowsWheelerTransformationModified()
 
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()

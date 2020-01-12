@@ -18,6 +18,7 @@ class StringRLECorpus5BitTest {
     private var log = Log.kotlinInstance()
     private val applyByteMapping = false
     private val applyBWT = false
+    private val applyBWTS = false
     private val bitsPerRleNumber = 5
 
     init {
@@ -59,12 +60,14 @@ class StringRLECorpus5BitTest {
                 "$folderToEncode/${it.name}", "$encodeFolder/CalgaryCorpus/${it.name}.rle",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
+                applyBurrowsWheelerTransformationS = applyBWTS,
                 bitPerRun = bitsPerRleNumber, chunkSize = 256
             )
             strRLE.decodeVarLength(
                 "$encodeFolder/CalgaryCorpus/${it.name}.rle", "$decodeFolder/CalgaryCorpus/${it.name}",
                 applyByteMapping = applyByteMapping,
                 applyBurrowsWheelerTransformation = applyBWT,
+                applyBurrowsWheelerTransformationS = applyBWTS,
                 bitPerRun = bitsPerRleNumber
                 , chunkSize = 256
             )

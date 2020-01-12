@@ -1,7 +1,7 @@
 package edu.ba.twoDimensionalRLE.transformation
 
 import de.jupf.staticlog.Log
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
+import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -27,7 +27,8 @@ class ModifiedBurowsWheelerTransformationTest {
     @Test
     @Order(1)
     fun simpleTest() {
-        val bwtl = BurrowsWheelerTransformationModified()
+        val bwtl =
+            BurrowsWheelerTransformationModified()
         log.info("Starting transformation on $word ...")
         val result = bwtl.transform(word)
 
@@ -37,7 +38,8 @@ class ModifiedBurowsWheelerTransformationTest {
     @Test
     @Order(2)
     fun simpleTestDecode() {
-        val bwtl = BurrowsWheelerTransformationModified()
+        val bwtl =
+            BurrowsWheelerTransformationModified()
         val result = bwtl.transform(word)
         log.info("Starting inverse transformation on ${result.first} ...")
 
@@ -49,7 +51,8 @@ class ModifiedBurowsWheelerTransformationTest {
     @Test
     @Order(3)
     fun longTestDecode() {
-        val bwtl = BurrowsWheelerTransformationModified()
+        val bwtl =
+            BurrowsWheelerTransformationModified()
         log.info("Starting transformation on $longWord ...")
         val result = bwtl.transform(longWord)
         log.info("Result: ${result.first}")
@@ -65,7 +68,8 @@ class ModifiedBurowsWheelerTransformationTest {
     @Test
     @Order(4)
     fun byteArrayTestDecode() {
-        val bwtl = BurrowsWheelerTransformationModified()
+        val bwtl =
+            BurrowsWheelerTransformationModified()
         log.info("Starting bwt on byteArray $byteArray (${byteArray.decodeToString()})")
         val result = bwtl.transformByteArray(byteArray)
 
