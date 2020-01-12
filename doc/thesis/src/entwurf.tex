@@ -32,7 +32,7 @@ TODO: explain used \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin
 
 \subsubsection{Compression improvements trough vertical reading}
 \par{
-First results of just plain binary RLE on the vertical interpretation improved its overall performance and archived a small edge over regular RLE with a reduction in the corpus size of around 3\% with 2 bits per run. 
+First results of just plain binary RLE on the vertical interpretation improved its overall performance and achieved a small edge over regular RLE with a reduction in the corpus size of around 3\% with 2 bits per run. 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
@@ -47,7 +47,7 @@ First results of just plain binary RLE on the vertical interpretation improved i
 }
 
 \par{
-If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of around 1 with 2 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 5 bits per RLE run and only archives a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE.
+If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of around 1 with 2 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 5 bits per RLE run and only achieves a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE.
 
 \begin{table}[H]
 	\centering
@@ -269,10 +269,12 @@ Swapping the implementation resulted in way better results, even with the simple
 
 \par{
 Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 2 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with 4 bits per encoded number with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$ as show in Figure \ref{fig:3:Different run lengths with and without transformations}. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
+
+TODO: make both plots align side by sider
 \begin{figure}[H]
 	\begin{tikzpicture}[scale=1]
 	\begin{axis}[
-	width=\textwidth,
+	width=.5\textwidth,
 	height=0.45\textwidth,
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
@@ -319,7 +321,7 @@ Using the modified bijective Burrows-Wheeler-Transformation, regular binary and 
 	\label{fig:3:Different run lengths with and without transformations}
 	\begin{tikzpicture}[scale=1]
 	\begin{axis}[
-	width=\textwidth,
+	width=.5\textwidth,
 	height=0.45\textwidth,
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
@@ -368,7 +370,7 @@ Using the modified bijective Burrows-Wheeler-Transformation, regular binary and 
 }
 
 \par{
-In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out. After testing all combinations of possible and reasonable variables it was found that using a Burrows-Wheeler-Transformation and byte remapping as preprocessing steps, parse the transformed data in vertical order and then using 3 bits per run for low significant bits and 7 for the 3 most significant bits, the Run length encoding performs at its peak. Using this setup, the Calgary Corpus can be compressed down to 58.1 \% of its original size while using only 4.65 $\frac{bits}{symbol}$ as shown in figure \ref{fig:4:Different run lengths for byte mapping and transformation and varying maximum run lengths}. This was the best result archived so far and the detailed compression results are shown below.
+In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out. After testing all combinations of possible and reasonable variables it was found that using a Burrows-Wheeler-Transformation and byte remapping as preprocessing steps, parse the transformed data in vertical order and then using 3 bits per run for low significant bits and 7 for the 3 most significant bits, the Run length encoding performs at its peak. Using this setup, the Calgary Corpus can be compressed down to 58.1 \% of its original size while using only 4.65 $\frac{bits}{symbol}$ as shown in figure \ref{fig:4:Different run lengths for byte mapping and transformation and varying maximum run lengths}. This was the best result achievedd so far and the detailed compression results are shown below.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
