@@ -80,6 +80,7 @@ These results were already better than the simple binary RLE but they were still
 }
 
 \subsection{Varying maximum run lengths}
+\label{ch:Conceptual Design:sec:var lengths}
 \par{
 This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for higher bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio below 8, more specifically all textual files, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall.
 \begin{table}[H]
@@ -235,14 +236,120 @@ While it was only applicable to textual data and very slow, even when divided in
 In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Transformation inversion was performed using a Matrix M containing all cyclic rotations of the input word, sorted in lexicographic order. However this is has a bad complexity and the inverting process does not even has access to this Matrix M.\\
 
 TODO: explain creation using suffix array \\
-
-TODO: create inversion using Lyndon words\\
 }
 
 \par{
-In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination.
+In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination. To do so, it was first swapped against an sufficient implementation provided by a paper from m. Burrows and D. J. Wheeler \cite{Burrows94} from 1994. Their method is also the one described in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt} and could handle arbitrary input but it also had some downsides like the additional index $I$ of the transformation, which had to be persisted as well. The major downside of this implementation although was the rather slow. To overcome this issue and the saving of additional indices, the implementation used had to be swapped once more against one that was first described by \cite{Burrows-linear-time} in 2009.
+
+TODO: explain inversion using Lyndon words
 }
 
+\par{
+Using a Burrows-Wheeler-Transformation regular binary and byte-wise RLE had their peak performance while using 2 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with 4 bits per encoded number with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$.
+\begin{figure}[H]
+	%\begin{scaletikzpicturetowidth}{\textwidth}
+	\begin{tikzpicture}%[scale=\tikzscale]
+	\begin{axis}[
+	xlabel={$\frac{bits}{run}$},
+	ylabel={Compression ratio},
+	xmin=1, xmax=9,
+	ymin=60, ymax=150,
+	xtick={2,3,4,5,6,7,8},
+	ytick={60,80,100,120,140},
+	legend pos=north west,
+	ymajorgrids=true,
+	grid style=dashed,
+	]
+	\addplot[
+	color=red,
+	mark=square,
+	]
+	coordinates {
+		(2,97.14)(3,110.82)(4,134.83)(5,163)(6,192)
+	};
+	\addplot[
+	color=black,
+	mark=square,
+	]
+	coordinates {
+		(2,91.06)(3,97.1)(4,112)(5,133)(6,151)
+	};
+	\addplot[
+	color=blue,
+	mark=square,
+	]
+	coordinates {
+		(2,78.58)(3,68.76)(4,67.87)(5,72.83)(6,81.37)(7,91.96)(8,103.69)
+	};
+	\addplot[
+	color=green,
+	mark=square,
+	]
+	coordinates {
+		(2,77.87)(3,67.17)(4,65.27)(5,69.21)(6,76.74)(7,86.33)(8,97.07)
+	};
+	\legend{no transformation,Mapping,BWT,BWT \& Mapping}
+	\end{axis}
+	\end{tikzpicture}
+	%\end{scaletikzpicturetowidth}
+	\caption{Different run lengths with and without transformations}
+	\label{fig:3:Different run lengths with and without transformations}
+\end{figure}
+}
+
+\par{
+In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out.
+
+\begin{figure}[H]
+	%\begin{scaletikzpicturetowidth}{\textwidth}
+	\begin{tikzpicture}%[scale=\tikzscale]
+	\begin{axis}[
+	xlabel={$\frac{bits}{run}$},
+	ylabel={Compression ratio},
+	xmin=2, xmax=9,
+	ymin=70, ymax=100,
+	xtick={3,4,5,6,7,8},
+	ytick={80,90,100},
+	legend pos=north west,
+	ymajorgrids=true,
+	grid style=dashed,
+	]
+	\addplot[
+	color=blue,
+	mark=square,
+	]
+	coordinates {
+		(3,84.80)(4,82.80)(5,83.94)(6,86.97)(7,90.99)(8,95.60)
+	};
+	\addplot[
+	color=red,
+	mark=square,
+	]
+	coordinates {
+		(3,84.32)(4,80.58)(5,79.07)(6,79.05)(7,79.94)(8,81.40)
+	};
+	\addplot[
+	color=green,
+	mark=square,
+	]
+	coordinates {
+		(3,85.88)(4,82.65)(5,80.88)(6,80.12)(7,79.98)(8,80.23)
+	};
+	\addplot[
+	color=black,
+	mark=square,
+	]
+	coordinates {
+		(3,88.30)(4,86.51)(5,85.45)(6,84.89)(7,84.65)(8,84.60)
+	};
+	\legend{4 most sign. bits,3 most sign. bits,2 most sign. bits, 1 most sign. bit}
+	\end{axis}
+	\end{tikzpicture}
+	%\end{scaletikzpicturetowidth}
+	\caption{Different run lengths for byte mapping and varying maximum run lengths}
+	\label{fig:2:different run lengths for byte mapping and varying maximum run lengths}
+\end{figure}
+}
 %% ==============================
 \section{Other Processing Options}
 %% ==============================
