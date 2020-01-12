@@ -1,4 +1,4 @@
-package edu.ba.twoDimensionalRLE.tranformation
+package edu.ba.twoDimensionalRLE.tranformation.modified
 
 import com.google.common.primitives.SignedBytes
 import de.jupf.staticlog.Log
@@ -46,8 +46,11 @@ class BurrowsWheelerTransformationModified {
         return Pair(String(table.map { it[it.lastIndex] }.toCharArray()), index)
     }
 
-    fun transform(input: File) {
-        //TODO
+    fun transform(input: File, outputFile: File): Int {
+        val transformed = transformByteArray(input.readBytes())
+
+        outputFile.writeBytes(transformed.first)
+        return transformed.second
     }
 
 
@@ -64,7 +67,7 @@ class BurrowsWheelerTransformationModified {
     fun inverseTransform(L: String, index: Int): String {
 
         // corresponding to D1. [find first characters of rotations]
-        val F = L.toCharArray().sortedArray()
+    //    val F = L.toCharArray().sortedArray()
 
         // corresponding to D2. [build list of predecessor characters]
         val P = IntArray(L.length)
@@ -99,7 +102,7 @@ class BurrowsWheelerTransformationModified {
     fun inverseTransformByteArray(L: ByteArray, index: Int): ByteArray {
 
         // corresponding to D1. [find first characters of rotations]
-        val F = L.sortedArray()
+   //     val F = L.sortedArray()
 
         // corresponding to D2. [build list of predecessor characters]
         val P = IntArray(L.size)

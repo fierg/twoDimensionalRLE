@@ -7,7 +7,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
+import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -159,7 +159,8 @@ class StringRunLengthEncoder : Encoder {
         var chunks = DataChunk.readChunksFromFile(inputFile, chunkSize, log)
 
         if (applyBurrowsWheelerTransformation) {
-            val bwt = BurrowsWheelerTransformationModified()
+            val bwt =
+                BurrowsWheelerTransformationModified()
             log.info("Performing burrows wheeler transformation on all chunks...")
             chunks = bwt.performModifiedBurrowsWheelerTransformationOnAllChunks(chunks)
         }

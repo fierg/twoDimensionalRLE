@@ -5,7 +5,10 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformationModified
+import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
+import kanzi.SliceByteArray
+import kanzi.transform.BWT
+import kanzi.transform.BWTS
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -37,31 +40,43 @@ class ModifiedMixedEncoder : Encoder {
     ) {
 
         val analyzer = Analyzer()
-        val bwt = BurrowsWheelerTransformationModified()
+        val bwts = BWTS()
         var mappedFile: String? = null
         var transformedFile: String? = null
 
         analyzer.analyzeFile(File(inputFile))
 
-        if(applyBurrowsWheelerTransformation){
-            mappedFile = "${outputFile}_bwt_tmp"
-
+        if (applyBurrowsWheelerTransformation) {
+            log.debug("Applying bijective Burrows Wheeler Transformation to file...")
+            transformedFile = "${outputFile}_bwt_tmp"
+            val buf1 = File(inputFile).readBytes()
+            val buf2 = ByteArray(buf1.size)
+            val sa1 = SliceByteArray(buf1, 0)
+            val sa2 = SliceByteArray(buf2, 0)
+            bwts.forward(sa1,sa2)
+            File(transformedFile).writeBytes(sa2.array)
         }
 
         if (applyByteMapping) {
             mappedFile = "${outputFile}_mapped_tmp"
-            analyzer.mapFile(inputFile, mappedFile)
+            log.debug("Applying byte mapping to file...")
+            analyzer.mapFile(if (applyBurrowsWheelerTransformation) transformedFile!! else inputFile, mappedFile)
         }
 
-        BitStream(File(mappedFile ?: inputFile).openBinaryStream(true)).use { streamIn ->
-            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+        var streamFile = inputFile
+        if (applyBurrowsWheelerTransformation) streamFile = transformedFile!!
+        if (applyByteMapping) streamFile = mappedFile!!
 
+
+        BitStream(File(streamFile).openBinaryStream(true)).use { streamIn ->
+            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 if (applyByteMapping) {
-                    writeLengthHeaderToFile(analyzer.getByteMapping().size,streamOut,log,1)
+                    log.debug("Writing mapping to file...")
+                    writeLengthHeaderToFile(analyzer.getByteMapping().size, streamOut, log, 1)
                     writeByteMappingToStream(streamOut, analyzer.getByteMapping(), log)
                 }
-
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
+                log.debug("Starting encoding of file...")
 
                 for (bitPosition in 0..7) {
                     if (bitPosition > splitPosition) {
@@ -73,6 +88,7 @@ class ModifiedMixedEncoder : Encoder {
                 }
             }
         }
+        log.debug("Finished encoding.")
     }
 
     private fun encodeBitPositionOfStreamRLE(
@@ -125,7 +141,15 @@ class ModifiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        encodeInternal(inputFile, outputFile, 5, bitsPerRLENumber, applyByteMapping, applyBurrowsWheelerTransformation,6)
+        encodeInternal(
+            inputFile,
+            outputFile,
+            5,
+            bitsPerRLENumber,
+            applyByteMapping,
+            applyBurrowsWheelerTransformation,
+            6
+        )
     }
 
     override fun decode(
