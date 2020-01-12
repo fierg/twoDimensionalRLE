@@ -172,7 +172,6 @@ grid style=dashed,
 
 \par{
 Empirically found, the combination of 2 bits per run and 5 bits per run for the 3 most significant bits yielded the overall best results with 79\% of its original size and 6.32 $\frac{bits}{symbol}$. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size.
-
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
@@ -243,12 +242,31 @@ In general a Burrows-Wheeler-Transformation should also increase the runs in the
 
 TODO: explain inversion using Lyndon words
 }
+\par{
+Swapping the implementation resulted in way better results, even with the simple regular RLE archiving compression ratios around 60 \% of its original size was possible while using 4 bits per run. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. Another reason is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk.
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{r|r|r}	
+			bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+			\hline
+			8 & 74.5 & 5.96\\
+			7 & 70.0 & 5.60\\
+			6 & 65.7 & 5.25\\
+			5 & 61.8 & 4.98\\
+			4 & 59.9 & 4.81\\
+			3 & 61.3 & 4.94\\
+			2 & 69.8 & 5.42
+		\end{tabular}
+		\caption{Modified Burrows Wheeler Transformation on byte wise RLE}
+		\label{tab:t12 Modified Burrows Wheeler Transformation on byte wise RLE}
+	\end{table}
+}
+
 
 \par{
-Using a Burrows-Wheeler-Transformation regular binary and byte-wise RLE had their peak performance while using 2 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with 4 bits per encoded number with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$.
+Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 2 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with 4 bits per encoded number with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
 \begin{figure}[H]
-	%\begin{scaletikzpicturetowidth}{\textwidth}
-	\begin{tikzpicture}%[scale=\tikzscale]
+	\begin{tikzpicture}[scale=1]
 	\begin{axis}[
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
@@ -291,25 +309,16 @@ Using a Burrows-Wheeler-Transformation regular binary and byte-wise RLE had thei
 	\legend{no transformation,Mapping,BWT,BWT \& Mapping}
 	\end{axis}
 	\end{tikzpicture}
-	%\end{scaletikzpicturetowidth}
 	\caption{Different run lengths with and without transformations}
 	\label{fig:3:Different run lengths with and without transformations}
-\end{figure}
-}
-
-\par{
-In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out.
-
-\begin{figure}[H]
-	%\begin{scaletikzpicturetowidth}{\textwidth}
-	\begin{tikzpicture}%[scale=\tikzscale]
+	\begin{tikzpicture}[scale=1]
 	\begin{axis}[
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
-	xmin=2, xmax=9,
-	ymin=70, ymax=100,
-	xtick={3,4,5,6,7,8},
-	ytick={80,90,100},
+	xmin=3, xmax=9,
+	ymin=55, ymax=70,
+	xtick={4,5,6,7,8},
+	ytick={55,60,65,70},
 	legend pos=north west,
 	ymajorgrids=true,
 	grid style=dashed,
@@ -319,46 +328,82 @@ In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for 
 	mark=square,
 	]
 	coordinates {
-		(3,84.80)(4,82.80)(5,83.94)(6,86.97)(7,90.99)(8,95.60)
+		(4,62)(5,59.8)(6,59.6)(7,60.6)(8,62.3)
 	};
 	\addplot[
 	color=red,
 	mark=square,
 	]
 	coordinates {
-		(3,84.32)(4,80.58)(5,79.07)(6,79.05)(7,79.94)(8,81.40)
+		(4,62.3)(5,59.6)(6,58.4)(7,58.1)(8,58.5)
 	};
 	\addplot[
 	color=green,
 	mark=square,
 	]
 	coordinates {
-		(3,85.88)(4,82.65)(5,80.88)(6,80.12)(7,79.98)(8,80.23)
+		(4,63.5)(5,61.4)(6,60.2)(7,59.7)(8,59.5)
 	};
 	\addplot[
 	color=black,
 	mark=square,
 	]
 	coordinates {
-		(3,88.30)(4,86.51)(5,85.45)(6,84.89)(7,84.65)(8,84.60)
+		(4,65.2)(5,64.1)(6,63.4)(7,63.0)(8,62.9)
 	};
 	\legend{4 most sign. bits,3 most sign. bits,2 most sign. bits, 1 most sign. bit}
 	\end{axis}
 	\end{tikzpicture}
-	%\end{scaletikzpicturetowidth}
-	\caption{Different run lengths for byte mapping and varying maximum run lengths}
-	\label{fig:2:different run lengths for byte mapping and varying maximum run lengths}
+	\caption{Different run lengths for byte mapping and transformation and varying maximum run lengths}
+	\label{fig:4:Different run lengths for byte mapping and transformation and varying maximum run lengths}
 \end{figure}
+}
+
+\par{
+In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out. After testing all combinations of possible and reasonable variables it was found that using a Burrows-Wheeler-Transformation and byte remapping as preprocessing steps, parse the transformed data in vertical order and then using 3 bits per run for low significant bits and 7 for the 3 most significant bits, the Run length encoding performs at its peak. Using this setup, the Calgary Corpus can be compressed down to 58.1 \% of its original size while using only 4.65 $\frac{bits}{symbol}$. This was the best result archived so far and the detailed compression results are shown below.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{r|r|r|r|r}	
+		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		\hline
+		bib & 111261 & 62791 & 56.43 & 4.51\\
+		book1 & 768771 & 465661 & 60.57 & 4.84 \\
+		book2 & 610856 & 343998 & 56.31 & 4.51\\
+		geo & 102400 & 117428 & 114.67 & 9.17\\
+		news & 377109 & 232600 & 61.67 & 4.93\\
+		obj1 & 21504 & 22242 & 103.43 & 8.27\\
+		obj2& 246814 & 180879 & 73.28 & 5.86\\		 
+		paper1 & 53161 & 31608 & 59.45 & 4.75\\		 
+		paper2& 82199 & 46982 & 57.15 & 4.57\\		 
+		pic & 513216 & 196148 & 38.21 & 3.05\\		 
+		progc & 39611 & 24186 & 61.05 & 4.88\\		 
+		progl & 71646 & 33233 & 46.38 & 3.71\\		 
+		progp & 49379 & 23753 & 48.10 & 3.84\\		 
+		trans & 93695 & 44203 & 47.17 & 3.77\\
+		\hline
+		all files & 3145718 & 1829808 & 58.16 & 4.65
+	\end{tabular}
+	\caption{Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+\end{table}
+\par{
+One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data.
+}
+
+\par{
+No further attempts to add or improve preprocessing steps of this kind were made, instead the results were analyzed and compared with other results in section \ref{ch:Evaluation}.
+
+TODO: summarize some things
+}
 }
 %% ==============================
 \section{Other Processing Options}
 %% ==============================
 \label{ch:Conceptual Design:sec:Postprocessing}
-- encoding with huffman codes\\
-\ldots
+Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move to Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. However this step is not considered preprocessing anymore but could improve the compression furthermore.
 
 \subsection{Performance improvements}
-
+TBD
 %% ==============================
 \section{Implementation Decisions}
 %% ==============================
