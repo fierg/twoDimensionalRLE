@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.rle
 import edu.ba.twoDimensionalRLE.encoder.rle.StringRunLengthEncoder
 import org.junit.jupiter.api.*
 import java.io.File
+
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -88,6 +89,7 @@ class StringRLETest {
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall.rle_var",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
+            applyBurrowsWheelerTransformationS = false,
             bitPerRun = 4, chunkSize = 256
         )
     }
@@ -99,6 +101,7 @@ class StringRLETest {
             "$encodeFolder/$fileToEncodeSmall.rle_var", "$decodeFolder/${fileToEncodeSmall}_var",
             applyByteMapping = true,
             applyBurrowsWheelerTransformation = true,
+            applyBurrowsWheelerTransformationS = false,
             bitPerRun = 4
             , chunkSize = 256
         )

@@ -31,7 +31,7 @@ class ModifiedMixedEncoderTest {
 
     private val mixedEncoder = ModifiedMixedEncoder()
 
-    @Test
+  //  @Test
     @Order(1)
     fun encodeVertReadingRLEallNrEqual() {
 
@@ -72,7 +72,7 @@ class ModifiedMixedEncoderTest {
         }
     }
 
-    @Test
+//    @Test
     @Order(2)
     fun encodeVertReadingRLEallNrEqualBWTS() {
 
@@ -113,7 +113,7 @@ class ModifiedMixedEncoderTest {
         }
     }
 
-    @Test
+  //  @Test
     @Order(3)
     fun encodeVertReadingRLEallNrEqualMapping() {
 
@@ -153,7 +153,7 @@ class ModifiedMixedEncoderTest {
             Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
         }
     }
-    @Test
+  //  @Test
     @Order(4)
     fun encodeVertReadingRLEallNrEqualMappingAndBWT() {
 
@@ -201,8 +201,8 @@ class ModifiedMixedEncoderTest {
 
         log.info("Encoding with vertical byte reading and binary RLE, with byte remapping, using more bits per rle nr for higher order bits.")
 
-        for (splitPosition in 4..6) {
-            for (bitsPerRleNumber in 2..4) {
+        for (splitPosition in 3..6) {
+            for (bitsPerRleNumber in 3..3) {
                 for (bitsPerRleNumber2 in 3..8) {
                     if (bitsPerRleNumber2 != bitsPerRleNumber) {
                         if (File("${encodeFolder}/CalgaryCorpus").exists()) {
