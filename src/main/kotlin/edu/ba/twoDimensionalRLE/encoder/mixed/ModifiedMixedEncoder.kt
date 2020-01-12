@@ -5,6 +5,7 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import kanzi.SliceByteArray
 import kanzi.transform.BWT
@@ -40,7 +41,7 @@ class ModifiedMixedEncoder : Encoder {
     ) {
 
         val analyzer = Analyzer()
-        val bwts = BWTS()
+        val bwts = BWTSWrapper()
         var mappedFile: String? = null
         var transformedFile: String? = null
 
@@ -49,12 +50,7 @@ class ModifiedMixedEncoder : Encoder {
         if (applyBurrowsWheelerTransformation) {
             log.debug("Applying bijective Burrows Wheeler Transformation to file...")
             transformedFile = "${outputFile}_bwt_tmp"
-            val buf1 = File(inputFile).readBytes()
-            val buf2 = ByteArray(buf1.size)
-            val sa1 = SliceByteArray(buf1, 0)
-            val sa2 = SliceByteArray(buf2, 0)
-            bwts.forward(sa1,sa2)
-            File(transformedFile).writeBytes(sa2.array)
+            bwts.transformFile(File(inputFile),File(transformedFile))
         }
 
         if (applyByteMapping) {

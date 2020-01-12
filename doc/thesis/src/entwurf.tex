@@ -18,7 +18,7 @@ Without further ado, design and implementation of the initial ideas began. As Se
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
 \par{
-Implementing the vertical reading of the input shown in Section \ref{ch:Conceptual Design:sec:Parallel Byte Reading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
+Implementing the vertical reading of the input shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
 
 \subsubsection{First Ideas}
 \par{
@@ -387,7 +387,7 @@ In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for 
 	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
 \end{table}
 \par{
-One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data.
+One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data. But the idea of combing the RLE methods with Huffman encoding still stuck around and was picked up again later on in a modified way in Section \ref{ch:Conceptual Design:sec:Postprocessing}. 
 }
 
 \par{
@@ -408,10 +408,8 @@ TBD
 \section{Implementation Decisions}
 %% ==============================
 \label{ch:Conceptual Design:sec:Implementation Decisions}
-- why kotlin\\
-- performance improvements with the graalvm\\
-- other decisions\\
-\ldots
+
+The algorithms described have all been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between native speed and higher language conciseness and fault-tolerance. Also there were some library available for Byte- and Bit-Operations on streams which proved to be quite useful.
 
 %% ==============================
 \section{Implementation Detail}
