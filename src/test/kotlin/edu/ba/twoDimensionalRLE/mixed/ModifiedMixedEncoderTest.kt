@@ -201,9 +201,9 @@ class ModifiedMixedEncoderTest {
 
         log.info("Encoding with vertical byte reading and binary RLE, with byte remapping, using more bits per rle nr for higher order bits.")
 
-        for (splitPosition in 3..6) {
+        for (splitPosition in 4..4) {
             for (bitsPerRleNumber in 3..3) {
-                for (bitsPerRleNumber2 in 3..8) {
+                for (bitsPerRleNumber2 in 7..7) {
                     if (bitsPerRleNumber2 != bitsPerRleNumber) {
                         if (File("${encodeFolder}/CalgaryCorpus").exists()) {
                             log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
@@ -241,4 +241,24 @@ class ModifiedMixedEncoderTest {
         }
     }
 
+    @Test
+    @Order(6)
+    fun decode() {
+
+        File("${encodeFolder}/CalgaryCorpus").listFiles().forEach {
+            try {
+                log.info("Decoding $it")
+                mixedEncoder.decodeInternal(
+                    "${encodeFolder}/CalgaryCorpus/${it.name}",
+                    "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
+                    bitsPerRLENumber1 = 7,
+                    bitsPerRLENumber2 = 3,
+                    applyByteMapping = true, splitPosition = 4,
+                    applyBurrowsWheelerTransformation = true
+                )
+            } catch (e: Exception) {
+                log.error(e.toString(), e)
+            }
+        }
+    }
 }

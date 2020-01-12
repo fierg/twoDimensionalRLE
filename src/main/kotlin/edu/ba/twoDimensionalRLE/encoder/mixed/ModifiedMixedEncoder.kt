@@ -6,10 +6,6 @@ import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
-import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
-import kanzi.SliceByteArray
-import kanzi.transform.BWT
-import kanzi.transform.BWTS
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
@@ -18,9 +14,10 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = false
-
+    private val DEBUG = true
     private val log = Log.kotlinInstance()
+
+    private val defaultZerosAfterHeadder = 2
 
     init {
         log.newFormat {
@@ -50,7 +47,7 @@ class ModifiedMixedEncoder : Encoder {
         if (applyBurrowsWheelerTransformation) {
             log.debug("Applying bijective Burrows Wheeler Transformation to file...")
             transformedFile = "${outputFile}_bwt_tmp"
-            bwts.transformFile(File(inputFile),File(transformedFile))
+            bwts.transformFile(File(inputFile), File(transformedFile))
         }
 
         if (applyByteMapping) {
@@ -72,19 +69,47 @@ class ModifiedMixedEncoder : Encoder {
                     writeByteMappingToStream(streamOut, analyzer.getByteMapping(), log)
                 }
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
+                for (i in 0..7) lineMaps[i] = mutableListOf()
                 log.debug("Starting encoding of file...")
 
                 for (bitPosition in 0..7) {
-                    if (bitPosition > splitPosition) {
-                        encodeBitPositionOfStreamRLE(bitsPerRLENumber1, bitPosition, streamIn, streamOut, lineMaps)
-                    } else {
-                        encodeBitPositionOfStreamRLE(bitsPerRLENumber2, bitPosition, streamIn, streamOut, lineMaps)
-
-                    }
+                    encodeBitPositionOfStreamRLE(
+                        if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
+                        bitPosition,
+                        streamIn,
+                        streamOut,
+                        lineMaps
+                    )
+                }
+                for (i in 0..1) streamOut.write(0.toByte())
+                lineMaps.forEach { (t, u) ->
+                    writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 7) 0 else defaultZerosAfterHeadder)
                 }
             }
         }
         log.debug("Finished encoding.")
+    }
+
+    fun decodeInternal(
+        inputFile: String,
+        outputFile: String,
+        bitsPerRLENumber1: Int,
+        bitsPerRLENumber2: Int,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean,
+        splitPosition: Int
+    ) {
+        val parsedNumbers = mutableListOf<Short>()
+        BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+            streamIn.position = streamIn.size - 50
+            log.debug("Trying to parse all number counts...")
+            val countMap = mutableMapOf<Int, Int>()
+            var counter = 0
+            while (streamIn.position < streamIn.size) {
+                countMap[counter++] = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
+            }
+            countMap
+        }
     }
 
     private fun encodeBitPositionOfStreamRLE(
@@ -109,17 +134,13 @@ class ModifiedMixedEncoder : Encoder {
             if (lastBit == currentBit) {
                 if (++counter == maxLength) {
                     writeRunToStream(counter, streamOut, bitsPerRLENumber)
-                    if (DEBUG) lineMaps.getOrElse(bitPosition, defaultValue = { mutableListOf() }).add(
-                        counter
-                    )
+                    lineMaps[bitPosition]!!.add(counter)
                     counter = 0
                 }
             } else {
                 if (counter > 0) {
                     writeRunToStream(counter, streamOut, bitsPerRLENumber)
-                    if (DEBUG) lineMaps.getOrElse(bitPosition, defaultValue = { mutableListOf() }).add(
-                        counter
-                    )
+                    lineMaps[bitPosition]!!.add(counter)
                     counter = 1
                 } else {
                     counter++
