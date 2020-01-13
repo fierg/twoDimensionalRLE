@@ -14,7 +14,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = false
+    private val DEBUG = true
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -134,10 +134,11 @@ class ModifiedMixedEncoder : Encoder {
     ) {
         var currentBit = false
         var counter = 0
-        var currentNumber = 0
+        var currentNumber: Int
 
-        while (counter++ < expectedCount) {
+        while (counter <= expectedCount) {
             currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
+            counter++
             if (currentNumber != 0) {
                 for (i in 0 until currentNumber) {
                     streamOut.position++
@@ -145,6 +146,7 @@ class ModifiedMixedEncoder : Encoder {
                     if (currentBit) streamOut += currentBit
                 }
             }
+            if(DEBUG) streamOut.flush()
             currentBit = !currentBit
         }
         streamOut.position = 0
@@ -180,9 +182,11 @@ class ModifiedMixedEncoder : Encoder {
             streamIn.offset = bitPosition
 
             currentBit = streamIn.readBit()
+            log.debug("bit at position 0x${Integer.toHexString(streamIn.position.toInt())} : ${streamIn.offset} equals ${if (currentBit) 1 else 0} ")
 
             if (lastBit == currentBit) {
-                if (++counter == maxLength) {
+                counter++
+                if (counter == maxLength) {
                     writeRunToStream(counter, streamOut, bitsPerRLENumber)
                     writeRunToStream(0, streamOut, bitsPerRLENumber)
                     lineMaps[bitPosition]!!.add(counter)
@@ -199,6 +203,10 @@ class ModifiedMixedEncoder : Encoder {
                 }
                 lastBit = !lastBit
             }
+        }
+        if (counter != 0){
+            writeRunToStream(counter, streamOut, bitsPerRLENumber)
+            lineMaps[bitPosition]!!.add(counter)
         }
     }
 

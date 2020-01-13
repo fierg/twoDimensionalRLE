@@ -182,7 +182,7 @@ class ModifiedMixedEncoderTest {
                                 "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
                                 bitsPerRLENumber1 = bitsPerRleNumber2,
                                 bitsPerRLENumber2 = bitsPerRleNumber,
-                                applyByteMapping = true, splitPosition = splitPosition,
+                                applyByteMapping = false, splitPosition = splitPosition,
                                 applyBurrowsWheelerTransformation = false
                             )
                         } catch (e: Exception) {
@@ -199,7 +199,7 @@ class ModifiedMixedEncoderTest {
     }
 
 
-    //@Test
+   // @Test
     @Order(4)
     fun encodeVertReadingRLEallNrEqualMappingAndBWT() {
 
@@ -240,7 +240,7 @@ class ModifiedMixedEncoderTest {
         }
     }
 
-    //@Test
+    @Test
     @Order(6)
     fun decode() {
         if (File("${decodeFolder}/CalgaryCorpus").exists()) {
@@ -256,9 +256,9 @@ class ModifiedMixedEncoderTest {
                 mixedEncoder.decodeInternal(
                     "${encodeFolder}/CalgaryCorpus/${it.name}",
                     "${decodeFolder}/CalgaryCorpus/${it.nameWithoutExtension}",
-                    bitsPerRLENumber1 = 4,
-                    bitsPerRLENumber2 = 4,
-                    applyByteMapping = false, splitPosition = 6,
+                    bitsPerRLENumber1 = 7,
+                    bitsPerRLENumber2 = 3,
+                    applyByteMapping = false, splitPosition = 4,
                     applyBurrowsWheelerTransformation = false
                 )
             } catch (e: Exception) {
