@@ -98,7 +98,7 @@ class MixedEncoder : Encoder {
             if (applyByteMapping) {
                 log.debug("Trying to parse byte mapping size...")
                 val byteMappingSize = readHeaderFromEncodedFile(stream)
-                mapping = readByteMappingFromStream(stream, byteMappingSize, log)
+                mapping = parseByteMappingFromStream(stream, byteMappingSize, log)
             }
 
             val binRleNumbers = binRLE.readBinRLENumbersFromStream(stream, binRLElentgh, bitsPerRLENumber)

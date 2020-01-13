@@ -81,7 +81,10 @@ class ModifiedMixedEncoder : Encoder {
                         lineMaps
                     )
                 }
+
+                streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
                 for (i in 0..1) streamOut.write(0.toByte())
+
                 lineMaps.forEach { (t, u) ->
                     writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 7) 0 else defaultZerosAfterHeadder)
                 }
@@ -101,15 +104,46 @@ class ModifiedMixedEncoder : Encoder {
     ) {
         val parsedNumbers = mutableListOf<Short>()
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
-            streamIn.position = streamIn.size - 50
-            log.debug("Trying to parse all number counts...")
-            val countMap = mutableMapOf<Int, Int>()
-            var counter = 0
-            while (streamIn.position < streamIn.size) {
-                countMap[counter++] = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
+            val countMap = parseCountMapFromTail(streamIn)
+            val expectedMappingSize = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
+            val mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
+
+            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+                for (bitPosition in 0..7) {
+                    decodeBitPositionOfEncodedStream(
+                        if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
+                        bitPosition,
+                        streamIn,
+                        streamOut,
+                        countMap
+                    )
+                }
             }
-            countMap
         }
+    }
+
+    private fun decodeBitPositionOfEncodedStream(
+        bitsPerRLEencodedNumber: Int,
+        bitPosition: Int,
+        streamIn: BitStream,
+        streamOut: BitStream,
+        countMap: MutableMap<Int, Int>
+    ) {
+            
+
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun parseCountMapFromTail(streamIn: BitStream): MutableMap<Int, Int> {
+        log.debug("Trying to parse all number counts...")
+        val countMap = mutableMapOf<Int, Int>()
+        var counter = 0
+        streamIn.position = streamIn.size - 1
+        while (streamIn.position < streamIn.size && countMap.entries.size < 8) {
+            countMap[counter++] = parseFromTail(streamIn, defaultZerosAfterHeadder, log)
+        }
+        streamIn.position = 0
+        return countMap
     }
 
     private fun encodeBitPositionOfStreamRLE(
@@ -177,6 +211,14 @@ class ModifiedMixedEncoder : Encoder {
         byteArraySize: Int,
         bitsPerRLENumber: Int
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        decodeInternal(
+            inputFile,
+            outputFile,
+            bitsPerRLENumber,
+            bitsPerRLENumber,
+            applyByteMapping,
+            applyBurrowsWheelerTransformation,
+            6
+        )
     }
 }

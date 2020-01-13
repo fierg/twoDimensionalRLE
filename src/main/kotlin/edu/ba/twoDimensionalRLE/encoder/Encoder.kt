@@ -38,7 +38,6 @@ interface Encoder {
     }
 
     fun writeLengthHeaderToFile(count: Int, stream: BitStream, log: Logger, numberOfZerosAfter: Int): Long {
-
         val bytesNeeded = writeCountToStream(log, count, stream)
         for (i in 0 until numberOfZerosAfter) {
             stream.write(0.toByte())
@@ -55,7 +54,7 @@ interface Encoder {
         count: Int,
         stream: BitStream
     ): Double {
-        log.debug("Finding shortest header size...")
+        log.debug("Finding shortest header size for count $count...")
         val bytesNeeded = ceil(log2(count.toDouble() + 1) / 8)
         var header = count.toString(2)
         val padSize = (bytesNeeded * 8).toInt()
@@ -63,6 +62,7 @@ interface Encoder {
 
         log.debug("Write length header with ${bytesNeeded.toInt()} bytes size.")
         StringBuffer(header).writeInvertedToBinaryStream(stream)
+        log.debug("Wrote $count as  0x${Integer.toHexString(count)} / $header so stream.")
         if (DEBUG) stream.flush()
         return bytesNeeded
     }
@@ -121,7 +121,7 @@ interface Encoder {
         while (expectedSize == 0L) {
             val currentByte = stream.readByte()
             log.debug(
-                "current byte read at 0x${Integer.toHexString(stream.position.toUByte().toInt() - 1).padStart(
+                "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
                     2,
                     '0'
                 )}, position ${stream.position - 1}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
@@ -136,6 +136,43 @@ interface Encoder {
                     stream.position = stream.position - bytesRead
                     expectedSize = stream.readBits(currentByteSize * 8, false)
                     stream.position++
+                } else {
+                    currentByteSize++
+                }
+            }
+        }
+        log.debug("Parsed 0x${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
+        assert(Int.MAX_VALUE > expectedSize, lazyMessage = { "Casting overflow while parsing a header!" })
+        return expectedSize.toInt()
+    }
+
+    fun parseFromTail(stream: BitStream, numberOfZerosAfter: Int, log: Logger): Int {
+        var currentByteSize = 0
+        var zerosRead = 0
+        var bytesRead = 0
+        var expectedSize = 0L
+
+        while (expectedSize == 0L) {
+            val currentByte = stream.readByte()
+            stream.position = stream.position - 2
+            log.debug(
+                "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
+                    2,
+                    '0'
+                )}, position ${stream.position}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
+            )
+
+            bytesRead++
+            if (currentByte != 0.toByte()) {
+                currentByteSize++
+                zerosRead = 0
+            } else {
+                zerosRead++
+                if (zerosRead == numberOfZerosAfter) {
+                    stream.position = stream.position + numberOfZerosAfter + 1
+                    expectedSize = stream.readBits((currentByteSize - 1) * 8, false)
+                    stream.position = stream.position - (currentByteSize - 1) - numberOfZerosAfter - 1
+                    log.debug("new stream position: ${stream.position}")
                 } else {
                     currentByteSize++
                 }
@@ -178,7 +215,7 @@ interface Encoder {
         if (DEBUG) stream.flush()
     }
 
-    fun readByteMappingFromStream(stream: BitStream, expectedMappingSize: Int, log: Logger): Map<Byte, Byte> {
+    fun parseByteMappingFromStream(stream: BitStream, expectedMappingSize: Int, log: Logger): Map<Byte, Byte> {
         log.debug("Expecting $expectedMappingSize mappings from stream...")
         val mapping = mutableMapOf<Byte, Byte>()
         var mappingCounter = 0

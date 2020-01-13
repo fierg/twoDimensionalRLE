@@ -245,7 +245,7 @@ class ModifiedMixedEncoderTest {
     @Order(6)
     fun decode() {
 
-        File("${encodeFolder}/CalgaryCorpus").listFiles().forEach {
+        File("${encodeFolder}/CalgaryCorpus").listFiles().filter { it.extension.endsWith("mixed") }.forEach {
             try {
                 log.info("Decoding $it")
                 mixedEncoder.decodeInternal(
