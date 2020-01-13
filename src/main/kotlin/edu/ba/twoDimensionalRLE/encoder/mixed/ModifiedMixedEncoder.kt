@@ -122,6 +122,8 @@ class ModifiedMixedEncoder : Encoder {
                     )
                 }
             }
+
+            //TODO invert mapping and transformation
         }
     }
 
@@ -136,7 +138,7 @@ class ModifiedMixedEncoder : Encoder {
         var counter = 0
         var currentNumber: Int
 
-        while (counter <= expectedCount) {
+        while (counter < expectedCount) {
             currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
             counter++
             if (currentNumber != 0) {
@@ -146,7 +148,7 @@ class ModifiedMixedEncoder : Encoder {
                     if (currentBit) streamOut += currentBit
                 }
             }
-            if(DEBUG) streamOut.flush()
+            if (DEBUG) streamOut.flush()
             currentBit = !currentBit
         }
         streamOut.position = 0
@@ -186,25 +188,21 @@ class ModifiedMixedEncoder : Encoder {
 
             if (lastBit == currentBit) {
                 counter++
-                if (counter == maxLength) {
-                    writeRunToStream(counter, streamOut, bitsPerRLENumber)
+                if (counter > maxLength) {
+                    writeRunToStream(counter - 1, streamOut, bitsPerRLENumber)
                     writeRunToStream(0, streamOut, bitsPerRLENumber)
-                    lineMaps[bitPosition]!!.add(counter)
+                    lineMaps[bitPosition]!!.add(counter - 1)
                     lineMaps[bitPosition]!!.add(0)
-                    counter = 0
+                    counter = 1
                 }
             } else {
-                if (counter > 0) {
-                    writeRunToStream(counter, streamOut, bitsPerRLENumber)
-                    lineMaps[bitPosition]!!.add(counter)
-                    counter = 1
-                } else {
-                    counter++
-                }
+                writeRunToStream(counter, streamOut, bitsPerRLENumber)
+                lineMaps[bitPosition]!!.add(counter)
+                counter = 1
                 lastBit = !lastBit
             }
         }
-        if (counter != 0){
+        if (counter != 0) {
             writeRunToStream(counter, streamOut, bitsPerRLENumber)
             lineMaps[bitPosition]!!.add(counter)
         }

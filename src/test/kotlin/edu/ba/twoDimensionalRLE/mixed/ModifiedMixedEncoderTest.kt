@@ -182,7 +182,7 @@ class ModifiedMixedEncoderTest {
                                 "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
                                 bitsPerRLENumber1 = bitsPerRleNumber2,
                                 bitsPerRLENumber2 = bitsPerRleNumber,
-                                applyByteMapping = false, splitPosition = splitPosition,
+                                applyByteMapping = true, splitPosition = splitPosition,
                                 applyBurrowsWheelerTransformation = false
                             )
                         } catch (e: Exception) {
@@ -258,7 +258,7 @@ class ModifiedMixedEncoderTest {
                     "${decodeFolder}/CalgaryCorpus/${it.nameWithoutExtension}",
                     bitsPerRLENumber1 = 7,
                     bitsPerRLENumber2 = 3,
-                    applyByteMapping = false, splitPosition = 4,
+                    applyByteMapping = true, splitPosition = 4,
                     applyBurrowsWheelerTransformation = false
                 )
             } catch (e: Exception) {
