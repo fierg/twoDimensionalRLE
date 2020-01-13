@@ -62,7 +62,7 @@ interface Encoder {
 
         log.debug("Write length header with ${bytesNeeded.toInt()} bytes size.")
         StringBuffer(header).writeInvertedToBinaryStream(stream)
-        log.debug("Wrote $count as  0x${Integer.toHexString(count)} / $header so stream.")
+        log.debug("Wrote $count as  0x${Integer.toHexString(count)} / $header to stream.")
         if (DEBUG) stream.flush()
         return bytesNeeded
     }
@@ -124,7 +124,7 @@ interface Encoder {
                 "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
                     2,
                     '0'
-                )}, position ${stream.position - 1}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
+                )}, position ${stream.position}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
             )
             bytesRead++
             if (currentByte != 0.toByte()) {

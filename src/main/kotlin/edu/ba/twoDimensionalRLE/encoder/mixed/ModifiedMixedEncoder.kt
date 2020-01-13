@@ -14,7 +14,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = true
+    private val DEBUG = false
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -65,7 +65,7 @@ class ModifiedMixedEncoder : Encoder {
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 if (applyByteMapping) {
                     log.debug("Writing mapping to file...")
-                    writeLengthHeaderToFile(analyzer.getByteMapping().size, streamOut, log, 1)
+                    writeLengthHeaderToFile(analyzer.getByteMapping().size, streamOut, log, defaultZerosAfterHeadder)
                     writeByteMappingToStream(streamOut, analyzer.getByteMapping(), log)
                 }
                 val lineMaps = mutableMapOf<Int, MutableList<Int>>()
@@ -73,6 +73,7 @@ class ModifiedMixedEncoder : Encoder {
                 log.debug("Starting encoding of file...")
 
                 for (bitPosition in 0..7) {
+                    log.debug("Encoding all runs of bits of significance $bitPosition")
                     encodeBitPositionOfStreamRLE(
                         if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
                         bitPosition,
@@ -85,8 +86,8 @@ class ModifiedMixedEncoder : Encoder {
                 streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
                 for (i in 0..1) streamOut.write(0.toByte())
 
-                lineMaps.forEach { (t, u) ->
-                    writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 7) 0 else defaultZerosAfterHeadder)
+                lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
+                    writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
                 }
             }
         }
@@ -102,20 +103,22 @@ class ModifiedMixedEncoder : Encoder {
         applyBurrowsWheelerTransformation: Boolean,
         splitPosition: Int
     ) {
-        val parsedNumbers = mutableListOf<Short>()
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             val countMap = parseCountMapFromTail(streamIn)
-            val expectedMappingSize = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
-            val mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
+            if (applyByteMapping) {
+                val expectedMappingSize = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
+                val mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
+            }
 
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 for (bitPosition in 0..7) {
+                    log.debug("decoding all runs for bits of significance $bitPosition...")
                     decodeBitPositionOfEncodedStream(
                         if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
                         bitPosition,
                         streamIn,
                         streamOut,
-                        countMap
+                        countMap.getOrElse(bitPosition) { throw IllegalArgumentException("No count mapping found for bit position $bitPosition!") }
                     )
                 }
             }
@@ -127,11 +130,24 @@ class ModifiedMixedEncoder : Encoder {
         bitPosition: Int,
         streamIn: BitStream,
         streamOut: BitStream,
-        countMap: MutableMap<Int, Int>
+        expectedCount: Int
     ) {
-            
+        var currentBit = false
+        var counter = 0
+        var currentNumber = 0
 
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        while (counter++ < expectedCount) {
+            currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
+            if (currentNumber != 0) {
+                for (i in 0 until currentNumber) {
+                    streamOut.position++
+                    streamOut.offset = bitPosition
+                    if (currentBit) streamOut += currentBit
+                }
+            }
+            currentBit = !currentBit
+        }
+        streamOut.position = 0
     }
 
     private fun parseCountMapFromTail(streamIn: BitStream): MutableMap<Int, Int> {
@@ -168,7 +184,9 @@ class ModifiedMixedEncoder : Encoder {
             if (lastBit == currentBit) {
                 if (++counter == maxLength) {
                     writeRunToStream(counter, streamOut, bitsPerRLENumber)
+                    writeRunToStream(0, streamOut, bitsPerRLENumber)
                     lineMaps[bitPosition]!!.add(counter)
+                    lineMaps[bitPosition]!!.add(0)
                     counter = 0
                 }
             } else {

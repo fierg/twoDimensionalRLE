@@ -4,19 +4,13 @@ import edu.ba.twoDimensionalRLE.extensions.shl
 import kotlin.experimental.inv
 
 
-// Port to (proper) Java of the DivSufSort algorithm by Yuta Mori.
+// Port to Kotlin by Sven Fiergolla, original port to (proper) Java of the DivSufSort algorithm by Yuta Mori.
 // DivSufSort is a fast two-stage suffix sorting algorithm.
 // The original C code is here: https://code.google.com/p/libdivsufsort/
 // See also https://code.google.com/p/libdivsufsort/source/browse/wiki/SACA_Benchmarks.wiki
 // for comparison of different suffix array construction algorithms.
 // It is used to implement the forward stage of the BWT in linear time.
 
-// Port to (proper) Java of the DivSufSort algorithm by Yuta Mori.
-// DivSufSort is a fast two-stage suffix sorting algorithm.
-// The original C code is here: https://code.google.com/p/libdivsufsort/
-// See also https://code.google.com/p/libdivsufsort/source/browse/wiki/SACA_Benchmarks.wiki
-// for comparison of different suffix array construction algorithms.
-// It is used to implement the forward stage of the BWT in linear time.
 @ExperimentalUnsignedTypes
 class DivSufSort {
     private var sa: IntArray

@@ -126,6 +126,7 @@ class StringRunLengthEncoder : Encoder {
                     if (lastSeenBit == currentBit) {
                         if (++counter == maxLength) {
                             writeRunToStream(counter, stream, bitPerRun)
+                            writeRunToStream(0,stream,bitPerRun)
                             counter = 0
                         }
                     } else {
