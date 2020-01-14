@@ -120,8 +120,8 @@ class Analyzer {
         val encodedFiles = mutableMapOf<File, Long>()
         Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .filter { !it.first.name.endsWith("_tmp") }.forEach {
-            encodedFiles[it.first] = it.second
-        }
+                encodedFiles[it.first] = it.second
+            }
 
 
         val sizeEncoded: Long
@@ -172,7 +172,12 @@ class Analyzer {
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 while (streamIn.position < streamIn.size) {
                     val currentByte = streamIn.readByte()
-                    streamOut.write(mapping.getOrElse(currentByte) { throw IllegalArgumentException("No mapping found for byte $currentByte!") })
+                    streamOut.write(mapping.getOrElse(currentByte) {
+                        log.warn("No signed mapping found, trying for an unsigned one... (experimental)")
+                        mapping.getOrElse((currentByte * -1).toByte()) {
+                            mapping.getValue(0)
+                        }
+                    })
                 }
             }
         }

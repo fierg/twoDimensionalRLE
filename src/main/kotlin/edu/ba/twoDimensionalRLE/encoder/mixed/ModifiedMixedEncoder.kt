@@ -160,9 +160,9 @@ class ModifiedMixedEncoder : Encoder {
             counter++
             if (currentNumber != 0) {
                 for (i in 0 until currentNumber) {
-                    streamOut.position++
                     streamOut.offset = bitPosition
                     if (currentBit) streamOut += currentBit
+                    streamOut.position++
                 }
             }
             //if (DEBUG) streamOut.flush()
