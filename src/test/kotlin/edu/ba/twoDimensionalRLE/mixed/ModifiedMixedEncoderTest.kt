@@ -49,14 +49,14 @@ class ModifiedMixedEncoderTest {
         val deferred = mutableListOf<Deferred<Any>>()
         val context = newFixedThreadPoolContext(10, "co")
 
-        for (i in 2..3) {
-            for (j in 2..3) {
-                for (k in 3..4) {
-                    for (l in 3..4) {
-                        for (m in 3..4) {
-                            for (n in 3..4) {
-                                for (o in 4..5) {
-                                    for (p in 4..8) {
+        for (i in 2..2) {
+            for (j in 2..2) {
+                for (k in 3..3) {
+                    for (l in 3..3) {
+                        for (m in 3..3) {
+                            for (n in 4..4) {
+                                for (o in 5..7) {
+                                    for (p in 8..8) {
                                         deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
                                                 mapOf(0 to i, 1 to j, 2 to k, 3 to l, 4 to m, 5 to n, 6 to o, 7 to p)

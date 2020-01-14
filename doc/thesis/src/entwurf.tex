@@ -127,31 +127,31 @@ grid style=dashed,
 \end{figure}
 
 \par{
-Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 3 bits per run and 7 bits per run for the 3 most significant bits yielded the overall best results with 101.6\% of its original size and 8.13 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:different run lengths for byte mapping and varying maximum run lengths}. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size which was still not really compressing. Some files got a little smaller while other files almost doubled in size which is still no real enhancement over regular rle which performs really well on specific files.
+Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 2 bits for the most insignificant bits,3 for the third, fourth and fifth most insignificant bit 4 for the sixths most one, 7 bits for the second most significant bit and 8 for the most significant one yielded the overall best results with 97\% of its original size and 7.76 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:different run lengths for byte mapping and varying maximum run lengths}. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size which was still not really compressing. Some files got a little smaller while other files almost doubled in size which is still no real enhancement over regular RLE which performs really well on specific files.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
 		\hline
-		bib & 111261 & 97867 & 87.96 & 7.03\\
-		book1 & 768771 & 579649 & 75.39 & 6.03 \\
-		book2 & 610856 & 484989 & 79.39 & 6.35\\
-		geo & 102400 & 116487 & 113.75 & 9.10\\
-		news & 377109 & 315446 & 83.64 & 6.69\\
-		obj1 & 21504 & 23871 & 111.00 & 8.88\\
-		obj2& 246814 & 276301 & 111.94 & 8.95\\		 
-		paper1 & 53161 & 43556 & 81.93 & 6.55\\		 
-		paper2& 82199 & 62544 & 76.08 & 6.08\\		 
-		pic & 513216 & 272034 & 53.00 & 4.24\\		 
-		progc & 39611 & 33073 & 83.49 & 6.67\\		 
-		progl & 71646 & 53653 & 74.88 & 5.99\\		 
-		progp & 49379 & 39400 & 79.79 & 6.38\\		 
-		trans & 93695 & 84494 & 90.17 & 7.21\\
+		bib & 111261 & 113067 & 101.62 & 8.12\\
+		book1 & 768771 & 707189 & 91.98 & 7.35\\
+		book2 & 610856 & 580831 & 95.08 & 7.60\\
+		geo & 102400 & 140790 & 137.49 & 10.99\\
+		news & 377109 & 375687 & 99.62 & 7.96\\
+		obj1 & 21504 & 29411 & 136.76 & 10.94\\
+		obj2& 246814 & 327865 & 132.83 &  10.62\\		 
+		paper1 & 53161 & 52319 & 98.41 & 7.87\\		 
+		paper2& 82199 & 75969 & 92.42 & 7.39\\		 
+		pic & 513216 & 396642 & 77.28 & 6.18\\		 
+		progc & 39611 & 39907 & 100.74 & 8.0\\		 
+		progl & 71646 & 66453 & 92.75 & 7.42\\		 
+		progp & 49379 & 46517 & 94.20 & 7.53\\		 
+		trans & 93695 & 95111 & 101.51 & 8.12\\
 		\hline
-		all files & 3145718 & 2487460 & 79.07 & 6.32
+		all files & 3145718 & 3051854 & 97.01 & 7.76
 	\end{tabular}
-	\caption{Calgary Corpus encoded with vertical reading, byte remapping and 2 bits per RLE run and 5 for the 3 most significance bits}
-\label{tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and 2 bits per RLE run and 5 for the 3 most significance bits}
+	\caption{Calgary Corpus encoded with vertical reading, byte remapping and varying bits per run}
+\label{tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and varying bits per run}
 \end{table}
 }
 
@@ -199,6 +199,9 @@ In general a Burrows-Wheeler-Transformation should also increase the runs in the
 TODO: explain inversion using Lyndon words
 }
 \par{
+	TODO: explain more
+	
+	
 Swapping the implementation resulted in way better results, even with the simple regular RLE archiving compression ratios around 60 \% of its original size was possible while using 4 bits per run. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. Another reason is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk.
 	\begin{table}[H]
 		\centering
