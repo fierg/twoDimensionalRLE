@@ -101,15 +101,20 @@ class Analyzer {
 
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
-        sizeCompare(folderToEncode, encodedFolder, null, null)
+    fun sizeCompare(folderToEncode: String, encodedFolder: String): Long {
+        return sizeCompare(folderToEncode, encodedFolder, null, null)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String) {
-        sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String): Long {
+        return sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?, filterFile: String?) {
+    fun sizeCompare(
+        folderToEncode: String,
+        encodedFolder: String,
+        filterExtension: String?,
+        filterFile: String?
+    ): Long {
         val originalFiles = mutableMapOf<File, Long>()
         Files.walk(File(folderToEncode).toPath()).sorted().map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .forEach {
@@ -160,6 +165,8 @@ class Analyzer {
             }
         }
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+        return sizeEncoded
     }
 
     fun mapFile(inputFile: String, outputFile: String) {

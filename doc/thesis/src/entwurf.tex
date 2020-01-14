@@ -32,7 +32,7 @@ TODO: explain used \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin
 
 \subsubsection{Compression improvements trough vertical reading}
 \par{
-First results of just plain binary RLE on the vertical interpretation improved its overall performance and achieved a small edge over regular binary RLE with a slightly smaller expansion.
+First results of just plain binary RLE on the vertical interpretation improved its overall performance and achieved a small edge over regular binary RLE with a slightly smaller expansion but it is still not as good as byte wise RLE with a small run value of 2 bits.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
@@ -58,56 +58,14 @@ If we take a closer look on each file, we see similar results compared to the or
 \subsection{Varying maximum run lengths}
 \label{ch:Conceptual Design:sec:var lengths}
 \par{
-This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for higher bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio below 8, more specifically all textual files, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall.
-\begin{table}[H]
-	\centering
-	\begin{tabular}{r|r|r|r|r}	
-		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
-		\hline
-		bib & 111261 & 110258 & 99.09 & 7.92\\
-		book1 & 768771 & 733208 & 95.37 & 7.62 \\
-		book2 & 610856 & 582583 & 95.37 & 7.62\\
-		geo & 102400 & 121496 & 118.64 & 9.49\\
-		news & 377109 & 353955 & 93.86 & 7.50\\
-		obj1 & 21504 & 24067 & 111.91 & 8.95\\
-		obj2& 246814 & 292143 & 118.36 & 9.46\\		 
-		paper1 & 53161 & 50758 & 95.47 & 7.63\\		 
-		paper2& 82199 & 78273 & 95.22 & 7.61\\		 
-		pic & 513216 & 356712 & 69.50 & 5.56\\		 
-		progc & 39611 & 36392 & 91.87 & 7.34\\		 
-		progl & 71646 & 63902 & 89.19 & 7.13\\		 
-		progp & 49379 & 45508 & 92.16 & 7.37\\		 
-		trans & 93695 & 85964 & 91.74 & 7.33\\
-		\hline
-		all files & 3145718 & 2939315 & 93.43 & 7.47
-	\end{tabular}
-	\caption{Calgary Corpus encoded with vertical reading and 2 bits per RLE run and 5 for higher significance bits}
-\label{tab:t42 Calgary Corpus encoded with vertical reading and 2 bits per RLE run and 5 for higher significance bits}
-\end{table}
+This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for higher bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall.}
 
-with 3 bits per RLE number for the lower significance bits and 7 for the highest 1 bits... 
-2020-01-13 19:55:25 INFO/Analyzer  Corpus size original: 3145718 // 3.145718 Mb  
-2020-01-13 19:55:25 INFO/Analyzer  Corpus size encoded: 3848210 // 3.84821 Mb  
-2020-01-13 19:55:25 INFO/Analyzer  1.2233169025322677 compression ratio  
-2020-01-13 19:55:25 INFO/Analyzer  with 9.786535220258141 bits/symbol  
-2020-01-13 19:55:25 INFO/Analyzer  File bib, size original: 111261, size encoded: 145620, compression: 130.8814409361771, bps: 10.470515274894169  
-2020-01-13 19:55:25 INFO/Analyzer  File book1, size original: 768771, size encoded: 961810, compression: 125.1100782937962, bps: 10.008806263503697  
-2020-01-13 19:55:25 INFO/Analyzer  File book2, size original: 610856, size encoded: 767255, compression: 125.60325183021858, bps: 10.048260146417487  
-2020-01-13 19:55:25 INFO/Analyzer  File geo, size original: 102400, size encoded: 167413, compression: 163.4892578125, bps: 13.079140625  
-2020-01-13 19:55:25 INFO/Analyzer  File news, size original: 377109, size encoded: 460402, compression: 122.08724798400463, bps: 9.76697983872037  
-2020-01-13 19:55:25 INFO/Analyzer  File obj1, size original: 21504, size encoded: 31922, compression: 148.4468005952381, bps: 11.875744047619047  
-2020-01-13 19:55:25 INFO/Analyzer  File obj2, size original: 246814, size encoded: 390150, compression: 158.07450144643335, bps: 12.645960115714669  
-2020-01-13 19:55:25 INFO/Analyzer  File paper1, size original: 53161, size encoded: 66582, compression: 125.24595097910122, bps: 10.019676078328098  
-2020-01-13 19:55:25 INFO/Analyzer  File paper2, size original: 82199, size encoded: 103008, compression: 125.31539313130331, bps: 10.025231450504265  
-2020-01-13 19:55:25 INFO/Analyzer  File pic, size original: 513216, size encoded: 451436, compression: 87.96218356403541, bps: 7.036974685122833  
-2020-01-13 19:55:25 INFO/Analyzer  File progc, size original: 39611, size encoded: 46921, compression: 118.45446971800762, bps: 9.47635757744061  
-2020-01-13 19:55:25 INFO/Analyzer  File progl, size original: 71646, size encoded: 81433, compression: 113.66021829550847, bps: 9.092817463640678  
-2020-01-13 19:55:25 INFO/Analyzer  File progp, size original: 49379, size encoded: 58853, compression: 119.18629376860608, bps: 9.534903501488486  
-2020-01-13 19:55:25 INFO/Analyzer  File trans, size original: 93695, size encoded: 111309, compression: 118.79929558674422, bps: 9.503943646939538  
-
-}
 \par{
-Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits had do be applied first.
+Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and validating every combination of different run lengths of every bit were tried out. Also the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits had do be applied first.
+}
+
+\par{
+Testing out every combination of different run lengths would imply running $8^7$ combinations because every of the 8 bits could be encoded with 2 to 7 bits per run, totaling at $2097152$ possible combinations. Assuming around 10 seconds for each encoding round would still result in somewhat around $6000h$ of computing which is clearly to much. Even using multi-threading would not completely resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then manually improve further.
 }
 
 \subsection{Byte remapping}

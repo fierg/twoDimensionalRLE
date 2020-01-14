@@ -3,6 +3,11 @@ package edu.ba.twoDimensionalRLE.mixed
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.mixed.ModifiedMixedEncoder
+import edu.ba.twoDimensionalRLE.extensions.reversed
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -31,219 +36,100 @@ class ModifiedMixedEncoderTest {
 
     private val mixedEncoder = ModifiedMixedEncoder()
 
-  //  @Test
-    @Order(1)
-    fun encodeVertReadingRLEallNrEqual() {
-
-        log.info("Encoding with vertical byte reading and binary RLE, no transformations, all bits per number are the same.")
-
-        for (bitsPerRleNumber in 2..8) {
-            if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
-
-
-            }
-            log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-            File("${encodeFolder}/CalgaryCorpus").mkdirs()
-            File("${decodeFolder}/CalgaryCorpus").mkdirs()
-
-            File(folderToEncode).listFiles().forEach {
-                try {
-                    log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number...")
-                    mixedEncoder.encodeInternal(
-                        "${folderToEncode}/${it.name}",
-                        "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber,
-                        bitsPerRLENumber2 = bitsPerRleNumber,
-                        applyByteMapping = false,
-                        applyBurrowsWheelerTransformation = false,
-                        splitPosition = 6
-                    )
-                } catch (e: Exception) {
-                    log.error(e.toString(), e)
-                }
-            }
-
-            log.info("Finished encoding of corpus.")
-
-            Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
-        }
-    }
-
-    //    @Test
-    @Order(2)
-    fun encodeVertReadingRLEallNrEqualBWTS() {
-
-        log.info("Encoding with vertical byte reading and binary RLE, with inverse BWT, all bits per number are the same.")
-
-        for (bitsPerRleNumber in 2..8) {
-            if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
-
-
-            }
-            log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-            File("${encodeFolder}/CalgaryCorpus").mkdirs()
-            File("${decodeFolder}/CalgaryCorpus").mkdirs()
-
-            File(folderToEncode).listFiles().forEach {
-                try {
-                    log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number...")
-                    mixedEncoder.encodeInternal(
-                        "${folderToEncode}/${it.name}",
-                        "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber,
-                        bitsPerRLENumber2 = bitsPerRleNumber,
-                        applyByteMapping = false,
-                        applyBurrowsWheelerTransformation = true,
-                        splitPosition = 6
-                    )
-                } catch (e: Exception) {
-                    log.error(e.toString(), e)
-                }
-            }
-
-            log.info("Finished encoding of corpus.")
-
-            Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
-        }
-    }
-
-    //  @Test
-    @Order(3)
-    fun encodeVertReadingRLEallNrEqualMapping() {
-
-        log.info("Encoding with vertical byte reading and binary RLE, with byte mapping, all bits per number are the same.")
-
-        for (bitsPerRleNumber in 2..8) {
-            if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
-
-
-            }
-            log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-            File("${encodeFolder}/CalgaryCorpus").mkdirs()
-            File("${decodeFolder}/CalgaryCorpus").mkdirs()
-
-            File(folderToEncode).listFiles().forEach {
-                try {
-                    log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number...")
-                    mixedEncoder.encodeInternal(
-                        "${folderToEncode}/${it.name}",
-                        "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber,
-                        bitsPerRLENumber2 = bitsPerRleNumber,
-                        applyByteMapping = true,
-                        applyBurrowsWheelerTransformation = false,
-                        splitPosition = 6
-                    )
-                } catch (e: Exception) {
-                    log.error(e.toString(), e)
-                }
-            }
-
-            log.info("Finished encoding of corpus.")
-
-            Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
-        }
-    }
-
-
-
-   // @Test
-    @Order(4)
-    fun encodeVertReadingRLEallNrEqualMappingAndBWT() {
-
-        log.info("Encoding with vertical byte reading and binary RLE, with byte mapping and bijective BWT, all bits per number are the same.")
-
-        for (bitsPerRleNumber in 4..4) {
-            if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
-
-
-            }
-            log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-            File("${encodeFolder}/CalgaryCorpus").mkdirs()
-            File("${decodeFolder}/CalgaryCorpus").mkdirs()
-
-            File(folderToEncode).listFiles().forEach {
-                try {
-                    log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number...")
-                    mixedEncoder.encodeInternal(
-                        "${folderToEncode}/${it.name}",
-                        "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                        bitsPerRLENumber1 = bitsPerRleNumber,
-                        bitsPerRLENumber2 = bitsPerRleNumber,
-                        applyByteMapping = false,
-                        applyBurrowsWheelerTransformation = false,
-                        splitPosition = 6
-                    )
-                } catch (e: Exception) {
-                    log.error(e.toString(), e)
-                }
-            }
-
-            log.info("Finished encoding of corpus.")
-
-            Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
-        }
-    }
-
 
     @Test
     @Order(5)
     fun encodeVertReadingRLEVaryingNrs() {
-        log.info("Encoding with vertical byte reading and binary RLE, with byte remapping and bijective BWT, using more bits per rle nr for higher order bits.")
+        log.info("Encoding with vertical byte reading and binary RLE.")
 
-        for (splitPosition in 4..4) {
-            for (bitsPerRleNumber in 3..3) {
-                for (bitsPerRleNumber2 in 7..7) {
-                    if (File("${encodeFolder}/CalgaryCorpus").exists()) {
-                        log.info("deleting directory: ${encodeFolder}/CalgaryCorpus")
-                        File("${encodeFolder}/CalgaryCorpus").deleteRecursively()
-                        File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
+        val applyByteMapping = true
+        val applyBurrowsWheelerTransformation = false
+        val applyHuffmanEncoding = false
+        val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
 
-                    }
-                    log.info("creating directory: ${encodeFolder}/CalgaryCorpus")
-                    File("${encodeFolder}/CalgaryCorpus").mkdirs()
-                    File("${decodeFolder}/CalgaryCorpus").mkdirs()
+        if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
+        if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
+        val deferred = mutableListOf<Deferred<Any>>()
+        for (i in 2..2) {
+            for (j in 2..2) {
+                for (k in 3..3) {
+                    for (l in 4..4) {
+                        for (m in 4..4) {
+                            for (n in 5..5) {
+                                for (o in 5..7) {
+                                    for (p in 8..8) {
+                                        deferred.add(GlobalScope.async {
+                                            val bitsPerNumberMapping =
+                                                mapOf(0 to i, 1 to j, 2 to k, 3 to l, 4 to m, 5 to n, 6 to o, 7 to p)
 
-                    File(folderToEncode).listFiles().forEach {
-                        try {
-                            log.info("Encoding ${it.name} with $bitsPerRleNumber bits per RLE number for the lower significance bits and $bitsPerRleNumber2 for the highest ${7 - splitPosition} bits...")
-                            mixedEncoder.encodeInternal(
-                                "${folderToEncode}/${it.name}",
-                                "${encodeFolder}/CalgaryCorpus/${it.name}.mixed",
-                                bitsPerRLENumber1 = bitsPerRleNumber2,
-                                bitsPerRLENumber2 = bitsPerRleNumber,
-                                applyByteMapping = true, splitPosition = splitPosition,
-                                applyBurrowsWheelerTransformation = true
-                            )
-                        } catch (e: Exception) {
-                            log.error(e.toString(), e)
+                                            if (File("${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p").exists()) {
+                                                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p")
+                                                File("${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p").deleteRecursively()
+                                                File("${decodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p").deleteRecursively()
+
+
+                                            }
+                                            log.info("creating directory: ${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p")
+                                            File("${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p").mkdirs()
+                                            File("${decodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p").mkdirs()
+
+                                            File(folderToEncode).listFiles().forEach {
+                                                try {
+                                                    mixedEncoder.encodeInternal(
+                                                        "${folderToEncode}/${it.name}",
+                                                        "${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p/${it.name}.mixed",
+                                                        applyByteMapping,
+                                                        applyBurrowsWheelerTransformation,
+                                                        bitsPerNumberMapping
+
+                                                    )
+                                                } catch (e: Exception) {
+                                                    log.error(e.toString(), e)
+                                                }
+                                            }
+                                            log.info("Finished encoding of corpus.")
+
+                                            val result = Analyzer().sizeCompare(
+                                                folderToEncode,
+                                                "${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p",
+                                                "mixed"
+                                            )
+                                            resultMap[bitsPerNumberMapping] = result
+                                            return@async result
+                                        })
+                                    }
+                                }
+                            }
                         }
                     }
-                    log.info("Finished encoding of corpus.")
 
-                    Analyzer().sizeCompare(folderToEncode, "${encodeFolder}/CalgaryCorpus", "mixed")
                 }
-
             }
         }
+
+
+        runBlocking {
+            return@runBlocking deferred.map { it.await() }
+        }
+
+        log.info("all combinations tried. result:")
+        println(
+            resultMap.toList().sortedBy
+            { (_, value) -> value }.toMap()
+        )
+
+
     }
 
-    @Test
+    // @Test
     @Order(6)
     fun decode() {
+
+        val applyByteMapping = true
+        val applyBurrowsWheelerTransformation = true
+        val applyHuffmanEncoding = false
+
         if (File("${decodeFolder}/CalgaryCorpus").exists()) {
             log.info("deleting directory: ${decodeFolder}/CalgaryCorpus")
             File("${decodeFolder}/CalgaryCorpus").deleteRecursively()
@@ -257,17 +143,16 @@ class ModifiedMixedEncoderTest {
                 mixedEncoder.decodeInternal(
                     "${encodeFolder}/CalgaryCorpus/${it.name}",
                     "${decodeFolder}/CalgaryCorpus/${it.nameWithoutExtension}",
-                    bitsPerRLENumber1 = 7,
-                    bitsPerRLENumber2 = 3,
-                    applyByteMapping = true, splitPosition = 4,
-                    applyBurrowsWheelerTransformation = true,
-                    applyHuffmanEncoding = false
+                    applyByteMapping,
+                    applyBurrowsWheelerTransformation,
+                    applyHuffmanEncoding,
+                    mapOf(0 to 2, 1 to 2, 2 to 2, 3 to 2, 4 to 2, 5 to 2, 6 to 2, 7 to 2)
                 )
             } catch (e: Exception) {
                 log.error(e.toString(), e)
             }
         }
 
-        Analyzer().sizeCompare(folderToEncode, "${decodeFolder}/CalgaryCorpus","")
+        Analyzer().sizeCompare(folderToEncode, "${decodeFolder}/CalgaryCorpus", "")
     }
 }

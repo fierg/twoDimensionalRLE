@@ -5,7 +5,6 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
-import edu.ba.twoDimensionalRLE.extensions.reversed
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
@@ -15,7 +14,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = true
+    private val DEBUG = false
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -31,12 +30,26 @@ class ModifiedMixedEncoder : Encoder {
     fun encodeInternal(
         inputFile: String,
         outputFile: String,
-        bitsPerRLENumber1: Int,
+        bitsPerRLENumber: Int,
         bitsPerRLENumber2: Int,
-        applyByteMapping: Boolean,
         applyBurrowsWheelerTransformation: Boolean,
+        applyByteMapping: Boolean,
         splitPosition: Int
     ) {
+        val mapping = mutableMapOf<Int, Int>()
+        for (i in 0..7) mapping[i] = if (i < splitPosition) bitsPerRLENumber2 else bitsPerRLENumber
+        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation, mapping)
+    }
+
+    fun encodeInternal(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean,
+        bitsPerRunMap: Map<Int, Int>
+    ) {
+
+        log.debug("Encoding ${inputFile} with $bitsPerRunMap")
 
         val analyzer = Analyzer()
         val bwts = BWTSWrapper()
@@ -76,7 +89,7 @@ class ModifiedMixedEncoder : Encoder {
                 for (bitPosition in 0..7) {
                     log.debug("Encoding all runs of bits of significance $bitPosition")
                     encodeBitPositionOfStreamRLE(
-                        if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
+                        bitsPerRunMap.getOrElse(bitPosition) { throw IllegalArgumentException("No mapping found!") },
                         bitPosition,
                         streamIn,
                         streamOut,
@@ -105,12 +118,34 @@ class ModifiedMixedEncoder : Encoder {
         applyHuffmanEncoding: Boolean? = false,
         splitPosition: Int
     ) {
+        val mapping = mutableMapOf<Int, Int>()
+        for (i in 0..7) mapping[i] = if (i < splitPosition) bitsPerRLENumber2 else bitsPerRLENumber1
+
+        decodeInternal(
+            inputFile,
+            outputFile,
+            applyByteMapping,
+            applyBurrowsWheelerTransformation,
+            applyHuffmanEncoding,
+            mapping
+        )
+    }
+
+    fun decodeInternal(
+        inputFile: String,
+        outputFile: String,
+        applyByteMapping: Boolean,
+        applyBurrowsWheelerTransformation: Boolean,
+        applyHuffmanEncoding: Boolean?,
+        bitsPerRLENumberMap: Map<Int, Int>
+    ) {
         val analyzer = Analyzer()
         val bwts = BWTSWrapper()
 
         var mapping = emptyMap<Byte, Byte>()
         val mappedFile = if (applyBurrowsWheelerTransformation) "${outputFile}_mapped_tmp" else outputFile
-        val decodedFile = if (applyByteMapping || applyBurrowsWheelerTransformation) "${outputFile}_dec_tmp" else outputFile
+        val decodedFile =
+            if (applyByteMapping || applyBurrowsWheelerTransformation) "${outputFile}_dec_tmp" else outputFile
 
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             val countMap = parseCountMapFromTail(streamIn)
@@ -123,7 +158,7 @@ class ModifiedMixedEncoder : Encoder {
                 for (bitPosition in 0..7) {
                     log.debug("decoding all runs for bits of significance $bitPosition...")
                     decodeBitPositionOfEncodedStream(
-                        if (bitPosition > splitPosition) bitsPerRLENumber1 else bitsPerRLENumber2,
+                        bitsPerRLENumberMap.getOrElse(bitPosition) { throw IllegalArgumentException("No mapping found!") },
                         bitPosition,
                         streamIn,
                         streamOut,
