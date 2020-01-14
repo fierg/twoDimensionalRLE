@@ -38,7 +38,7 @@ class ModifiedMixedEncoderTest {
     fun encodeVertReadingRLEVaryingNrs() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
-        val applyByteMapping = false
+        val applyByteMapping = true
         val applyBurrowsWheelerTransformation = false
         val applyHuffmanEncoding = false
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
@@ -47,15 +47,15 @@ class ModifiedMixedEncoderTest {
         if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         val deferred = mutableListOf<Deferred<Any>>()
-        val context = newFixedThreadPoolContext(9, "co")
+        val context = newFixedThreadPoolContext(10, "co")
 
         for (i in 2..3) {
-            for (j in 2..4) {
-                for (k in 2..4) {
-                    for (l in 3..5) {
-                        for (m in 3..5) {
-                            for (n in 3..5) {
-                                for (o in 4..7) {
+            for (j in 2..3) {
+                for (k in 3..4) {
+                    for (l in 3..4) {
+                        for (m in 3..4) {
+                            for (n in 3..4) {
+                                for (o in 4..5) {
                                     for (p in 4..8) {
                                         deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
@@ -91,7 +91,9 @@ class ModifiedMixedEncoderTest {
                                             val result = Analyzer().sizeCompare(
                                                 folderToEncode,
                                                 "${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p",
-                                                "mixed"
+                                                "mixed",
+                                                null,
+                                                bitsPerNumberMapping
                                             )
                                             resultMap[bitsPerNumberMapping] = result
                                             return@async result

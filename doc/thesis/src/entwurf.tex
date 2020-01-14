@@ -61,13 +61,16 @@ If we take a closer look on each file, we see similar results compared to the or
 This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. Also the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits should be applied first.
 }
 \par{
-Testing out every combination of different run lengths would imply running $8^6$ combinations because every of the 8 bits could be encoded with 2 to 7 bits per run, totaling at $2097152$ possible combinations. Assuming around 10 seconds for each encoding round would still result in somewhat around $6000h$ of computing which is clearly to much. Even using multi-threading would not completely resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further.
-This way the results were improved to $XXX$ but this was still far from the desired state. Most files still increased in size even though all bits could be encoded differently. To increase runs overall, the already described byte mapping was applied to the input data.
+Testing out every combination of different run lengths would imply running $8^6$ combinations because every of the 8 bits could be encoded with 2 to 7 bits per run, totaling at $262144$ possible combinations. Assuming around 10 seconds for each encoding round would still result in somewhat around $730h$ of computing which is clearly to much. Even using multi-threading would not completely resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 10 percent points to $117.96\%$ of its original size instead of 127\% but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently. To increase the average run length overall, the already described byte mapping was applied to the input data.
 }
 
 \subsection{Byte remapping}
 \par{
-As shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} this effect could become useful if it resulted in longer runs. This effect was also seen in the second and third most significant bit, as higher value bytes became unlikely in the input data after the remapping so the idea of varying maximum run lengths for different significant bits became more appealing again. To determine the best combination of maximum run lengths and how many most significant bits should be encoded with a higher maximum run length, all combinations of these were tested and the results plotted below.
+As shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} this effect could become useful if it resulted in higher average runs. To apply the mapping, the individual file has to be analyzed at first to find the occurrence of each byte in the input data. We expect a map with the most occurring byte is assigned the lowest value or 0 as byte, the second most frequently read byte the second most which should be 1 and so on. Then while reading the file during late steps, every byte read will be replaced by its mapped value. If a small mapping is generated, lets say with 62 entries for example we know all bytes to encode will have zeros only on the first and second most significant bit value because the highest value after the mapping took place is 61. This should also be taken into account later on during encoding and finding the optimal maximum run lengths.
+To reverse the mapping after decoding the runs, the mapping has do be persisted into the encoded file and parsed back during the decoding process. This is simply done by adding the length of the mapping and then just all mapping keys to the header of the output file. 
+}
+\par{
+After some analysis it was found that the effect was also seen in the second and third most significant bit, as higher value bytes became unlikely in the input data after the remapping so the idea of varying maximum run lengths for different significant bits became more appealing again. To determine the best combination of maximum run lengths and how many most significant bits should be encoded with a higher maximum run length, most promising looking combinations of these were tested and the results plotted below.
 }
 \begin{figure}[H]
 %\begin{scaletikzpicturetowidth}{\textwidth}
@@ -124,7 +127,7 @@ grid style=dashed,
 \end{figure}
 
 \par{
-The combination of 3 bits per run and 7 bits per run for the 3 most significant bits yielded the overall best results with 101.6\% of its original size and 8.13 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:different run lengths for byte mapping and varying maximum run lengths}. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size which was still not really compressing. Some files got a little smaller while other files almost doubled in size which is still no real enhancement over regular rle which performs really well on specific files.
+Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 3 bits per run and 7 bits per run for the 3 most significant bits yielded the overall best results with 101.6\% of its original size and 8.13 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:different run lengths for byte mapping and varying maximum run lengths}. It has to be mentioned, that the expected overhead is rather small but the increase in average run length lead to a reduction in size which was still not really compressing. Some files got a little smaller while other files almost doubled in size which is still no real enhancement over regular rle which performs really well on specific files.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
@@ -150,25 +153,6 @@ The combination of 3 bits per run and 7 bits per run for the 3 most significant 
 	\caption{Calgary Corpus encoded with vertical reading, byte remapping and 2 bits per RLE run and 5 for the 3 most significance bits}
 \label{tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and 2 bits per RLE run and 5 for the 3 most significance bits}
 \end{table}
-
-2020-01-13 21:39:50 INFO/Analyzer  Corpus size original: 3145718 // 3.145718 Mb  
-2020-01-13 21:39:50 INFO/Analyzer  Corpus size encoded: 3197179 // 3.197179 Mb  
-2020-01-13 21:39:50 INFO/Analyzer  1.0163590633362558 compression ratio  
-2020-01-13 21:39:50 INFO/Analyzer  with 8.130872506690046 bits/symbol  
-2020-01-13 21:39:50 INFO/Analyzer  File bib, size original: 111261, size encoded: 127820, compression: 114.8830228022398, bps: 9.190641824179183  
-2020-01-13 21:39:50 INFO/Analyzer  File book1, size original: 768771, size encoded: 735120, compression: 95.62275371989838, bps: 7.64982029759187  
-2020-01-13 21:39:50 INFO/Analyzer  File book2, size original: 610856, size encoded: 623881, compression: 102.13225375538588, bps: 8.17058030043087  
-2020-01-13 21:39:50 INFO/Analyzer  File geo, size original: 102400, size encoded: 159874, compression: 156.126953125, bps: 12.49015625  
-2020-01-13 21:39:50 INFO/Analyzer  File news, size original: 377109, size encoded: 407185, compression: 107.97541294426811, bps: 8.638033035541449  
-2020-01-13 21:39:50 INFO/Analyzer  File obj1, size original: 21504, size encoded: 31871, compression: 148.20963541666669, bps: 11.856770833333334  
-2020-01-13 21:39:50 INFO/Analyzer  File obj2, size original: 246814, size encoded: 369726, compression: 149.7994441158119, bps: 11.983955529264952  
-2020-01-13 21:39:50 INFO/Analyzer  File paper1, size original: 53161, size encoded: 56323, compression: 105.94796937604636, bps: 8.475837550083709  
-2020-01-13 21:39:50 INFO/Analyzer  File paper2, size original: 82199, size encoded: 79621, compression: 96.86370880424336, bps: 7.749096704339469  
-2020-01-13 21:39:50 INFO/Analyzer  File pic, size original: 513216, size encoded: 330347, compression: 64.36802437959845, bps: 5.149441950367876  
-2020-01-13 21:39:50 INFO/Analyzer  File progc, size original: 39611, size encoded: 42454, compression: 107.17729923506096, bps: 8.574183938804877  
-2020-01-13 21:39:50 INFO/Analyzer  File progl, size original: 71646, size encoded: 68051, compression: 94.98227395807163, bps: 7.59858191664573  
-2020-01-13 21:39:50 INFO/Analyzer  File progp, size original: 49379, size encoded: 50333, compression: 101.93199538265254, bps: 8.154559630612203  
-2020-01-13 21:39:50 INFO/Analyzer  File trans, size original: 93695, size encoded: 110477, compression: 117.91130796734083, bps: 9.432904637387267 
 }
 
 \subsection{Burrows-Wheeler-Transformation Appliance}
@@ -375,8 +359,6 @@ One last option was the encoding of the lowest significant bits with another, mo
 \label{ch:Conceptual Design:sec:Postprocessing}
 Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but i a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move to Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. However this step is not considered preprocessing anymore but could improve the compression furthermore.
 
-\subsection{Performance improvements}
-TBD
 %% ==============================
 \section{Implementation Decisions}
 %% ==============================

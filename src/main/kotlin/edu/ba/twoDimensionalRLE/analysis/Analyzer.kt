@@ -102,18 +102,20 @@ class Analyzer {
     }
 
     fun sizeCompare(folderToEncode: String, encodedFolder: String): Long {
-        return sizeCompare(folderToEncode, encodedFolder, null, null)
+        return sizeCompare(folderToEncode, encodedFolder, null, null, null)
     }
 
     fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String): Long {
-        return sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
+        return sizeCompare(folderToEncode, encodedFolder, filterExtension, null, null)
     }
+
 
     fun sizeCompare(
         folderToEncode: String,
         encodedFolder: String,
         filterExtension: String?,
-        filterFile: String?
+        filterFile: String?,
+        mapping: Map<Int, Int>?
     ): Long {
         val originalFiles = mutableMapOf<File, Long>()
         Files.walk(File(folderToEncode).toPath()).sorted().map { mapper -> mapper.toFile() to mapper.toFile().length() }
@@ -140,6 +142,8 @@ class Analyzer {
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+        if (!mapping.isNullOrEmpty()) log.info("Used bits per run: $mapping")
         log.info("Corpus size original: $sizeOriginal // ${sizeOriginal / 1000000.0} Mb")
         log.info("Corpus size encoded: $sizeEncoded // ${sizeEncoded / 1000000.0} Mb")
 
