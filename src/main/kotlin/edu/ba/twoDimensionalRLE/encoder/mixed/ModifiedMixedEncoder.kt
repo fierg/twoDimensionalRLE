@@ -106,6 +106,10 @@ class ModifiedMixedEncoder : Encoder {
             }
         }
         log.debug("Finished encoding.")
+        if (!DEBUG){
+            if (applyByteMapping) File(mappedFile!!).delete()
+            if (applyBurrowsWheelerTransformation) File(transformedFile!!).delete()
+        }
     }
 
     fun decodeInternal(

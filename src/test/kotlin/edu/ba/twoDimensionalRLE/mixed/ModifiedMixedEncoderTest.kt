@@ -3,11 +3,7 @@ package edu.ba.twoDimensionalRLE.mixed
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.mixed.ModifiedMixedEncoder
-import edu.ba.twoDimensionalRLE.extensions.reversed
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -42,7 +38,7 @@ class ModifiedMixedEncoderTest {
     fun encodeVertReadingRLEVaryingNrs() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
-        val applyByteMapping = true
+        val applyByteMapping = false
         val applyBurrowsWheelerTransformation = false
         val applyHuffmanEncoding = false
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
@@ -51,15 +47,17 @@ class ModifiedMixedEncoderTest {
         if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         val deferred = mutableListOf<Deferred<Any>>()
-        for (i in 2..2) {
-            for (j in 2..2) {
-                for (k in 3..3) {
-                    for (l in 4..4) {
-                        for (m in 4..4) {
-                            for (n in 5..5) {
-                                for (o in 5..7) {
-                                    for (p in 8..8) {
-                                        deferred.add(GlobalScope.async {
+        val context = newFixedThreadPoolContext(9, "co")
+
+        for (i in 2..3) {
+            for (j in 2..4) {
+                for (k in 2..4) {
+                    for (l in 3..5) {
+                        for (m in 3..5) {
+                            for (n in 3..5) {
+                                for (o in 4..7) {
+                                    for (p in 4..8) {
+                                        deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
                                                 mapOf(0 to i, 1 to j, 2 to k, 3 to l, 4 to m, 5 to n, 6 to o, 7 to p)
 
