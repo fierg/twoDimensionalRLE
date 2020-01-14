@@ -171,7 +171,8 @@ class Analyzer {
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 while (streamIn.position < streamIn.size) {
-                    streamOut.write(mapping.getOrElse(streamIn.readByte()) { throw IllegalArgumentException("No mapping found!") })
+                    val currentByte = streamIn.readByte()
+                    streamOut.write(mapping.getOrElse(currentByte) { throw IllegalArgumentException("No mapping found for byte $currentByte!") })
                 }
             }
         }

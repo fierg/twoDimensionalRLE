@@ -5,6 +5,7 @@ import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
+import edu.ba.twoDimensionalRLE.extensions.reversed
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
@@ -133,7 +134,7 @@ class ModifiedMixedEncoder : Encoder {
 
             if (applyByteMapping) {
                 log.debug("Applying byte mapping to file...")
-                analyzer.mapFile(decodedFile, mappedFile!!, mapping)
+                analyzer.mapFile(decodedFile, mappedFile, mapping)
             }
 
             if (applyBurrowsWheelerTransformation) {
