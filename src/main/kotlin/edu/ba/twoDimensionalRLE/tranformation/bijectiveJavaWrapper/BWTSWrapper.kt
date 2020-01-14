@@ -47,7 +47,7 @@ class BWTSWrapper {
         bwts.inverse(sa3, sa4)
         outputFile.writeBytes(sa4.array)
 
-        log.info("Result:")
+        log.debug("Result:")
         if (DEBUG) println(outputFile.readText())
     }
 }

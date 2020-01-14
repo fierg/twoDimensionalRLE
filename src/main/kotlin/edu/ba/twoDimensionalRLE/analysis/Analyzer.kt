@@ -118,7 +118,8 @@ class Analyzer {
         val sizeOriginal = originalFiles.map { it.value }.reduce { l: Long?, l2: Long? -> l!! + l2!! }
 
         val encodedFiles = mutableMapOf<File, Long>()
-        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.filter { !it.first.name.endsWith("_tmp") }.forEach {
+        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
+            .filter { !it.first.name.endsWith("_tmp") }.forEach {
             encodedFiles[it.first] = it.second
         }
 
@@ -163,10 +164,14 @@ class Analyzer {
 
     fun mapFile(inputFile: String, outputFile: String) {
         val mapping = getByteMapping()
+        mapFile(inputFile, outputFile, mapping)
+    }
+
+    fun mapFile(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>) {
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 while (streamIn.position < streamIn.size) {
-                    streamOut.write(mapping[streamIn.readByte()]!!)
+                    streamOut.write(mapping.getOrElse(streamIn.readByte()) { throw IllegalArgumentException("No mapping found!") })
                 }
             }
         }

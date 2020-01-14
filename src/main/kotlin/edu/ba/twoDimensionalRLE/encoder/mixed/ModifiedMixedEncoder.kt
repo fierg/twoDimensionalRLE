@@ -101,16 +101,24 @@ class ModifiedMixedEncoder : Encoder {
         bitsPerRLENumber2: Int,
         applyByteMapping: Boolean,
         applyBurrowsWheelerTransformation: Boolean,
+        applyHuffmanEncoding: Boolean? = false,
         splitPosition: Int
     ) {
+        val analyzer = Analyzer()
+        val bwts = BWTSWrapper()
+
+        var mapping = emptyMap<Byte, Byte>()
+        val mappedFile = if (applyBurrowsWheelerTransformation) "${outputFile}_mapped_tmp" else outputFile
+        val decodedFile = if (applyByteMapping || applyBurrowsWheelerTransformation) "${outputFile}_dec_tmp" else outputFile
+
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             val countMap = parseCountMapFromTail(streamIn)
             if (applyByteMapping) {
                 val expectedMappingSize = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
-                val mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
+                mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
             }
 
-            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+            BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
                 for (bitPosition in 0..7) {
                     log.debug("decoding all runs for bits of significance $bitPosition...")
                     decodeBitPositionOfEncodedStream(
@@ -123,7 +131,15 @@ class ModifiedMixedEncoder : Encoder {
                 }
             }
 
-            //TODO invert mapping and transformation
+            if (applyByteMapping) {
+                log.debug("Applying byte mapping to file...")
+                analyzer.mapFile(decodedFile, mappedFile!!, mapping)
+            }
+
+            if (applyBurrowsWheelerTransformation) {
+                log.debug("Applying bijective Burrows Wheeler Transformation to file...")
+                bwts.invert(File(if (applyByteMapping) mappedFile else inputFile), File(outputFile))
+            }
         }
     }
 
@@ -148,7 +164,7 @@ class ModifiedMixedEncoder : Encoder {
                     if (currentBit) streamOut += currentBit
                 }
             }
-            if (DEBUG) streamOut.flush()
+            //if (DEBUG) streamOut.flush()
             currentBit = !currentBit
         }
         streamOut.position = 0
@@ -184,7 +200,7 @@ class ModifiedMixedEncoder : Encoder {
             streamIn.offset = bitPosition
 
             currentBit = streamIn.readBit()
-            log.debug("bit at position 0x${Integer.toHexString(streamIn.position.toInt())} : ${streamIn.offset} equals ${if (currentBit) 1 else 0} ")
+            //log.debug("bit at position 0x${Integer.toHexString(streamIn.position.toInt())} : ${streamIn.offset} equals ${if (currentBit) 1 else 0} ")
 
             if (lastBit == currentBit) {
                 counter++
@@ -242,6 +258,7 @@ class ModifiedMixedEncoder : Encoder {
             bitsPerRLENumber,
             applyByteMapping,
             applyBurrowsWheelerTransformation,
+            false,
             6
         )
     }
