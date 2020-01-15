@@ -238,8 +238,6 @@ In this example, the index is $I = 1$ and the matrix $M$ is
 	\end{tabular}
 	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
 \end{table}
-
-
 The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
 }
 
@@ -265,7 +263,7 @@ State of the art compression\\
 		\begin{tabular}[p]{r|r|r|r}
 			method &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
 			\hline
-			uncompressed & 3,141,622 & 100\% & 8.00\\
+			uncompressed & 3,141,622 & 100.0\% & 8.00\\
 			compress & 1,272,772 & 40.0\% & 3.24\\
 			ZIP v2.32 & 1,020,781 & 32.4\% & 2.59\\
 			gzip v1.3.5 & 1,017,624 & 32.3\% & 2.58\\

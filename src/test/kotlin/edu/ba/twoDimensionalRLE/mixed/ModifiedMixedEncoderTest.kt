@@ -47,16 +47,16 @@ class ModifiedMixedEncoderTest {
         if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         val deferred = mutableListOf<Deferred<Any>>()
-        val context = newFixedThreadPoolContext(8, "co")
+        val context = newFixedThreadPoolContext(10, "co")
 
-        for (i in 3..5) {
-            for (j in 3..5) {
-                for (k in 3..5) {
-                    for (l in 3..5) {
-                        for (m in 3..5) {
-                            for (n in 6..8) {
-                                for (o in 6..8) {
-                                    for (p in 8..8) {
+        for (i in 3..4) {
+            for (j in 3..4) {
+                for (k in 3..4) {
+                    for (l in 3..4) {
+                        for (m in 5..6) {
+                            for (n in 7..8) {
+                                for (o in 7..8) {
+                                    for (p in 7..11) {
                                         deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
                                                 mapOf(0 to i, 1 to j, 2 to k, 3 to l, 4 to m, 5 to n, 6 to o, 7 to p)
@@ -95,7 +95,7 @@ class ModifiedMixedEncoderTest {
                                                 "mixed",
                                                 null,
                                                 bitsPerNumberMapping,
-                                                false
+                                                true
                                             )
                                             resultMap[bitsPerNumberMapping] = result
                                             return@async result

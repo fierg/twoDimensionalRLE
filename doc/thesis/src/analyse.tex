@@ -11,7 +11,31 @@ The following chapter contains a detailed analysis of the problem and some funda
 
 \section{The Calgary corpus}
 \par{
-TODO
+The Calgary Corpus \cite{calgaryCorpus} is a rather old corpus created by Ian Witten, Tim Bell and John Cleary from the University of Calgary in 1987. It consists of text and some binary data files shown in \ref{tab:t05 The Calgary Corpus} and is still used for comparison between compression algorithms. After some objections were raised \cite{CalgaryCorpusCritic}, it was mostly replaced by the \href{http://corpus.canterbury.ac.nz/}{Canterbury Corpus} but it is still useful for comparing against other compression algorithms.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l|r|l}	
+		file & size & description\\
+		\hline
+bib & 111261 & ASCII text - 725 bibliographic references\\
+book1 & 768771 & unformatted ASCII text\\
+book2 & 610856 & ASCII text in UNIX \enquote{troff} format\\
+geo & 102400 & 32 bit numbers in IBM floating point format\\
+news & 377109 & ASCII text - USENET batch file on a variety of topics\\
+obj1 & 21504 & VAX executable program \\
+obj2 & 246814 &	Macintosh executable program \\
+paper1 & 53161 & UNIX \enquote{troff} format \\
+paper2 & 82199 & UNIX \enquote{troff} format \\
+pic & 513216 & 1728 x 2376 bitmap image\\
+progc & 39611 & Source code in C \\
+progl & 71646 &  Source code in Lisp\\
+progp & 49379 & Source code in Pascal\\
+trans & 93695 & ASCII and control characters\\	 
+	\end{tabular}
+	\caption{The Calgary Corpus}
+	\label{tab:t05 The Calgary Corpus}
+\end{table}	
 }
 
 %% ==============================
@@ -34,15 +58,15 @@ TODO
 	\begin{tabular}{l|r|r}
 		\label{tab:t4 simple run length eval}
 		
-		bits per rle number &  expansion ratio & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number &  expansion ratio \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		8 & 3.29& 26.38\\
-		7 & 2.88& 23.11\\
-		6 & 2.48& 19.87\\
-		5 & 2.08& 16.66\\
-		4 & 1.68 & 13.51\\
-		3 & 1.31& 10.50\\
-		2 & 1.04& 8.36\\
+		8 & 329 & 26.38\\
+		7 & 288 & 23.11\\
+		6 & 248 & 19.87\\
+		5 & 208 & 16.66\\
+		4 & 168 & 13.51\\
+		3 & 131 & 10.50\\
+		2 & 104 & 8.36\\
 	\end{tabular}
 	\caption{Binary RLE on the Calgary Corpus}
 \end{table}
@@ -58,7 +82,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 		
 		bits per rle number &  ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		8 & 165 & 13.2 \\
+		8 & 165 & 13.20 \\
 		7 & 154 & 12.38\\
 		6 & 144 & 11.57 \\
 		5 & 134 & 10.77\\

@@ -37,7 +37,7 @@ class ByteRLECorpusTest {
     @Test
     @Order(2)
     fun encodeAndDecodeCorpus() {
-        for (i in 2..8) {
+        for (i in 4..4) {
             if (File("$encodeFolder/CalgaryCorpus").exists()) {
                 log.info("deleting directory: $encodeFolder/CalgaryCorpus")
                 File("$encodeFolder/CalgaryCorpus").deleteRecursively()
