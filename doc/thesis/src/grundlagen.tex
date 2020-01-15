@@ -164,7 +164,7 @@ We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no o
 \[
 \sum_{(s,w)\in C} 2^{-l(w)} \leq 1
 \]
-And it is also proven that a Huffman algorithm generates optimal prefix codes.
+And it is also proven that a Huffman algorithm generates optimal prefix codes\cite{compressionIntroduction}.
 }
 \par{
 The algorithm in general is rather simple and the generation of the prefix codes will be demonstrated using an example. 
@@ -259,8 +259,8 @@ State of the art compression\\
 
 \par{
 	
-	\begin{table}
-		\begin{tabular}[p]{r|r|r|r}
+	\begin{table}[h]
+		\begin{tabular}{r|r|r|r}
 			method &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
 			\hline
 			uncompressed & 3,141,622 & 100.0\% & 8.00\\

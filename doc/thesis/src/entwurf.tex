@@ -251,7 +251,9 @@ all files & 3145718 & 1855520 & 58.98 & 4.71
 \end{table}
 }
 \par{
-There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. It did indeed perform at its best when applying the BWt and the mapping but it did not outperform the combination of BWT and byte wise RLE.
+There should still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. It did indeed perform at its best when applying the BWt and the mapping but it did not outperform the combination of BWT and byte wise RLE.
+
+TODO: rework
 \begin{figure}[h]
 	\begin{tikzpicture}[scale=1]
 	\begin{axis}[
