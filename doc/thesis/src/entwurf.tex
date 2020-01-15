@@ -199,31 +199,60 @@ In general a Burrows-Wheeler-Transformation should also increase the runs in the
 TODO: explain inversion using Lyndon words
 }
 \par{
-	TODO: explain more
-	
-	
-Swapping the implementation resulted in way better results, even with the simple regular RLE archiving compression ratios around 60 \% of its original size was possible while using 4 bits per run. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. Another reason is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk.
+The simple binary RLE did not really benefit from this transformation which is to be expected, because it generates repetitions of bytes, but if a byte needs many short runs it will still expand in size because the average runs are not that much influenced. For example just the letter e needs 6 different runs, no matter on which position or surrounded by what letters. The byte wise implementation on the other hand did very strongly benefit from this transformation, it will always create longer runs of bytes. Swapping the implementation of the Burrows-Wheeler-Transformation resulted in way better results, the simple byte wise RLE archives compression ratios around 59 \% of its original size while using 4 bits per run. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. Another reason is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk.
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{r|r|r}	
 			bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 			\hline
-			8 & 74.5 & 5.96\\
-			7 & 70.0 & 5.60\\
-			6 & 65.7 & 5.25\\
-			5 & 61.8 & 4.98\\
-			4 & 59.9 & 4.81\\
-			3 & 61.3 & 4.94\\
-			2 & 69.8 & 5.42
+			8 & 74.42 & 5.95\\
+			7 & 69.90 & 5.59\\
+			6 & 65.58 & 5.24\\
+			5 & 61.71 & 4.93\\
+			4 & 58.98 & 4.71\\
+			3 & 59.18 & 4.73\\
+			2 & 67.69 & 5.41
 		\end{tabular}
 		\caption{Modified Burrows Wheeler Transformation on byte wise RLE}
 		\label{tab:t12 Modified Burrows Wheeler Transformation on byte wise RLE}
 	\end{table}
 }
+\par{
+TODO: Discuss results
+\\
+\begin{table}[H]
+	\centering
+	\begin{tabular}{r|r|r|r|r}	
+		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		\hline
+		bib & 111261 & 59285 & 53.28 & 4.26 \\  
+		book1 & 768771 & 590879 & 76.86 & 6.15 \\  
+		book2 & 610856 & 374742 & 61.35 & 4.91 \\  
+		geo & 102400 & 101192 & 98.82 & 7.91 \\  
+		news & 377109 & 246047 & 65.25 & 5.22 \\  
+		obj1 & 21504 & 16467 & 76.58 & 6.13 \\  
+		obj2 & 246814 & 126626 & 51.3 & 4.1 \\  
+		paper1 & 53161 & 34130 & 64.2 & 5.14 \\  
+		paper2 & 82199 & 56507 & 68.74 & 5.5 \\  
+		pic & 513216 & 136074 & 26.51 & 2.12 \\  
+		progc & 39611 & 24312 & 61.38 & 4.91 \\  
+		progl & 71646 & 31466 & 43.92 & 3.51 \\  
+		progp & 49379 & 20862 & 42.25 & 3.38 \\  
+		trans & 93695 & 32835 & 35.04 & 2.8 \\
+		\hline
+		all files & 3145718 & 1855520 & 58.98 & 4.71
+	\end{tabular}
+	\caption{Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+\end{table}
+}
 
 
 \par{
-Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 4 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with 4 bits per encoded number with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$ as show in Figure \ref{fig:3:Different run lengths with and without transformations}. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
+Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 4 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with a combination of bits per encoded number.
+
+
+with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$ as show in Figure \ref{fig:3:Different run lengths with and without transformations}. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
 
 TODO: make both plots align side by side
 \begin{figure}[H]
