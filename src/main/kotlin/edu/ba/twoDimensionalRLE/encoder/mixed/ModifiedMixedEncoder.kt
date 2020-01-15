@@ -4,6 +4,7 @@ import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
 import edu.ba.twoDimensionalRLE.analysis.Analyzer
 import edu.ba.twoDimensionalRLE.encoder.Encoder
+import edu.ba.twoDimensionalRLE.encoder.huffman.HuffmanEncoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import loggersoft.kotlin.streams.BitStream
@@ -38,7 +39,7 @@ class ModifiedMixedEncoder : Encoder {
     ) {
         val mapping = mutableMapOf<Int, Int>()
         for (i in 0..7) mapping[i] = if (i < splitPosition) bitsPerRLENumber2 else bitsPerRLENumber
-        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation, mapping)
+        encodeInternal(inputFile, outputFile, applyByteMapping, applyBurrowsWheelerTransformation, false, mapping)
     }
 
     fun encodeInternal(
@@ -46,6 +47,7 @@ class ModifiedMixedEncoder : Encoder {
         outputFile: String,
         applyByteMapping: Boolean,
         applyBurrowsWheelerTransformation: Boolean,
+        applyHuffmanEncoding: Boolean,
         bitsPerRunMap: Map<Int, Int>
     ) {
 
@@ -93,20 +95,26 @@ class ModifiedMixedEncoder : Encoder {
                         bitPosition,
                         streamIn,
                         streamOut,
-                        lineMaps
+                        lineMaps,
+                        applyHuffmanEncoding
                     )
                 }
 
-                streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
-                for (i in 0..1) streamOut.write(0.toByte())
+                if (applyHuffmanEncoding) {
+                    val huff = HuffmanEncoder()
+                    huff.encodeLineMapsToStream(lineMaps, streamOut)
+                } else {
+                    streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
+                    for (i in 0..1) streamOut.write(0.toByte())
 
-                lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
-                    writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
+                    lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
+                        writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
+                    }
                 }
             }
         }
         log.debug("Finished encoding.")
-        if (!DEBUG){
+        if (!DEBUG) {
             if (applyByteMapping) File(mappedFile!!).delete()
             if (applyBurrowsWheelerTransformation) File(transformedFile!!).delete()
         }
@@ -227,7 +235,8 @@ class ModifiedMixedEncoder : Encoder {
         bitPosition: Int,
         streamIn: BitStream,
         streamOut: BitStream,
-        lineMaps: MutableMap<Int, MutableList<Int>>
+        lineMaps: MutableMap<Int, MutableList<Int>>,
+        applyHuffmanEncoding: Boolean
     ) {
         var lastBit = false
         var currentBit: Boolean
@@ -245,21 +254,23 @@ class ModifiedMixedEncoder : Encoder {
             if (lastBit == currentBit) {
                 counter++
                 if (counter > maxLength) {
-                    writeRunToStream(counter - 1, streamOut, bitsPerRLENumber)
-                    writeRunToStream(0, streamOut, bitsPerRLENumber)
+                    if (!applyHuffmanEncoding) {
+                        writeRunToStream(counter - 1, streamOut, bitsPerRLENumber)
+                        writeRunToStream(0, streamOut, bitsPerRLENumber)
+                    }
                     lineMaps[bitPosition]!!.add(counter - 1)
                     lineMaps[bitPosition]!!.add(0)
                     counter = 1
                 }
             } else {
-                writeRunToStream(counter, streamOut, bitsPerRLENumber)
+                if (!applyHuffmanEncoding) writeRunToStream(counter, streamOut, bitsPerRLENumber)
                 lineMaps[bitPosition]!!.add(counter)
                 counter = 1
                 lastBit = !lastBit
             }
         }
         if (counter != 0) {
-            writeRunToStream(counter, streamOut, bitsPerRLENumber)
+            if (!applyHuffmanEncoding) writeRunToStream(counter, streamOut, bitsPerRLENumber)
             lineMaps[bitPosition]!!.add(counter)
         }
     }

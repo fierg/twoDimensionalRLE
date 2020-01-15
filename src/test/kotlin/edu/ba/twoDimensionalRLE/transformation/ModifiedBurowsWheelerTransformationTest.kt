@@ -1,6 +1,7 @@
 package edu.ba.twoDimensionalRLE.transformation
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.mixed.ModifiedMixedEncoderTest
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import kanzi.SliceByteArray
@@ -32,6 +33,7 @@ class ModifiedBurowsWheelerTransformationTest {
     companion object {
         private const val fileToEncodeSmall = "testFile_small.txt"
         private const val fileToEncode = "t8.shakespeare_medium.txt"
+        private const val folderToEncode = "data/corpus/CalgaryCorpus"
         private const val encodeFolder = "data/encoded/bwts"
         private const val decodeFolder = "data/decoded/bwts"
     }
@@ -133,9 +135,10 @@ class ModifiedBurowsWheelerTransformationTest {
     fun fileTestEncodeAndDecodeSmall() {
         val bwts = BWTSWrapper()
 
-        bwts.transformFile(File("data/$fileToEncodeSmall"), File("${encodeFolder}/${fileToEncodeSmall}_bwts"))
-
-        bwts.invert(File("${encodeFolder}/${fileToEncodeSmall}_bwts"), File("${decodeFolder}/${fileToEncodeSmall}"))
+        File(folderToEncode).listFiles().forEach {
+            bwts.transformFile(File("$folderToEncode/${it.name}"), File("${encodeFolder}/${it.name}_bwts"))
+            bwts.invert(File("${encodeFolder}/${it.name}_bwts"), File("${decodeFolder}/${it.name}"))
+        }
     }
 
 }

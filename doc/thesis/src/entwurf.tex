@@ -225,34 +225,36 @@ TODO: Discuss results
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
 		\hline
-		bib & 111261 & 59285 & 53.28 & 4.26 \\  
-		book1 & 768771 & 590879 & 76.86 & 6.15 \\  
-		book2 & 610856 & 374742 & 61.35 & 4.91 \\  
-		geo & 102400 & 101192 & 98.82 & 7.91 \\  
-		news & 377109 & 246047 & 65.25 & 5.22 \\  
-		obj1 & 21504 & 16467 & 76.58 & 6.13 \\  
-		obj2 & 246814 & 126626 & 51.3 & 4.1 \\  
-		paper1 & 53161 & 34130 & 64.2 & 5.14 \\  
-		paper2 & 82199 & 56507 & 68.74 & 5.5 \\  
-		pic & 513216 & 136074 & 26.51 & 2.12 \\  
-		progc & 39611 & 24312 & 61.38 & 4.91 \\  
-		progl & 71646 & 31466 & 43.92 & 3.51 \\  
-		progp & 49379 & 20862 & 42.25 & 3.38 \\  
-		trans & 93695 & 32835 & 35.04 & 2.8 \\
-		\hline
-		all files & 3145718 & 1855520 & 58.98 & 4.71
+bib & 111261 & 76035 & 68.34 & 5.47 \\
+book1 & 768771 & 591919 & 77.0 & 6.16 \\
+book2 & 610856 & 427501 & 69.98 & 5.6 \\
+geo & 102400 & 135350 & 132.18 & 10.57 \\
+news & 377109 & 279747 & 74.18 & 5.93 \\
+obj1 & 21504 & 24722 & 114.96 & 9.2 \\
+obj2 & 246814 & 202166 & 81.91 & 6.55 \\
+paper1 & 53161 & 38461 & 72.35 & 5.79 \\
+paper2 & 82199 & 58828 & 71.57 & 5.73 \\
+pic & 513216 & 251806 & 49.06 & 3.93 \\
+progc & 39611 & 28546 & 72.07 & 5.77 \\
+progl & 71646 & 40723 & 56.84 & 4.55 \\
+progp & 49379 & 28475 & 57.67 & 4.61 \\
+trans & 93695 & 51655 & 55.13 & 4.41 \\
+\hline
+all files & 3145718 & 2240030 & 71.20 & 5.69
 	\end{tabular}
-	\caption{Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
-	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+	\caption{Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}
+	\label{tab:t5:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}
 \end{table}
 }
 
 
 \par{
-Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 4 bits per encoded number but interestingly the vertical encoded RLE did not. Instead it maxed out with a combination of bits per encoded number.
+Using the modified bijective Burrows-Wheeler-Transformation, regular binary and byte-wise RLE had their peak performance while using 4 bits per encoded number but interestingly the vertical encoded RLE did also for the first 5 bits, while using 8 for the most significant bit and 6 for the second and third most significant bit with 71 \% of its original size with only 5.69 $\frac{bits}{symbol}$.
 
 
-with 67 \% of its original size with only 5.42 $\frac{bits}{symbol}$. Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$ as show in Figure \ref{fig:3:Different run lengths with and without transformations}. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
+TODO: reevaluate!!!
+
+ Combining the byte mapping and the transformation yielded slightly better results with 65 \% and 5.22 $\frac{bits}{symbol}$ as show in Figure \ref{fig:3:Different run lengths with and without transformations}. There was still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths.
 
 TODO: make both plots align side by side
 \begin{figure}[H]
@@ -362,22 +364,22 @@ TODO: reevaluate results after bug!!!
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
 		\hline
-		bib & 111261 & 62791 & 56.43 & 4.51\\
-		book1 & 768771 & 465661 & 60.57 & 4.84 \\
-		book2 & 610856 & 343998 & 56.31 & 4.51\\
-		geo & 102400 & 117428 & 114.67 & 9.17\\
-		news & 377109 & 232600 & 61.67 & 4.93\\
-		obj1 & 21504 & 22242 & 103.43 & 8.27\\
-		obj2& 246814 & 180879 & 73.28 & 5.86\\		 
-		paper1 & 53161 & 31608 & 59.45 & 4.75\\		 
-		paper2& 82199 & 46982 & 57.15 & 4.57\\		 
-		pic & 513216 & 196148 & 38.21 & 3.05\\		 
-		progc & 39611 & 24186 & 61.05 & 4.88\\		 
-		progl & 71646 & 33233 & 46.38 & 3.71\\		 
-		progp & 49379 & 23753 & 48.10 & 3.84\\		 
-		trans & 93695 & 44203 & 47.17 & 3.77\\
+bib & 111261 & 76035 & 68.34 & 5.47 \\
+book1 & 768771 & 591919 & 77.0 & 6.16 \\
+book2 & 610856 & 427501 & 69.98 & 5.6 \\
+geo & 102400 & 135350 & 132.18 & 10.57 \\
+news & 377109 & 279747 & 74.18 & 5.93 \\
+obj1 & 21504 & 24722 & 114.96 & 9.2 \\
+obj2 & 246814 & 202166 & 81.91 & 6.55 \\
+paper1 & 53161 & 38461 & 72.35 & 5.79 \\
+paper2 & 82199 & 58828 & 71.57 & 5.73 \\
+pic & 513216 & 251806 & 49.06 & 3.93 \\
+progc & 39611 & 28546 & 72.07 & 5.77 \\
+progl & 71646 & 40723 & 56.84 & 4.55 \\
+progp & 49379 & 28475 & 57.67 & 4.61 \\
+trans & 93695 & 51655 & 55.13 & 4.41 \\
 		\hline
-		all files & 3145718 & 1829808 & 58.16 & 4.65
+		all files & 3145718 & 2240030 & 71.20 & 5.69
 	\end{tabular}
 	\caption{Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
 	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}

@@ -38,7 +38,7 @@ class ModifiedMixedEncoderTest {
     fun encodeVertReadingRLEVaryingNrs() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
-        val applyByteMapping = false
+        val applyByteMapping = true
         val applyBurrowsWheelerTransformation = true
         val applyHuffmanEncoding = false
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
@@ -47,15 +47,15 @@ class ModifiedMixedEncoderTest {
         if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         val deferred = mutableListOf<Deferred<Any>>()
-        val context = newFixedThreadPoolContext(10, "co")
+        val context = newFixedThreadPoolContext(8, "co")
 
-        for (i in 2..2) {
-            for (j in 2..2) {
-                for (k in 3..3) {
-                    for (l in 3..3) {
-                        for (m in 3..3) {
-                            for (n in 4..4) {
-                                for (o in 5..7) {
+        for (i in 3..5) {
+            for (j in 3..5) {
+                for (k in 3..5) {
+                    for (l in 3..5) {
+                        for (m in 3..5) {
+                            for (n in 6..8) {
+                                for (o in 6..8) {
                                     for (p in 8..8) {
                                         deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
@@ -79,6 +79,7 @@ class ModifiedMixedEncoderTest {
                                                         "${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p/${it.name}.mixed",
                                                         applyByteMapping,
                                                         applyBurrowsWheelerTransformation,
+                                                        applyHuffmanEncoding,
                                                         bitsPerNumberMapping
 
                                                     )
