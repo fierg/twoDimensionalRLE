@@ -26,9 +26,7 @@ Initially some other ideas have been followed with very poor results. One idea w
 
 \subsubsection{Other Difficulties}
 \par{
-Other difficulties arose while performing bit operations, because it became slow on larger workloads. \\
-
-TODO: explain used \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{lib}}
+Other difficulties arose while performing bit operations, because it became slow on larger workloads. This and other issues where solved by using the Kotlin library  \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}}. This way most operations can be performed on the stream instead of reading all data to encode and then working in memory.
 
 \subsubsection{Compression improvements trough vertical reading}
 \par{
@@ -52,16 +50,16 @@ First results of just plain binary RLE on the vertical interpretation improved i
 }
 
 \par{
-If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of just above 1 with 3 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 6 bits per RLE run and only achieves a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE. These results were already better than the simple binary RLE but they were still quite far from the desired outcome. This mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run to solve this issue.  
+If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of just above 1 with 3 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 6 bits per RLE run and only achieves a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE. These results were quite far from the desired outcome which mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run arose, to solve this issue.  
 }
 
 \subsection{Varying maximum run lengths}
 \label{ch:Conceptual Design:sec:var lengths}
 \par{
-This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent. Now most files have a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. Also the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits should be applied first.
+This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. Also the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits should be applied first.
 }
 \par{
-Testing out every combination of different run lengths would imply running $8^6$ combinations because every of the 8 bits could be encoded with 2 to 7 bits per run, totaling at $262144$ possible combinations. Assuming around 10 seconds for each encoding round would still result in somewhat around $730h$ of computing which is clearly to much. Even using multi-threading would not completely resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 10 percent points to $117.96\%$ of its original size instead of 127\% but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently. To increase the average run length overall, the already described byte mapping was applied to the input data.
+Testing out every reasonable combination of different run lengths would imply running $8^8$ combinations because every of the 8 bits could be encoded with 2 to 10 bits per run. Assuming around 10 seconds for each encoding round would still result in somewhat around 46 thousand hours of computing which is clearly to much. Even using multi-threading would not resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 10 percent points to $117.96\%$ of its original size instead of 127\% but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently. To increase the average run length overall, the already described byte mapping was applied to the input data.
 }
 
 \subsection{Byte remapping}
@@ -364,26 +362,27 @@ TODO: reevaluate results after bug!!!
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
 		\hline
-bib & 111261 & 76035 & 68.34 & 5.47 \\
-book1 & 768771 & 591919 & 77.0 & 6.16 \\
-book2 & 610856 & 427501 & 69.98 & 5.6 \\
-geo & 102400 & 135350 & 132.18 & 10.57 \\
-news & 377109 & 279747 & 74.18 & 5.93 \\
-obj1 & 21504 & 24722 & 114.96 & 9.2 \\
-obj2 & 246814 & 202166 & 81.91 & 6.55 \\
-paper1 & 53161 & 38461 & 72.35 & 5.79 \\
-paper2 & 82199 & 58828 & 71.57 & 5.73 \\
-pic & 513216 & 251806 & 49.06 & 3.93 \\
-progc & 39611 & 28546 & 72.07 & 5.77 \\
-progl & 71646 & 40723 & 56.84 & 4.55 \\
-progp & 49379 & 28475 & 57.67 & 4.61 \\
-trans & 93695 & 51655 & 55.13 & 4.41 \\
+bib & 111261 & 73843 & 66.37 & 5.31 \\
+book1 & 768771 & 570348 & 74.19 & 5.94 \\
+book2 & 610856 & 409639 & 67.06 & 5.36 \\
+geo & 102400 & 145950 & 142.53 & 11.40 \\
+news & 377109 & 275396 & 73.03 & 5.84 \\
+obj1 & 21504 & 27023 & 125.66 & 10.05 \\
+obj2 & 246814 & 213392 & 86.46 & 6.92 \\
+paper1 & 53161 & 37344 & 70.25 & 5.62 \\
+paper2 & 82199 & 56490 & 68.72 & 5.50 \\
+pic & 513216 & 227914 & 44.41 & 3.55 \\
+progc & 39611 & 28275 & 71.38 & 5.71 \\
+progl & 71646 & 38144 & 53.24 & 4.26 \\
+progp & 49379 & 27029 & 54.74 & 4.38 \\
+trans & 93695 & 49314 & 52.63 & 4.21 \\
 		\hline
-		all files & 3145718 & 2240030 & 71.20 & 5.69
+		all files & 3145718 & 2184197 & 6943 & 5.55
 	\end{tabular}
-	\caption{Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
-	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using 3 bits per RLE run and 7 for the 3 most significance bits}
+	\caption{Calgary Corpus encoded, all preprocessing steps, using bits per run: 4, 4,4, 4, 5, 7, 8, 10}
+	\label{tab:t5:Calgary Corpus encoded, all preprocessing steps, using bits per run: 4, 4,4, 4, 5, 7, 8, 10}
 \end{table}
+
 \par{
 One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data. But the idea of combing the RLE methods with Huffman encoding still stuck around and was picked up again later on in a modified way in Section \ref{ch:Conceptual Design:sec:Postprocessing}. No further attempts to add or improve preprocessing steps of this kind were made, instead the results were analyzed and compared with other results in section \ref{ch:Evaluation}.
 }
