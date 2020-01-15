@@ -38,8 +38,8 @@ class ModifiedMixedEncoderTest {
     fun encodeVertReadingRLEVaryingNrs() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
-        val applyByteMapping = true
-        val applyBurrowsWheelerTransformation = false
+        val applyByteMapping = false
+        val applyBurrowsWheelerTransformation = true
         val applyHuffmanEncoding = false
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
@@ -93,7 +93,8 @@ class ModifiedMixedEncoderTest {
                                                 "${encodeFolder}/CalgaryCorpus/$i$j$k$l$m$n$o$p",
                                                 "mixed",
                                                 null,
-                                                bitsPerNumberMapping
+                                                bitsPerNumberMapping,
+                                                false
                                             )
                                             resultMap[bitsPerNumberMapping] = result
                                             return@async result
