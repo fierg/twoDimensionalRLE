@@ -56,10 +56,10 @@ If we take a closer look on each file, we see similar results compared to the or
 \subsection{Varying maximum run lengths}
 \label{ch:Conceptual Design:sec:var lengths}
 \par{
-This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. Also the concept of mapping the input to lower value bytes to artificially increase runs of consecutive zeros on more significant bits should be applied first.
+This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. For reference, this mapping can be described by a vector $v_i$ with 8 components $v_1,v_2,...,v_8$ each with values greater 1. Each component corresponds to the bits per run stored for the bit number $i$ of each byte.
 }
 \par{
-Testing out every reasonable combination of different run lengths would imply running $8^8$ combinations because every of the 8 bits could be encoded with 2 to 10 bits per run. Assuming around 10 seconds for each encoding round would still result in somewhat around 46 thousand hours of computing which is clearly to much. Even using multi-threading would not resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 7 percent points to $112.41\%$ of its original size instead of 127\% with a fix length for every bits position as shown in figure \ref{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: 2, 2, 2, 2, 3, 4, 3, 7}, but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently but the average run length of the lower bits must be very low if 2 bits per RLE number achieved best results. To increase the average run length overall, the already described byte mapping was applied to the input data.
+Testing out every reasonable combination of different run lengths would imply running $8^8$ combinations because every of the 8 bits could be encoded with 2 to 10 bits per run. Assuming around 10 seconds for each encoding round would still result in somewhat around 46 thousand hours of computing which is clearly to much. Even using multi-threading would not resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 7 percent points to $112.41\%$ of its original size instead of 127\% with a fix length for every bits position as shown in figure \ref{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}, but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently but the average run length of the lower bits must be very low if 2 bits per RLE number achieved best results. To increase the average run length overall, the already described byte mapping was applied to the input data.
 }
 
 \begin{table}[H]
@@ -84,8 +84,8 @@ trans & 93695 & 99818 & 106.54 & 8.52 \\
 		\hline
 		all files & 3145718 & 3536225 & 112.41 & 8.99
 	\end{tabular}
-	\caption{Calgary Corpus encoded, vertical encoding, using bits per run: 2, 2, 2, 2, 3, 4, 3, 7}
-	\label{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: 2, 2, 2, 2, 3, 4, 3, 7}
+	\caption{Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}
+	\label{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}
 \end{table}
 
 \subsection{Byte remapping}
@@ -117,11 +117,11 @@ grid style=dashed,
 ybar]
 \addplot[color=blue,fill]
 	coordinates {
-		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)	(22233578,100)(22233579,102)(222335710,106)
+		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)(22233578,100)(22233579,102)(222335710,106)
 	};
 \addplot[color=red,fill]
 coordinates {
-	(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)	(22233578,95)(22233579,94.9)(222335710,95)
+	(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
 };
 	\legend{with byte mapping, without byte mapping}
 \end{axis}
@@ -251,7 +251,7 @@ all files & 3145718 & 1855520 & 58.98 & 4.71
 \end{table}
 }
 \par{
-There should still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. It did indeed perform at its best when applying the BWt and the mapping but it did not outperform the combination of BWT and byte wise RLE.
+There should still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. It did indeed perform at its best when applying the BWT and the mapping but it did not outperform the combination of BWT and byte wise RLE.
 
 TODO: rework
 \begin{figure}[h]
