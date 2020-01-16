@@ -19,7 +19,7 @@ class ModifiedMixedEncoderTest {
     private var log = Log.kotlinInstance()
     val applyByteMapping = false
     val applyBurrowsWheelerTransformation = false
-    val applyHuffmanEncoding = false
+    val applyHuffmanEncoding = true
 
     init {
         log.newFormat {

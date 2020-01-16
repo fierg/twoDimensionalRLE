@@ -106,7 +106,7 @@ class ModifiedMixedEncoder : Encoder {
                 }
 
                 streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
-                for (i in 0..1) streamOut.write(0.toByte())
+                for (i in 0..defaultZerosAfterHeadder) streamOut.write(0.toByte())
 
                 lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
                     writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
@@ -170,9 +170,9 @@ class ModifiedMixedEncoder : Encoder {
             if (applyHuffmanEncoding == true) {
                 val huffDecoder = HuffmanEncoder(DEBUG)
                 val expectedMappingSize = huffDecoder.parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
-                val mapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
+                val huffmanMapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
                 val decodedRuns =
-                    huffDecoder.decodeIntListFromStream(mapping, streamIn, countMap.map { it.value }.sum())
+                    huffDecoder.decodeIntListFromStream(huffmanMapping, streamIn, countMap.map { it.value }.sum())
                 val runMap = mutableMapOf<Int, List<Int>>()
                 var listOffset = 0
                 for (i in 0..7) {
