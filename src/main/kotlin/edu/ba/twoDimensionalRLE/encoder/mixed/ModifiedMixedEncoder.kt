@@ -15,7 +15,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = true
+    private val DEBUG = false
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -213,6 +213,13 @@ class ModifiedMixedEncoder : Encoder {
             if (applyBurrowsWheelerTransformation) {
                 log.debug("Applying bijective Burrows Wheeler Transformation to file...")
                 bwts.invert(File(if (applyByteMapping) mappedFile else decodedFile), File(outputFile))
+            }
+            if (!DEBUG) {
+                if (applyBurrowsWheelerTransformation xor applyByteMapping) File(decodedFile).delete()
+                if (applyBurrowsWheelerTransformation && applyByteMapping) {
+                    File(decodedFile).delete()
+                    File(mappedFile).delete()
+                }
             }
         }
     }

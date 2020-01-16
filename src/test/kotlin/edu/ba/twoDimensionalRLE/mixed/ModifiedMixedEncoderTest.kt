@@ -18,7 +18,7 @@ class ModifiedMixedEncoderTest {
 
     private var log = Log.kotlinInstance()
     val applyByteMapping = false
-    val applyBurrowsWheelerTransformation = false
+    val applyBurrowsWheelerTransformation = true
     val applyHuffmanEncoding = true
 
     init {
@@ -122,7 +122,7 @@ class ModifiedMixedEncoderTest {
         log.info("creating directory: ${decodeFolder}/CalgaryCorpus/88888888")
         File("${decodeFolder}/CalgaryCorpus/88888888").mkdirs()
 
-        File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().forEach {
+        File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().filter { it.extension == "mixed" }.forEach {
             try {
                 log.info("Decoding $it")
                 mixedEncoder.decodeInternal(
