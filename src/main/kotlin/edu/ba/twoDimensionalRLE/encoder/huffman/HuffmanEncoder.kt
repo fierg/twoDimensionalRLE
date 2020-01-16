@@ -12,13 +12,14 @@ import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.util.*
 import kotlin.experimental.or
+import kotlin.math.max
 
 @ExperimentalUnsignedTypes
-class HuffmanEncoder : Encoder, RangedEncoder {
+class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     val mapping = mutableMapOf<Byte, StringBuffer>()
     private val byteSize = 8
-    private val DEBUG = true
+    private val DEBUG = debug
 
     init {
         log.newFormat {
@@ -290,7 +291,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                         currentPrefixSeen.toString(),
                         { throw IllegalStateException("No mapping found!") })
                 //              log.debug("Decoded 0x${Integer.toHexString(byteDecoded.toUByte().toInt())} , $byteDecoded")
-                decodingResult.add(byteDecoded.toInt())
+                decodingResult.add(byteDecoded.toUByte().toInt())
                 stream.bitPosition = stream.bitPosition + currentMappingSize
                 currentMappingSize = smallestMapping
             } else {
@@ -479,9 +480,11 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         }
     }
 
-    fun encodeLineMapsToStream(lineMaps: Map<Int, MutableList<Int>>, streamOut: BitStream) {
+    fun encodeLineMapsToStream(lineMaps: Map<Int, MutableList<Int>>, streamOut: BitStream, bitsPerNumber: Int) {
+        val maxLength = 2.pow(bitsPerNumber)
+
         val counts = lineMaps.flatMap { entry -> entry.value }.groupingBy { it }.eachCount()
-        val frequencies = IntArray(256)
+        val frequencies = IntArray(maxLength)
         counts.toSortedMap().forEach{ (t, u) -> frequencies[t] = u }
         val mapping = getMappingFromTree(buildTree(frequencies), StringBuffer())
 
