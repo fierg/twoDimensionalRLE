@@ -361,7 +361,7 @@ class ModifiedMixedEncoder : Encoder {
             applyByteMapping,
             applyBurrowsWheelerTransformation,
             false,
-            6
+            5
         )
     }
 }
