@@ -1,11 +1,16 @@
 package edu.ba.twoDimensionalRLE.transformation
 
 import de.jupf.staticlog.Log
+import edu.ba.twoDimensionalRLE.mixed.ModifiedMixedEncoderTest
+import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
+import kanzi.SliceByteArray
+import kanzi.transform.BWTS
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import java.io.File
 
 
 @ExperimentalUnsignedTypes
@@ -13,14 +18,24 @@ import org.junit.jupiter.api.TestMethodOrder
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ModifiedBurowsWheelerTransformationTest {
     private var log = Log.kotlinInstance()
-    private val word ="abraca"
-    private val longWord = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+    private val word = "abraca"
+    private val longWord =
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
     private val byteArray = "testatestatest".toByteArray()
 
     init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
+
+    }
+
+    companion object {
+        private const val fileToEncodeSmall = "testFile_small.txt"
+        private const val fileToEncode = "t8.shakespeare_medium.txt"
+        private const val folderToEncode = "data/corpus/CalgaryCorpus"
+        private const val encodeFolder = "data/encoded/bwts"
+        private const val decodeFolder = "data/decoded/bwts"
     }
 
 
@@ -81,7 +96,49 @@ class ModifiedBurowsWheelerTransformationTest {
         log.info("Result: $inverted (${inverted.decodeToString()})")
     }
 
+    @Test
+    @Order(5)
+    fun fileTestEncodeAndDecode() {
+        val bwts = BWTS()
+        log.info("Starting bwt on file data/$fileToEncode")
+
+        val buf1 = File("data/$fileToEncode").readBytes()
+        val buf2 = ByteArray(buf1.size)
+        val sa1 = SliceByteArray(buf1, 0)
+        val sa2 = SliceByteArray(buf2, 0)
+        bwts.forward(sa1, sa2)
+        File("${encodeFolder}/${fileToEncode}_bwts").writeBytes(sa2.array)
 
 
+        log.info("Result:")
+        println(File("${encodeFolder}/${fileToEncode}_bwts").readText())
+
+
+        log.info("Starting inverse transformation on ${encodeFolder}/${fileToEncode}_bwts ...")
+
+        val buf3 = File("${encodeFolder}/${fileToEncode}_bwts").readBytes()
+        val buf4 = ByteArray(buf3.size)
+        val sa3 = SliceByteArray(buf3, 0)
+        val sa4 = SliceByteArray(buf4, 0)
+
+        bwts.inverse(sa3, sa4)
+        File("${decodeFolder}/${fileToEncode}").writeBytes(sa4.array)
+
+        log.info("Result:")
+        println(File("${decodeFolder}/${fileToEncode}").readText())
+
+
+    }
+
+    @Test
+    @Order(6)
+    fun fileTestEncodeAndDecodeSmall() {
+        val bwts = BWTSWrapper()
+
+        File(folderToEncode).listFiles().forEach {
+            bwts.transformFile(File("$folderToEncode/${it.name}"), File("${encodeFolder}/${it.name}_bwts"))
+            bwts.invert(File("${encodeFolder}/${it.name}_bwts"), File("${decodeFolder}/${it.name}"))
+        }
+    }
 
 }

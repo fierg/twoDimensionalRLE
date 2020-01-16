@@ -2,6 +2,9 @@ package edu.ba.twoDimensionalRLE.tranformation.bijective
 
 import kotlin.experimental.and
 
+
+// Port to Kotlin by Sven Fiergolla, original port to (proper) Java of the DivSufSort algorithm by Yuta Mori.
+
 class BurrowsWheelerTransformationS : ByteTransform {
     private var buffer1: IntArray
     private var buffer2: IntArray

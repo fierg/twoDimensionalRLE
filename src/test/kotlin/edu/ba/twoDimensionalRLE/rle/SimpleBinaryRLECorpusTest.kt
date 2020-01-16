@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import java.io.File
-import java.nio.file.Files
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class SimpleStringRLECorpusTest {
+class SimpleBinaryRLECorpusTest {
 
     private var log = Log.kotlinInstance()
     private val strRLE = StringRunLengthEncoder()
@@ -55,7 +54,7 @@ class SimpleStringRLECorpusTest {
         for (i in 2..8) {
             File("$encodeFolder/CalgaryCorpus/${i}bit").mkdirs()
             File(folderToEncode).listFiles().forEach {
-                strRLE.encodeSimple(
+                strRLE.encodeSimpleBinaryRLE(
                     "${folderToEncode}/${it.name}",
                     "${encodeFolder}/CalgaryCorpus/${i}bit/${it.name}.rle",
                     i

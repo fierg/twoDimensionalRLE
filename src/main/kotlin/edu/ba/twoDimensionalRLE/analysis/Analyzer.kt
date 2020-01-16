@@ -2,10 +2,13 @@ package edu.ba.twoDimensionalRLE.analysis
 
 import de.jupf.staticlog.Log
 import de.jupf.staticlog.core.LogLevel
+import edu.ba.twoDimensionalRLE.extensions.round
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.nio.file.Files
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 @ExperimentalUnsignedTypes
 class Analyzer {
@@ -101,15 +104,23 @@ class Analyzer {
 
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String) {
-        sizeCompare(folderToEncode, encodedFolder, null, null)
+    fun sizeCompare(folderToEncode: String, encodedFolder: String): Long {
+        return sizeCompare(folderToEncode, encodedFolder, null, null, null, false)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String) {
-        sizeCompare(folderToEncode, encodedFolder, filterExtension, null)
+    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String): Long {
+        return sizeCompare(folderToEncode, encodedFolder, filterExtension, null, null, false)
     }
 
-    fun sizeCompare(folderToEncode: String, encodedFolder: String, filterExtension: String?, filterFile: String?) {
+
+    fun sizeCompare(
+        folderToEncode: String,
+        encodedFolder: String,
+        filterExtension: String?,
+        filterFile: String?,
+        mapping: Map<Int, Int>?,
+        texTable: Boolean
+    ): Long {
         val originalFiles = mutableMapOf<File, Long>()
         Files.walk(File(folderToEncode).toPath()).sorted().map { mapper -> mapper.toFile() to mapper.toFile().length() }
             .forEach {
@@ -118,9 +129,10 @@ class Analyzer {
         val sizeOriginal = originalFiles.map { it.value }.reduce { l: Long?, l2: Long? -> l!! + l2!! }
 
         val encodedFiles = mutableMapOf<File, Long>()
-        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }.filter { !it.first.name.endsWith("_tmp") }.forEach {
-            encodedFiles[it.first] = it.second
-        }
+        Files.walk(File(encodedFolder).toPath()).map { mapper -> mapper.toFile() to mapper.toFile().length() }
+            .filter { !it.first.name.endsWith("_tmp") }.forEach {
+                encodedFiles[it.first] = it.second
+            }
 
 
         val sizeEncoded: Long
@@ -134,6 +146,8 @@ class Analyzer {
         val bitsPerSymbol = (sizeEncoded * 8).toDouble() / sizeOriginal.toDouble()
 
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+        if (!mapping.isNullOrEmpty()) log.info("Used bits per run: $mapping")
         log.info("Corpus size original: $sizeOriginal // ${sizeOriginal / 1000000.0} Mb")
         log.info("Corpus size encoded: $sizeEncoded // ${sizeEncoded / 1000000.0} Mb")
 
@@ -147,26 +161,52 @@ class Analyzer {
                     encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
                 val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
-                log.info("File ${original.key.name}, size original: ${original.value}, size encoded: ${encodedFile.values.first()}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
+                if (texTable)
+                    println(
+                        "${original.key.name} & ${original.value} & ${encodedFile.values.first()} & ${((encodedFile.values.first().toDouble() / original.value.toDouble()) * 100).round(
+                            2
+                        )} & ${bitsPerSymbolFile.round(2)} \\\\"
+                    )
+                else
+                    log.info("File ${original.key.name}, size original: ${original.value}, size encoded: ${encodedFile.values.first()}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
             } else {
                 if (original.key.name == filterFile) {
                     val encodedFile =
                         encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
                     val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
-                    log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
+                    if (texTable)
+                        println(
+                            "${original.key.name} & ${original.value} & ${encodedFile.values.first()} & ${((encodedFile.values.first().toDouble() / original.value.toDouble()) * 100).round(
+                                2
+                            )} & ${bitsPerSymbolFile.round(2)} \\\\"
+                        )
+                    else
+                        log.info("File ${original.key.name}, size encoded: ${encodedFile.values.first()}, size original: ${original.value}, compression: ${(encodedFile.values.first().toDouble() / original.value.toDouble()) * 100}, bps: $bitsPerSymbolFile")
                 }
             }
         }
         log.info("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+        return sizeEncoded
     }
 
     fun mapFile(inputFile: String, outputFile: String) {
         val mapping = getByteMapping()
+        mapFile(inputFile, outputFile, mapping)
+    }
+
+    fun mapFile(inputFile: String, outputFile: String, mapping: Map<Byte, Byte>) {
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
                 while (streamIn.position < streamIn.size) {
-                    streamOut.write(mapping[streamIn.readByte()]!!)
+                    val currentByte = streamIn.readByte()
+                    streamOut.write(mapping.getOrElse(currentByte) {
+                        log.warn("No signed mapping found, trying for an unsigned one... (experimental)")
+                        mapping.getOrElse((currentByte * -1).toByte()) {
+                            mapping.getValue(0)
+                        }
+                    })
                 }
             }
         }

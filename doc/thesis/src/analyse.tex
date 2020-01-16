@@ -9,12 +9,48 @@
 The following chapter contains a detailed analysis of the problem and some fundamental requirements for the algorithm. To have a comparison to some extent, the initial performance analysis was performed on the Calgary Corpus but the results of the unmodified run length coding algorithm where very underwhelming as expected.
 }
 
+\section{The Calgary corpus}
+\par{
+The Calgary Corpus \cite{calgaryCorpus} is a rather old corpus created by Ian Witten, Tim Bell and John Cleary from the University of Calgary in 1987. It consists of text and some binary data files shown in \ref{tab:t05 The Calgary Corpus} and is still used for comparison between compression algorithms. After some objections were raised \cite{CalgaryCorpusCritic}, it was mostly replaced by the \href{http://corpus.canterbury.ac.nz/}{Canterbury Corpus} but it is still useful for comparing against other compression algorithms.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l|r|l}	
+		file & size & description\\
+		\hline
+bib & 111261 & ASCII text - 725 bibliographic references\\
+book1 & 768771 & unformatted ASCII text\\
+book2 & 610856 & ASCII text in UNIX \enquote{troff} format\\
+geo & 102400 & 32 bit numbers in IBM floating point format\\
+news & 377109 & ASCII text - USENET batch file on a variety of topics\\
+obj1 & 21504 & VAX executable program \\
+obj2 & 246814 &	Macintosh executable program \\
+paper1 & 53161 & UNIX \enquote{troff} format \\
+paper2 & 82199 & UNIX \enquote{troff} format \\
+pic & 513216 & 1728 x 2376 bitmap image\\
+progc & 39611 & Source code in C \\
+progl & 71646 &  Source code in Lisp\\
+progp & 49379 & Source code in Pascal\\
+trans & 93695 & ASCII and control characters\\	 
+	\end{tabular}
+	\caption{The Calgary Corpus}
+	\label{tab:t05 The Calgary Corpus}
+\end{table}	
+}
+
 %% ==============================
 \section{Initial Findings}
 %% ==============================
 \label{ch:Analysis:sec:Initial Findings}
 \par{
- Originally developed and used on black and white pallet images containing only two values, on a binary level so to speak, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. As you can see, there are no runs of a considerable size and this is the case for most printable characters as they all have a value between 32 and 127 (or 255 for the extended ASCII). Applied to the Calgary Corpus in this simple implementation, there should be an increase in size expected or \textit{negative compression} as one might say.
+	The algorithm itself works in a very simple manner. Reading each bit of the input data in a consecutive way, count the consecutive bits and write the count instead of the bits themselves. So the input of \enquote{00011100} would resolve to two counts of length 3 and one of length 2 if we also assume a starting zero. Encoding this can be done by \enquote{11 | 11 | 10}.  We do not need stop symbols of any kind if we assume a fixed size for the count of each run so we can easily decode this back by making the same assumptions and reading always 2 bit and start with a zero. This implies setting a maximum run length during encoding, limited by the amount of bits used to encode one single count of the input data. If the run is starting with a 1 or a count exceeds this maximum run length, we need to add a pseudo run of length zero, so for example the input of \enquote{11000000} would be encoded to \enquote{00|10|11|00|11}, corresponding to zero times zero at the beginning, two ones, three zeros, then zero times one then three more zeros. The longer the consecutive runs, the better it can be stored, expecting they do not exceed the maximum run length but on the other hand, a high maximum run length needs more bits per run which implies more overhead if the runs to save are rather short. So in general we assume an improvement when the average run length is close to the maximum run length and not often exceeding it. 
+}
+\par{
+	Originally developed and used on black and white pallet images containing only two values often in large repetitions, we want to use it for rather arbitrary data, mostly text. The initial algorithm is not suited for that because continuous text as binary representation does not contain runs of any kind, which could be compressed. The ASCII representation of the letter 'e' which is the most common in general English, has the value 130 or '01100101' as 7-bit ASCII or '001100101' as byte value of the UTF-8 representation. As you can see, there are no runs of a considerable size and this is the case for most printable characters as they all have a value between 32 and 127 (or 255 for the extended ASCII). Applied to the Calgary Corpus in this simple implementation, there should be an increase in size expected or \textit{negative compression} as one might say.
+}
+
+\par{
+	With rather low expected average run length in general data it was still unclear which amount of bits per run are most suited for the mix of data residing in the corpus, so between 2 and 8 bits per run were tried and the results are shown in table \ref{tab:t4 simple run length eval}. They depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1. For this reason, many implementations combine RLE with other encoding schemes like Huffman encoding to be able to encode runs with variable length, which will be discussed later on.
 }
 
 \begin{table}[h]
@@ -22,25 +58,21 @@ The following chapter contains a detailed analysis of the problem and some funda
 	\begin{tabular}{l|r|r}
 		\label{tab:t4 simple run length eval}
 		
-		bits per rle number &  expansion ratio & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number &  expansion ratio \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		8 & 3.29& 26.38\\
-		7 & 2.88& 23.11\\
-		6 & 2.48& 19.87\\
-		5 & 2.08& 16.66\\
-		4 & 1.68 & 13.51\\
-		3 & 1.31& 10.50\\
-		2 & 1.04& 8.36\\
+		8 & 329 & 26.38\\
+		7 & 288 & 23.11\\
+		6 & 248 & 19.87\\
+		5 & 208 & 16.66\\
+		4 & 168 & 13.51\\
+		3 & 131 & 10.50\\
+		2 & 104 & 8.36\\
 	\end{tabular}
 	\caption{Binary RLE on the Calgary Corpus}
 \end{table}
 
 \par{
-The results in Table \ref{tab:t4 simple run length eval} depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1. For this reason, many implementations combine RLE with other encoding schemes like Huffman encding to be able to encode runs with variable length.
-}
-
-\par{
-RLE is also applicable on a byte level, because there should be repetitions of any kind like consecutive letters or line endings (EOL). Byte level RLE encodes runs of identical byte values, ignoring individual bits and word boundaries. The most common byte level RLE scheme encodes runs of bytes into 2-byte packets. The first byte contains the run count of 1 to 256, and the second byte contains the value of the byte run. If a run exceeds a count of 256, it has to be encoded twice, one with count 256 and one with any further runs.
+RLE is also applicable on a byte level, because there should be repetitions of any kind like consecutive letters or line endings (EOL). This modified byte level RLE encodes runs of identical byte values, ignoring individual bits and word boundaries. The most common byte level RLE scheme encodes runs of bytes into 2-byte packets. The first byte contains the run count of 1 to 256, and the second byte contains the value of the byte run. If a run exceeds a count of 256, it has to be encoded twice, one with count 256 and one with any further runs. So for example the word \enquote{aaabbbb} will be encoded to \enquote{0x02 | 0x61 | 0x03 | 0x62}. We do not need runs of length zero because longer runs just have to be encoded more than once so we can use all 256 possible byte values as a count. Using 8 bit for one run is obviously exaggerated because in arbitrary text it is rather rare that a character repeats more that twice. So different sizes of maximum run lengths were tried and the results are shown below.
 }
 
 \begin{table}[h]
@@ -50,7 +82,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 		
 		bits per rle number &  ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
 		\hline
-		8 & 165 & 13.2 \\
+		8 & 165 & 13.20 \\
 		7 & 154 & 12.38\\
 		6 & 144 & 11.57 \\
 		5 & 134 & 10.77\\
@@ -63,15 +95,13 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 
 
 \par{
- However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty, which is also shown in Table \ref{tab:t5 run length eval}.
- Even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line.
-Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
+ However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty. But even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line. Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
 }
 
 \par{
-If we take a more detailed look, we can see that while most files expand with larger RLE numbers, some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding. However the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run. Now it is quite clear why run length encoding is very suited for monochromatic images where it archives a compression ratio close to the theoretical expected maximum compression.
+If we take a more detailed look, we can see that while most files expand with larger RLE numbers regardless which implementation of RLE, but some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding however the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run. Now it is quite clear why run length encoding is very suited for monochromatic images where it achieves a compression ratio close to the theoretical expected maximum compression because the file mostly consists of long runs of repeating bytes depicting the same color value.
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r|r}	
 		file & size original & $\frac{bits}{RLE number}$ & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
@@ -104,8 +134,8 @@ The broad idea of preprocessing is to manipulate the input data in a way that re
 \label{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}
 \par{
 To understand how a Burrows-Wheeler-Transformation improves the effectiveness of compression, consider the effect in a common word in English text. Examine the letter ‘t’ in the word ‘the’, in an input string holding multiple instances of this word.
-Sorting all rotations of a string results in all rotations starting with ‘he ’ will be sorted together and most of them are going to to end in the letter ‘t’. This implies that the transformed string L has a large number of the letter t, combined with some other characters, such as space, ‘s’, ‘T’, and ‘S’. This is true for all characters, so any substring of L is likely to contain a large number of a some distinct characters. \enquote{The overall effect is that the probability that given character $c$ will occur at a given
-point in L is very high if $c$ occurs near that point in L, and is low otherwise.} \cite{Burrows94}
+Sorting all rotations of a string results in all rotations starting with ‘he ’ will be sorted together and most of them are going to to end in the letter ‘t’. This implies that the transformed string L has a large number of the letter t, combined with some other characters, such as space, ‘s’, ‘T’, and ‘S’. This is true for all characters, so any substring of L is likely to contain a large number of some distinct characters. \enquote{The overall effect is that the probability that given character $c$ will occur at a given
+point in L is very high if $c$ occurs near that point in L, and is low otherwise} \cite{Burrows94}.
 }
 
 \par{
@@ -125,10 +155,10 @@ Instead of performing compute intense operation on the data, we could also inter
 The binary UTF-8 interpretation of the example string from earlier S = ‘abraca’ results in 8 runs of length 1, 9 runs of length 2 as well as 3 runs of length 3 and 4.  
 \scalardump\dataA
 
-Reading the data in a different way, all most significant bits, then al second most significant bits and so forth, it results in much longer runs as shown below.
+Reading the data in a different way, all most significant bits, then al second most significant bits and so forth, results in much longer runs. This becomes clear if we read each row in the example below. 
 \arraydump\dataA
 
-Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 6 runs of length 1 as opposed by the simple interpretation. This is because the binary similarity between the used characters, as the character for a and b only differ in one bit. It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compression. 
+Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 6 runs of length 1 as opposed by the simple interpretation. This is because the binary similarity between the used characters, as the character for a and b only differ in one bit. It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compressions. 
 }
 
 \subsection{Byte remapping}
@@ -145,7 +175,7 @@ The usage of other characters expanded the used byte range to between 32 and 117
 }
 
 \par{
-One idea to solve the shorter runs might be a dynamic byte remapping, as the input data is read in parts, where the most frequently used bytes are mapped to the lowest value. This way the values are not alternating in the whole range of 0 to 255 but rather in a smaller subset and the most frequent ones will be the smallest values, so in theory our average runs should increase because we should encounter more consecutive zeros. Some sections have more specific characters or bytes than others but this idea can also be applied to the whole file however it is unclear at this point what method outperforms which. A single map for each block of data should result in lower average values used but also creates a kind of overhead because the mapping has to be stored in the encoded file as well. Applying a simple mapping to lover values results in the following horizontally interpreted rows.
+One idea to solve the shorter runs might be a dynamic byte remapping, as the input data is read in parts, where the most frequently used bytes are mapped to the lowest value. This way the values are not alternating in the whole range of 0 to 255 but rather in a smaller subset and the most frequent ones will be the smallest values, so in theory our average runs should increase because we should encounter more consecutive zeros. Some sections have more specific characters or bytes than others but this idea can also be applied to the whole file however it is unclear at this point what method outperforms which. A single map for each block of data should result in lower average values used but also creates a kind of overhead because the mapping has to be stored in the encoded file as well. Applying a simple mapping to lower values results in the following horizontally interpreted rows.
 }
 
 \par{
@@ -156,13 +186,15 @@ Using this method, the 4 most significant bits all result in zero columns, even 
 
 \subsection{Combined approaches}
 \par{
-The idea of combining different compression methods into a superior method is not new and was also performed on RLE as mentioned in Section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}. While the idea of encoding the RLE numbers with Huffman codes is already known and analyzed, it is mostly in a static sense and optimized for special purpose applications. However the vertical byte reading enables new approaches, even more in combination with the idea of byte remapping and might become applicable to more than just binary Fax transmissions or DNA sequencing with longer runs of any kind in average.
+The idea of combining different compression methods into a superior method is not new and was also performed on RLE as mentioned in Section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}. While the idea of encoding the RLE numbers with Huffman codes is already known and analyzed, it is mostly in a static sense and optimized for special purpose applications. However the vertical byte reading enables new approaches, even more in combination with the idea of byte remapping and might become applicable to more than just binary Fax transmissions or DNA sequencing \textbf{TODO: reference} with longer runs of any kind in average.
 }
 \par{
 It might be interesting to see how well the appliance performs using the vertical binary encoding, in combination with the byte mapping. We expect the more significant the bit, the longer the runs because alternating values should be mostly on the lower significance bits. Using larger run length numbers for these rows while using smaller RLE numbers or even another encoding scheme like simple Huffman encoding we should improve our initial results.
 }
+
+\subsection{Huffman encoding of the RLE runs}
 \par{
-Another interesting approach is the improvement archived by the combination of different methods like performing this modified RLE run on arbitrary data and then encode the results with Huffman codes, using shorter codes for more frequent runs. This idea is not new and also used in the current Fax Transmission Protocol but only for the simple binary RLE in combination with modified Huffman Codes. Other papers also mentioned these combined approaches and seemed to archived good compression ratios, not much worse than the theoretical limit of around 1.5 $\frac{bits}{symbol}$ shown in Section \ref{ch:Principles of compression:sec:Compression}. This was also done by M. Burrows and D.J. Wheeler in 1994 with their Transformation, in combination with a Move-to-Front Coder and a Huffman Coder \cite{Burrows94}. Encoding the Calgary Corpus resulted in a decrease in size to just 27\% of its original with a mean $\frac{bits}{symbol}$ of just $2.43$. This approach would no longer be considered preprocessing, but if more compression could be archived by adding a post-processing step it is still worth trying out.}
+Another interesting approach is the improvement achieved by the combination of different methods like performing this modified RLE run on arbitrary data and then encode the results with Huffman codes, using shorter codes for more frequent runs. This idea is not new and also used in the current Fax Transmission Protocol but only for the simple binary RLE in combination with modified Huffman Codes. Other papers also mentioned these combined approaches and seemed to achieved good compression ratios, not much worse than the theoretical limit of around 1.5 $\frac{bits}{symbol}$ shown in Section \ref{ch:Principles of compression:sec:Compression}. This was for example done by M. Burrows and D.J. Wheeler in 1994 with their Transformation, in combination with a Move-to-Front Coder and a Huffman Coder \cite{Burrows94}. Encoding the Calgary Corpus resulted in a decrease in size to just 27\% of its original with a mean $\frac{bits}{symbol}$ of just $2.43$. This approach would no longer be considered preprocessing, but if more compression could be achieved by adding a post-processing step it is still worth trying out. It clearly has some benefits over the encoding of regular RLE numbers with a fixed size because we can encode with varying lengths, which also implies the absence of additional zeros, needed in the initial implementations.}
 
 %% ==============================
 \section{Summary}
