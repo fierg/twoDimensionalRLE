@@ -32,15 +32,92 @@ class ModifiedMixedEncoderTest {
 
     private val mixedEncoder = ModifiedMixedEncoder()
 
-
     @Test
     @Order(5)
-    fun encodeVertReadingRLEVaryingNrs() {
+    fun encodeVertReadingRLEVaryingNrsA() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
         val applyByteMapping = true
         val applyBurrowsWheelerTransformation = true
-        val applyHuffmanEncoding = false
+        val applyHuffmanEncoding = true
+        val resultMap = mutableMapOf<Map<Int, Int>, Long>()
+
+
+        if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
+        if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
+        if (applyHuffmanEncoding) log.info("Encoding with huffman encoding instead of fixed size.")
+        val deferred = mutableListOf<Deferred<Any>>()
+        val context = newFixedThreadPoolContext(10, "co")
+
+        for (i in 8..8) {
+            deferred.add(CoroutineScope(context).async {
+                val bitsPerNumberMapping =
+                    mapOf(0 to i, 1 to i, 2 to i, 3 to i, 4 to i, 5 to i, 6 to i, 7 to i)
+
+                if (File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").exists()) {
+                    log.info("deleting directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
+                    File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
+                    File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
+
+
+                }
+                log.info("creating directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
+                File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
+                File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
+
+                File(folderToEncode).listFiles().forEach {
+                    try {
+                        mixedEncoder.encodeInternal(
+                            "${folderToEncode}/${it.name}",
+                            "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i/${it.name}.mixed",
+                            applyByteMapping,
+                            applyBurrowsWheelerTransformation,
+                            applyHuffmanEncoding,
+                            bitsPerNumberMapping
+
+                        )
+                    } catch (e: Exception) {
+                        log.error(e.toString(), e)
+                    }
+                }
+                log.info("Finished encoding of corpus.")
+
+                val result = Analyzer().sizeCompare(
+                    folderToEncode,
+                    "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i",
+                    "mixed",
+                    null,
+                    bitsPerNumberMapping,
+                    true
+                )
+                resultMap[bitsPerNumberMapping] = result
+                return@async result
+            })
+        }
+
+
+        runBlocking {
+            return@runBlocking deferred.map { it.await() }
+        }
+
+        log.info("all combinations tried. result:")
+        println(
+            resultMap.toList().sortedBy
+            { (_, value) -> value }.toMap()
+        )
+
+
+    }
+
+
+   // @Test
+    @Order(5)
+    fun encodeVertReadingRLEVaryingNrs() {
+        log.info("Encoding with vertical byte reading and binary RLE.")
+
+        val applyByteMapping = false
+        val applyBurrowsWheelerTransformation = false
+        val applyHuffmanEncoding = true
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
 
@@ -49,14 +126,14 @@ class ModifiedMixedEncoderTest {
         val deferred = mutableListOf<Deferred<Any>>()
         val context = newFixedThreadPoolContext(10, "co")
 
-        for (i in 3..4) {
-            for (j in 3..4) {
-                for (k in 3..4) {
-                    for (l in 3..4) {
-                        for (m in 5..6) {
-                            for (n in 7..8) {
-                                for (o in 7..8) {
-                                    for (p in 7..11) {
+        for (i in 8..8) {
+            for (j in 8..8) {
+                for (k in 8..8) {
+                    for (l in 8..8) {
+                        for (m in 8..8) {
+                            for (n in 8..8) {
+                                for (o in 8..8) {
+                                    for (p in 8..8) {
                                         deferred.add(CoroutineScope(context).async {
                                             val bitsPerNumberMapping =
                                                 mapOf(0 to i, 1 to j, 2 to k, 3 to l, 4 to m, 5 to n, 6 to o, 7 to p)
@@ -124,13 +201,13 @@ class ModifiedMixedEncoderTest {
 
     }
 
-    // @Test
+  //  @Test
     @Order(6)
     fun decode() {
 
         val applyByteMapping = true
         val applyBurrowsWheelerTransformation = true
-        val applyHuffmanEncoding = false
+        val applyHuffmanEncoding = true
 
         if (File("${decodeFolder}/CalgaryCorpus").exists()) {
             log.info("deleting directory: ${decodeFolder}/CalgaryCorpus")
@@ -148,7 +225,41 @@ class ModifiedMixedEncoderTest {
                     applyByteMapping,
                     applyBurrowsWheelerTransformation,
                     applyHuffmanEncoding,
-                    mapOf(0 to 2, 1 to 2, 2 to 2, 3 to 2, 4 to 2, 5 to 2, 6 to 2, 7 to 2)
+                    mapOf(0 to 8, 1 to 8, 2 to 8, 3 to 8, 4 to 8, 5 to 8, 6 to 8, 7 to 8)
+                )
+            } catch (e: Exception) {
+                log.error(e.toString(), e)
+            }
+        }
+
+        Analyzer().sizeCompare(folderToEncode, "${decodeFolder}/CalgaryCorpus", "")
+    }
+
+    @Test
+    @Order(6)
+    fun decodeF() {
+
+        val applyByteMapping = true
+        val applyBurrowsWheelerTransformation = true
+        val applyHuffmanEncoding = true
+
+        if (File("${decodeFolder}/CalgaryCorpus/88888888").exists()) {
+            log.info("deleting directory: ${decodeFolder}/CalgaryCorpus/88888888")
+            File("${decodeFolder}/CalgaryCorpus/88888888").deleteRecursively()
+        }
+        log.info("creating directory: ${decodeFolder}/CalgaryCorpus/88888888")
+        File("${decodeFolder}/CalgaryCorpus/88888888").mkdirs()
+
+        File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().forEach {
+            try {
+                log.info("Decoding $it")
+                mixedEncoder.decodeInternal(
+                    "${encodeFolder}/CalgaryCorpus/88888888/${it.name}",
+                    "${decodeFolder}/CalgaryCorpus/88888888/${it.nameWithoutExtension}",
+                    applyByteMapping,
+                    applyBurrowsWheelerTransformation,
+                    applyHuffmanEncoding,
+                    mapOf(0 to 8, 1 to 8, 2 to 8, 3 to 8, 4 to 8, 5 to 8, 6 to 8, 7 to 8)
                 )
             } catch (e: Exception) {
                 log.error(e.toString(), e)

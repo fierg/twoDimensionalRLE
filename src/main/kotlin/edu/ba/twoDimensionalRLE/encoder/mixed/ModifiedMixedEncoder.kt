@@ -15,7 +15,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = false
+    private val DEBUG = true
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -103,13 +103,14 @@ class ModifiedMixedEncoder : Encoder {
                 if (applyHuffmanEncoding) {
                     val huff = HuffmanEncoder()
                     huff.encodeLineMapsToStream(lineMaps, streamOut)
-                } else {
-                    streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
-                    for (i in 0..1) streamOut.write(0.toByte())
+                }
 
-                    lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
-                        writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
-                    }
+                streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
+                for (i in 0..1) streamOut.write(0.toByte())
+
+                lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
+                    writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
+
                 }
             }
         }
@@ -161,21 +162,47 @@ class ModifiedMixedEncoder : Encoder {
 
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             val countMap = parseCountMapFromTail(streamIn)
+            val totalExpectedRuns = countMap.map { it.value }.sum()
             if (applyByteMapping) {
                 val expectedMappingSize = parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
                 mapping = parseByteMappingFromStream(streamIn, expectedMappingSize, log)
             }
 
-            BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
-                for (bitPosition in 0..7) {
-                    log.debug("decoding all runs for bits of significance $bitPosition...")
-                    decodeBitPositionOfEncodedStream(
-                        bitsPerRLENumberMap.getOrElse(bitPosition) { throw IllegalArgumentException("No mapping found!") },
-                        bitPosition,
-                        streamIn,
-                        streamOut,
-                        countMap.getOrElse(bitPosition) { throw IllegalArgumentException("No count mapping found for bit position $bitPosition!") }
-                    )
+            if (applyHuffmanEncoding == true) {
+                val huffDecoder = HuffmanEncoder()
+                val expectedMappingSize = huffDecoder.parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
+                val mapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
+                val decodedRuns =
+                    huffDecoder.decodeIntListFromStream(mapping, streamIn, countMap.map { it.value }.sum())
+                val runMap = mutableMapOf<Int, List<Int>>()
+                for (i in 0..7) {
+                    runMap[i] = decodedRuns.subList(0, countMap[i]!!)
+                }
+
+                assert(
+                    decodedRuns.size == totalExpectedRuns,
+                    lazyMessage = { "Unexpected number of runs decoded! expected $totalExpectedRuns, found ${decodedRuns.size}" })
+
+                BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
+                    for (bitPosition in 0..7) {
+                        log.debug("decoding all runs for bits of significance $bitPosition...")
+                        decodeBitPositionOfRunMap(streamOut, runMap)
+                    }
+                }
+
+            } else {
+
+                BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
+                    for (bitPosition in 0..7) {
+                        log.debug("decoding all runs for bits of significance $bitPosition...")
+                        decodeBitPositionOfEncodedStream(
+                            bitsPerRLENumberMap.getOrElse(bitPosition) { throw IllegalArgumentException("No mapping found!") },
+                            bitPosition,
+                            streamIn,
+                            streamOut,
+                            countMap.getOrElse(bitPosition) { throw IllegalArgumentException("No count mapping found for bit position $bitPosition!") }
+                        )
+                    }
                 }
             }
 
@@ -216,6 +243,30 @@ class ModifiedMixedEncoder : Encoder {
             currentBit = !currentBit
         }
         streamOut.position = 0
+    }
+
+    private fun decodeBitPositionOfRunMap(
+        streamOut: BitStream,
+        countMap: Map<Int, List<Int>>
+    ) {
+        countMap.toSortedMap().forEach { (t, u) ->
+            var currentBit = false
+            var counter = 0
+
+            u.forEach {
+                counter++
+                if (it != 0) {
+                    for (i in 0 until it) {
+                        streamOut.offset = t
+                        if (currentBit) streamOut += currentBit
+                        streamOut.position++
+                    }
+                }
+                //if (DEBUG) streamOut.flush()
+                currentBit = !currentBit
+                streamOut.position = 0
+            }
+        }
     }
 
     private fun parseCountMapFromTail(streamIn: BitStream): MutableMap<Int, Int> {

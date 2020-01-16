@@ -3,6 +3,7 @@ package edu.ba.twoDimensionalRLE.encoder
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import loggersoft.kotlin.streams.BitStream
+import java.text.ParseException
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -152,16 +153,19 @@ interface Encoder {
         var bytesRead = 0
         var expectedSize = 0L
 
-        while (expectedSize == 0L) {
+        while (expectedSize == 0L && currentByteSize < 128) {
             val currentByte = stream.readByte()
             stream.position = stream.position - 2
-            log.debug(
-                "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
-                    2,
-                    '0'
-                )}, position ${stream.position}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
-            )
 
+            /*
+             log.debug(
+
+                 "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
+                     2,
+                     '0'
+                 )}, position ${stream.position}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
+             )
+ */
             bytesRead++
             if (currentByte != 0.toByte()) {
                 currentByteSize++
@@ -178,9 +182,14 @@ interface Encoder {
                 }
             }
         }
-        log.debug("Parsed 0x${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
-        assert(Int.MAX_VALUE > expectedSize, lazyMessage = { "Casting overflow while parsing a header!" })
-        return expectedSize.toInt()
+
+        if (expectedSize == 0L) {
+            throw IllegalStateException("Unable to parse from tail, no length found!")
+        } else {
+            log.debug("Parsed 0x${Integer.toHexString(expectedSize.toInt())} -> a size of $expectedSize.")
+            assert(Int.MAX_VALUE > expectedSize, lazyMessage = { "Casting overflow while parsing a header!" })
+            return expectedSize.toInt()
+        }
     }
 
     fun parseHuffmanMappingFromStream(
