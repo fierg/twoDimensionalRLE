@@ -15,7 +15,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = true
+    private val DEBUG = false
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -101,16 +101,15 @@ class ModifiedMixedEncoder : Encoder {
                 }
 
                 if (applyHuffmanEncoding) {
-                    val huff = HuffmanEncoder()
-                    huff.encodeLineMapsToStream(lineMaps, streamOut)
+                    val huff = HuffmanEncoder(DEBUG)
+                    huff.encodeLineMapsToStream(lineMaps, streamOut, bitsPerRunMap.values.max()!!)
                 }
 
                 streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
-                for (i in 0..1) streamOut.write(0.toByte())
+                for (i in 0..defaultZerosAfterHeadder) streamOut.write(0.toByte())
 
                 lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
                     writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
-
                 }
             }
         }
@@ -169,14 +168,16 @@ class ModifiedMixedEncoder : Encoder {
             }
 
             if (applyHuffmanEncoding == true) {
-                val huffDecoder = HuffmanEncoder()
+                val huffDecoder = HuffmanEncoder(DEBUG)
                 val expectedMappingSize = huffDecoder.parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
-                val mapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
+                val huffmanMapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
                 val decodedRuns =
-                    huffDecoder.decodeIntListFromStream(mapping, streamIn, countMap.map { it.value }.sum())
+                    huffDecoder.decodeIntListFromStream(huffmanMapping, streamIn, countMap.map { it.value }.sum())
                 val runMap = mutableMapOf<Int, List<Int>>()
+                var listOffset = 0
                 for (i in 0..7) {
-                    runMap[i] = decodedRuns.subList(0, countMap[i]!!)
+                    runMap[i] = decodedRuns.subList(listOffset, listOffset + countMap[i]!!)
+                    listOffset += countMap[i]!!
                 }
 
                 assert(
@@ -184,10 +185,8 @@ class ModifiedMixedEncoder : Encoder {
                     lazyMessage = { "Unexpected number of runs decoded! expected $totalExpectedRuns, found ${decodedRuns.size}" })
 
                 BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
-                    for (bitPosition in 0..7) {
-                        log.debug("decoding all runs for bits of significance $bitPosition...")
-                        decodeBitPositionOfRunMap(streamOut, runMap)
-                    }
+                    log.debug("decoding all runs to file...")
+                    decodeBitPositionOfRunMap(streamOut, runMap)
                 }
 
             } else {
@@ -213,7 +212,14 @@ class ModifiedMixedEncoder : Encoder {
 
             if (applyBurrowsWheelerTransformation) {
                 log.debug("Applying bijective Burrows Wheeler Transformation to file...")
-                bwts.invert(File(if (applyByteMapping) mappedFile else inputFile), File(outputFile))
+                bwts.invert(File(if (applyByteMapping) mappedFile else decodedFile), File(outputFile))
+            }
+            if (!DEBUG) {
+                if (applyBurrowsWheelerTransformation xor applyByteMapping) File(decodedFile).delete()
+                if (applyBurrowsWheelerTransformation && applyByteMapping) {
+                    File(decodedFile).delete()
+                    File(mappedFile).delete()
+                }
             }
         }
     }
@@ -225,46 +231,41 @@ class ModifiedMixedEncoder : Encoder {
         streamOut: BitStream,
         expectedCount: Int
     ) {
+        streamOut.position = 0
         var currentBit = false
-        var counter = 0
+        var currentCount = 0
         var currentNumber: Int
 
-        while (counter < expectedCount) {
+        while (currentCount < expectedCount) {
             currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
-            counter++
-            if (currentNumber != 0) {
-                for (i in 0 until currentNumber) {
-                    streamOut.offset = bitPosition
-                    if (currentBit) streamOut += currentBit
-                    streamOut.position++
-                }
+            if (currentCount + 1 == expectedCount){
+                log.debug("last number parsed: $currentNumber")
             }
-            //if (DEBUG) streamOut.flush()
+            for (i in 0 until currentNumber) {
+                streamOut.offset = bitPosition
+                if (currentBit) streamOut += currentBit
+                if (!currentBit || bitPosition != 7) streamOut.position++
+            }
+            currentCount++
             currentBit = !currentBit
         }
-        streamOut.position = 0
     }
 
     private fun decodeBitPositionOfRunMap(
         streamOut: BitStream,
         countMap: Map<Int, List<Int>>
     ) {
-        countMap.toSortedMap().forEach { (t, u) ->
+        countMap.toSortedMap().forEach { (bitPosition, rleNumberList) ->
+            streamOut.position = 0
             var currentBit = false
-            var counter = 0
 
-            u.forEach {
-                counter++
-                if (it != 0) {
-                    for (i in 0 until it) {
-                        streamOut.offset = t
-                        if (currentBit) streamOut += currentBit
-                        streamOut.position++
-                    }
+            rleNumberList.forEach {
+                for (i in 0 until it) {
+                    streamOut.offset = bitPosition
+                    if (currentBit) streamOut += currentBit
+                    if (bitPosition != 7) streamOut.position++
                 }
-                //if (DEBUG) streamOut.flush()
                 currentBit = !currentBit
-                streamOut.position = 0
             }
         }
     }
@@ -316,8 +317,8 @@ class ModifiedMixedEncoder : Encoder {
             } else {
                 if (!applyHuffmanEncoding) writeRunToStream(counter, streamOut, bitsPerRLENumber)
                 lineMaps[bitPosition]!!.add(counter)
-                counter = 1
                 lastBit = !lastBit
+                counter = 1
             }
         }
         if (counter != 0) {

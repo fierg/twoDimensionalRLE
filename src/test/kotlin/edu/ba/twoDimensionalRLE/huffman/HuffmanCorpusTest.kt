@@ -31,7 +31,7 @@ class HuffmanCorpusTest {
         private const val decodeFolder = "data/decoded/huffman"
     }
 
-    private val huffmanEncoder = HuffmanEncoder()
+    private val huffmanEncoder = HuffmanEncoder(true)
 
     @Test
     @Order(1)

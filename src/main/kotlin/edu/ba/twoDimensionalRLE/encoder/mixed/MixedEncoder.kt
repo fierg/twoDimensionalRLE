@@ -62,7 +62,7 @@ class MixedEncoder : Encoder {
         applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         val input = File(inputFile)
-        val huff = HuffmanEncoder()
+        val huff = HuffmanEncoder(DEBUG)
         val binRLE = BinaryRunLengthEncoder()
 
         log.info("Staring to decode $inputFile...")
@@ -145,7 +145,7 @@ class MixedEncoder : Encoder {
     ) {
         val input = File(inputFile)
         val totalSize = input.length()
-        val huffmanEncoder = HuffmanEncoder()
+        val huffmanEncoder = HuffmanEncoder(DEBUG)
         var chunks = DataChunk.readChunksFromFile(inputFile, byteArraySize, log)
         val huffBuffer = StringBuffer()
 
@@ -412,7 +412,7 @@ class MixedEncoder : Encoder {
         val expectedRLEBits = byteArraySize * (rleRange.last + 1 - rleRange.first)
         val expectedHuffmanBytes = byteArraySize * (huffmanRange.last + 1 - huffmanRange.first)
         val rle = BinaryRunLengthEncoder()
-        val huff = HuffmanEncoder()
+        val huff = HuffmanEncoder(DEBUG)
 
         log.info("Reading $input consecutively into chunks of size $byteArraySize bytes...")
 

@@ -121,12 +121,14 @@ interface Encoder {
 
         while (expectedSize == 0L) {
             val currentByte = stream.readByte()
+            /*
             log.debug(
                 "current byte read at 0x${Integer.toHexString(stream.position.toInt()).padStart(
                     2,
                     '0'
                 )}, position ${stream.position}: ${Integer.toHexString(currentByte.toUByte().toInt())}"
             )
+            */
             bytesRead++
             if (currentByte != 0.toByte()) {
                 currentByteSize++

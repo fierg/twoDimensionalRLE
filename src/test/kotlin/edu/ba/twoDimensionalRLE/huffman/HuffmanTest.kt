@@ -32,7 +32,7 @@ class HuffmanTest {
     @Order(2)
     fun getHuffmanMapping() {
         log.info("Creating huffman mapping from String $inputString...")
-        log.info(HuffmanEncoder().getHuffmanMapping(256, inputString.toByteArray()).toString())
+        log.info(HuffmanEncoder(true).getHuffmanMapping(256, inputString.toByteArray()).toString())
     }
 
 
@@ -40,7 +40,7 @@ class HuffmanTest {
     @Test
     @Order(3)
     fun encodeFileSmall() {
-        val encoder = HuffmanEncoder()
+        val encoder = HuffmanEncoder(true)
         encoder.encode(
             "data/$fileToEncodeSmall", "$encodeFolder/$fileToEncodeSmall",
             applyByteMapping = true,
@@ -52,7 +52,7 @@ class HuffmanTest {
     @Test
     @Order(4)
     fun encodeFileLarge() {
-        val encoder = HuffmanEncoder()
+        val encoder = HuffmanEncoder(true)
         encoder.encode(
             "data/$fileToEncode", "$encodeFolder/$fileToEncode",
             applyByteMapping = true,
@@ -64,7 +64,7 @@ class HuffmanTest {
     @Test
     @Order(6)
     fun decodeFileLarge() {
-        val encoder = HuffmanEncoder()
+        val encoder = HuffmanEncoder(true)
         encoder.decode(
             "$encodeFolder/$fileToEncode", "$decodeFolder/$fileToEncode",
             applyByteMapping = true,
