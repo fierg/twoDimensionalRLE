@@ -266,7 +266,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         huffmanMapping: Map<StringBuffer, Byte>,
         stream: BitStream,
         expectedSize: Int
-    ): MutableList<Int> {
+    ): List<Short> {
         assert(huffmanMapping.isNotEmpty()) { "Parsed empty huffman mapping." }
         log.debug("Reading huffman encoded runs from steam, expecting $expectedSize runs after decoding...")
 
@@ -274,7 +274,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
         val largesMapping = huffmanMapping.keys.maxBy { it.length }!!.length
         var currentMappingSize = smallestMapping
         var currentPrefixSeen: StringBuffer
-        val decodingResult = mutableListOf<Int>()
+        val decodingResult = mutableListOf<Short>()
         val stringMapping =
             huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
 
@@ -290,7 +290,7 @@ class HuffmanEncoder : Encoder, RangedEncoder {
                         currentPrefixSeen.toString(),
                         { throw IllegalStateException("No mapping found!") })
                 //              log.debug("Decoded 0x${Integer.toHexString(byteDecoded.toUByte().toInt())} , $byteDecoded")
-                decodingResult.add(byteDecoded.toInt())
+                decodingResult.add(byteDecoded.toShort())
                 stream.bitPosition = stream.bitPosition + currentMappingSize
                 currentMappingSize = smallestMapping
             } else {

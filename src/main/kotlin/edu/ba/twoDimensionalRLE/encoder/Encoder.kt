@@ -3,7 +3,6 @@ package edu.ba.twoDimensionalRLE.encoder
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import loggersoft.kotlin.streams.BitStream
-import java.text.ParseException
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -40,13 +39,13 @@ interface Encoder {
 
     fun writeLengthHeaderToFile(count: Int, stream: BitStream, log: Logger, numberOfZerosAfter: Int): Long {
         val bytesNeeded = writeCountToStream(log, count, stream)
-        for (i in 0 until numberOfZerosAfter) {
-            stream.write(0.toByte())
-        }
-
+        for (i in 0 until numberOfZerosAfter) stream.write(0.toByte())
+        /*
         if (DEBUG) {
             stream.flush()
         }
+        */
+
         return (bytesNeeded + numberOfZerosAfter).toLong()
     }
 
@@ -64,7 +63,7 @@ interface Encoder {
         log.debug("Write length header with ${bytesNeeded.toInt()} bytes size.")
         StringBuffer(header).writeInvertedToBinaryStream(stream)
         log.debug("Wrote $count as  0x${Integer.toHexString(count)} / $header to stream.")
-        if (DEBUG) stream.flush()
+        //if (DEBUG) stream.flush()
         return bytesNeeded
     }
 
@@ -85,11 +84,6 @@ interface Encoder {
         log.debug("Wrote $header so stream.")
 
         stream.write(0.toByte())
-
-
-        if (DEBUG) {
-            stream.flush()
-        }
 
         return (bytesNeeded).toLong() + 1
     }
@@ -153,7 +147,7 @@ interface Encoder {
         var bytesRead = 0
         var expectedSize = 0L
 
-        while (expectedSize == 0L && currentByteSize < 128) {
+        while (expectedSize == 0L && currentByteSize < 10) {
             val currentByte = stream.readByte()
             stream.position = stream.position - 2
 

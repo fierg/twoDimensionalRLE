@@ -9,7 +9,9 @@ import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import loggersoft.kotlin.streams.BitStream
 import loggersoft.kotlin.streams.openBinaryStream
+import java.io.EOFException
 import java.io.File
+import java.lang.Exception
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
@@ -108,9 +110,8 @@ class ModifiedMixedEncoder : Encoder {
                 streamOut.position = if (streamOut.offset != 0) streamOut.position + 1 else streamOut.position
                 for (i in 0..1) streamOut.write(0.toByte())
 
-                lineMaps.toSortedMap(reverseOrder()).forEach { (t, u) ->
+                lineMaps.toSortedMap().forEach { (t, u) ->
                     writeLengthHeaderToFile(u.count(), streamOut, log, if (t == 0) 0 else defaultZerosAfterHeadder)
-
                 }
             }
         }
@@ -171,10 +172,10 @@ class ModifiedMixedEncoder : Encoder {
             if (applyHuffmanEncoding == true) {
                 val huffDecoder = HuffmanEncoder()
                 val expectedMappingSize = huffDecoder.parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
-                val mapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
+                val huffmanMapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
                 val decodedRuns =
-                    huffDecoder.decodeIntListFromStream(mapping, streamIn, countMap.map { it.value }.sum())
-                val runMap = mutableMapOf<Int, List<Int>>()
+                    huffDecoder.decodeIntListFromStream(huffmanMapping, streamIn, countMap.map { it.value }.sum())
+                val runMap = mutableMapOf<Int, List<Short>>()
                 for (i in 0..7) {
                     runMap[i] = decodedRuns.subList(0, countMap[i]!!)
                 }
@@ -191,7 +192,6 @@ class ModifiedMixedEncoder : Encoder {
                 }
 
             } else {
-
                 BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
                     for (bitPosition in 0..7) {
                         log.debug("decoding all runs for bits of significance $bitPosition...")
@@ -230,7 +230,11 @@ class ModifiedMixedEncoder : Encoder {
         var currentNumber: Int
 
         while (counter < expectedCount) {
-            currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
+            try {
+                currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
+            } catch (e:EOFException){
+                throw IllegalStateException("Unexpected end of stream reached rung decoding!")
+            }
             counter++
             if (currentNumber != 0) {
                 for (i in 0 until currentNumber) {
@@ -247,7 +251,7 @@ class ModifiedMixedEncoder : Encoder {
 
     private fun decodeBitPositionOfRunMap(
         streamOut: BitStream,
-        countMap: Map<Int, List<Int>>
+        countMap: Map<Int, List<Short>>
     ) {
         countMap.toSortedMap().forEach { (t, u) ->
             var currentBit = false
@@ -255,7 +259,7 @@ class ModifiedMixedEncoder : Encoder {
 
             u.forEach {
                 counter++
-                if (it != 0) {
+                if (it != 0.toShort()) {
                     for (i in 0 until it) {
                         streamOut.offset = t
                         if (currentBit) streamOut += currentBit
@@ -264,8 +268,8 @@ class ModifiedMixedEncoder : Encoder {
                 }
                 //if (DEBUG) streamOut.flush()
                 currentBit = !currentBit
-                streamOut.position = 0
             }
+            streamOut.position = 0
         }
     }
 

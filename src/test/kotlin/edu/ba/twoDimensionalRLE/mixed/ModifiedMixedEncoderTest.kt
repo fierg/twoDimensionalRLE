@@ -37,9 +37,9 @@ class ModifiedMixedEncoderTest {
     fun encodeVertReadingRLEVaryingNrsA() {
         log.info("Encoding with vertical byte reading and binary RLE.")
 
-        val applyByteMapping = true
-        val applyBurrowsWheelerTransformation = true
-        val applyHuffmanEncoding = true
+        val applyByteMapping = false
+        val applyBurrowsWheelerTransformation = false
+        val applyHuffmanEncoding = false
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
 
@@ -205,8 +205,8 @@ class ModifiedMixedEncoderTest {
     @Order(6)
     fun decode() {
 
-        val applyByteMapping = true
-        val applyBurrowsWheelerTransformation = true
+        val applyByteMapping = false
+        val applyBurrowsWheelerTransformation = false
         val applyHuffmanEncoding = true
 
         if (File("${decodeFolder}/CalgaryCorpus").exists()) {
@@ -239,9 +239,9 @@ class ModifiedMixedEncoderTest {
     @Order(6)
     fun decodeF() {
 
-        val applyByteMapping = true
-        val applyBurrowsWheelerTransformation = true
-        val applyHuffmanEncoding = true
+        val applyByteMapping = false
+        val applyBurrowsWheelerTransformation = false
+        val applyHuffmanEncoding = false
 
         if (File("${decodeFolder}/CalgaryCorpus/88888888").exists()) {
             log.info("deleting directory: ${decodeFolder}/CalgaryCorpus/88888888")
