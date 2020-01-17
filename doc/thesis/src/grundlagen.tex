@@ -167,43 +167,33 @@ We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no o
 And it is also proven that a Huffman algorithm generates optimal prefix codes\cite{compressionIntroduction}.
 }
 \par{
-The algorithm in general is rather simple and the generation of the prefix codes will be demonstrated using an example. 
+The algorithm in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. For decoding it is required to persists the mapping as well.
 
+TODO: fix numbers on vector
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1,
 		level distance = 1.5cm}] 
 	\node [arn_n] {}
-	child{ node [arn_n] {1} 
-		child{ node [arn_n] {1} 
-			child{ node [arn_n] {b}}
-		}
-		child{ node [arn_n] {0}
-			child{ node [arn_n] {a}}
-		}                            
+	child{ node [arn_n] { } 
+		child{ node [arn_n] {b}}
+		child{ node [arn_n] {a}}                            
 	}
-	child{ node [arn_n] {0}
-			child{ node [arn_n] {c}}
-		}; 
+	child{ node [arn_n] {c}}; 
 	\end{tikzpicture}
 	\caption{example Huffman Tree with 3 Leaf Nodes} \label{fig:M1:example Huffman tree}
 \end{figure}
 }
-
 \par{
-TODO: explain stuff
+Decoding is very trivial due to the prefix codes used b this algorithm. Reading bit by bit one can always see if a code is matching one of the mapping and if not, another bit is read. As soon as the parsed content matches a mapped code, we can decode it to the original symbol because there can not be a longer matching mapping. Due to the implementation via a Priority queue, which needs $O(log \: n)$ time per insertion and a tree with n leaves has $2n-1$ nodes let this algorithm perform in $O(n \: log \: n)$ time where $n$ is the number of symbols.
 }
-...
 
 \section{Other methods}
 \label{ch:Principles of compression:sec:Other}
 \par{
-There are other well known methods like \\
-- move to front\\
-- arithmetic coding\\
-- real world applications are mostly combinations of those\\
+There are other well known methods like Move-to-Front coding or arithmetic coding also applied in different compression algorithms with different methods and therefore there own pros and cons. Move-to-Front and arithmetic coding will not be discussed in this scope. But its worth mentioning that real world applications are mostly combinations of methods, like Deflate\cite{deutsch1996rfc1951} which uses LZSS\cite{10.1145/322344.322346} and Huffman encoding.  
 }
-...
+
 \subsection{Burrows-Wheeler-Transformation}
 \label{ch:Principles of compression:sec:Other:subSec:bwt}
 

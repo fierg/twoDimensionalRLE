@@ -26,7 +26,7 @@ Initially some other ideas have been followed with very poor results. One idea w
 
 \subsubsection{Other Difficulties}
 \par{
-Other difficulties arose while performing bit operations, because it became slow on larger workloads. This and other issues where solved by using the Kotlin library  \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}}. This way most operations can be performed on the stream instead of reading all data to encode and then working in memory.
+Other difficulties arose while performing bit operations, because it became slow on larger workloads. This and other issues where solved by using the Kotlin library  \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}} which also allows most operations to be performed on the stream instead of reading all data to encode and then working in memory.
 
 \subsubsection{Compression improvements trough vertical reading}
 \par{
@@ -61,8 +61,7 @@ This time the most significant bits have been encoded with more bits per run tha
 \par{
 Testing out every reasonable combination of different run lengths would imply running $8^8$ combinations because every of the 8 bits could be encoded with 2 to 10 bits per run. Assuming around 10 seconds for each encoding round would still result in somewhat around 46 thousand hours of computing which is clearly to much. Even using multi-threading would not resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 7 percent points to $112.41\%$ of its original size instead of 127\% with a fix length for every bits position as shown in figure \ref{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}, but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently but the average run length of the lower bits must be very low if 2 bits per RLE number achieved best results. To increase the average run length overall, the already described byte mapping was applied to the input data.
 }
-
-\begin{table}[H]
+\begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
@@ -123,7 +122,7 @@ ybar]
 coordinates {
 	(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
 };
-	\legend{with byte mapping, without byte mapping}
+	\legend{without byte mapping,with byte mapping}
 \end{axis}
 \end{tikzpicture}
 %}
@@ -134,7 +133,7 @@ coordinates {
 
 \par{
 Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 2 bits for the most insignificant bits, 3 for the fourth and fifth most insignificant bit 5 for the sixths most one, 7 bits for the second most significant bit and 9 bits for the most significant one yielded the overall best results with 94.9\% of its original size and 7.59 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:Byte mapping and varying maximum run lengths}. Some files got a little smaller while other files still expanded which is only somewhat of an enhancement over regular RLE which performs really well on specific files. But on this corpus a slight reduction in size was achieved using preprocessing and a modified RLE.
-\begin{table}[H]
+\begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
@@ -201,10 +200,10 @@ In Section \ref{ch:Principles of compression:sec:Other} the Burrows-Wheeler-Tran
 In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination. To do so, it was first swapped against an sufficient implementation provided by a paper from m. Burrows and D. J. Wheeler \cite{Burrows94} from 1994. Their method is also the one described in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt} and could handle arbitrary input but it also had some downsides like the additional index $I$ of the transformation, which had to be persisted as well. The major downside of this implementation although was the rather slow. To overcome this issue and the saving of additional indices, the implementation used had to be swapped once more against one that was first described by \cite{Burrows-linear-time} in 2009 which claimed to perform in linear time complexity.
 }
 \par{
-In form of the C library \href{https://code.google.com/archive/p/libdivsufsort}{libdivsufsort} a working implementation of BWTS was found, the bijective Burrows-Wheeler-Scott-Transformation described in \cite{DBLP:journals/corr/abs-1201-3077}. This kind of Burrows-Wheeler-Transformation does not require additional information, no start and stop symbols neither and index of its original position. Briefly, it does not construct a matrix of all cyclic rotations, instead it is computed with a suffix array sorted with DivSufSort, described in \cite{DBLP:journals/corr/abs-1710-01896} which is the fastest currently known method of constructing the transformation. To use it properly the code was ported to Kotlin but there are also ports of this library in Java and Go available which are recommended because the original code is neither documented nor readable.
+In form of the C library \href{https://code.google.com/archive/p/libdivsufsort}{libdivsufsort} a working implementation of BWTS was found, the bijective Burrows-Wheeler-Scott-Transformation described in \cite{DBLP:journals/corr/abs-1201-3077}. This kind of Burrows-Wheeler-Transformation does not require additional information, no start and stop symbols neither and index of its original position. Briefly, it does not construct a matrix of all cyclic rotations, instead it is computed with a suffix array sorted with DivSufSort\cite{DBLP:journals/corr/abs-1710-01896} which is the fastest currently known method of constructing the transformation. To use it properly the code was ported to Kotlin but there are also ports of this library in Java and Go available which are recommended because the original code is neither documented nor readable and the functionality can easily be used via a dependency.
 }
 \par{
-The simple binary RLE did not really benefit from this transformation which is to be expected, because it generates repetitions of bytes, but if a byte needs many short runs it will still expand in size because the average runs are not that much influenced. For example just the letter e needs 6 different runs, no matter on which position or surrounded by what letters. The byte wise implementation on the other hand did very strongly benefit from this transformation, it will always create longer runs of bytes. Swapping the implementation of the Burrows-Wheeler-Transformation resulted in way better results, the simple byte wise RLE archives compression ratios around 59 \% of its original size while using 4 bits per run, see table \ref{tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. This drastic increase was still a little astonishing but obviously average runs of characters increased so much, that 4 bits per run achieved the maximum result. Another reason for this vast improvement compared to the old implementations is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk or additional characters.
+The simple binary RLE did not really benefit from this transformation which has to be expected, because it generates repetitions of bytes, but if a byte needs many short runs it will still expand in size because the average runs are not that much influenced. For example just the letter e needs 6 different runs, no matter on which position or surrounded by what letters. The byte wise implementation on the other hand did very strongly benefit from this transformation, it will always create longer runs of bytes. Swapping the implementation of the Burrows-Wheeler-Transformation resulted in way better results, the simple byte wise RLE archives compression ratios around 59 \% of its original size while using 4 bits per run, see table \ref{tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}. This was mainly because of the longer repetitions possible after the transformation was performed on the whole input instead of small chunks. This drastic increase was still a little astonishing but obviously average runs of characters increased so much, that 4 bits per run achieved the maximum result. Another reason for this vast improvement compared to the old implementations is the lack of additional information needed to store because we do no longer need to store the transformation index of every chunk or additional characters.
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{r|r|r}	
@@ -223,7 +222,7 @@ The simple binary RLE did not really benefit from this transformation which is t
 	\end{table}
 }
 \par{
-This BWTS generates extreme long runs of identical byte values, which in turn enhances the performance of the byte wise RLE vastly. If we take a closer look we can see in table \ref{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation} that all files have a compression ratio below 100 while the total size is nearly reduced to half. The file \textit{geo} is still close to uncompressed but half of the files only need less than 5 $\frac{bits}{symbol}$. The file \textit{pic} is still the best compressible with only 2.12 $\frac{bits}{symbol}$.
+Working on the whole input data and no longer on small chunks, this BWTS generates extreme long runs of identical byte values, which in turn enhances the performance of the byte wise RLE vastly. If we take a closer look we can see in table \ref{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation} that all files have a compression ratio below 100 while the total size is nearly reduced to half. The file \textit{geo} is still close to uncompressed but half of the files only need less than 5 $\frac{bits}{symbol}$. The file \textit{pic} is still the best compressible with only 2.12 $\frac{bits}{symbol}$.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
@@ -251,83 +250,71 @@ all files & 3145718 & 1855520 & 58.98 & 4.71
 \end{table}
 }
 \par{
-There should still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. It did indeed perform at its best when applying the BWT and the mapping but it did not outperform the combination of BWT and byte wise RLE.
+There should still room for some optimizations because as seen in Section \ref{ch:Conceptual Design:sec:var lengths}, the remapping of the input resulted in longer runs on the higher order bits and the vertical interpretation made it possible to encode different sections with different maximum run lengths. It was expected that applying the Burrows-Wheeler-Transformation to the vertical encoding variant should improve its efficiency as much as the byte wise RLE did benefit, which turned out to be wrong. The vertical interpretation did indeed perform at its best when applying the BWTS and the mapping but it did not outperform the combination of BWTS and byte wise RLE which is kind of expected because the transformation creates repetitions on byte level.
 
-TODO: rework
 \begin{figure}[h]
-	\begin{tikzpicture}[scale=1]
+	\begin{tikzpicture}
 	\begin{axis}[
 	width=\textwidth,
 	height=0.45\textwidth,
+	axis x line=center,
+	axis y line=left,
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
-	xmin=1, xmax=9,
-	ymin=60, ymax=150,
-	xtick={2,3,4,5,6,7,8},
-	ytick={60,80,100,120,140},
+	symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,222335710},
+	x tick label style={font=\small,text width=1cm,align=center},
+	enlargelimits=true,
+	ymax=120,
 	legend pos=north west,
 	ymajorgrids=true,
-	grid style=dashed,
+	grid style=dashed
 	]
-	\addplot[
-	color=red,
-	mark=square,
-	]
+	\addplot[color=blue,mark=square]
 	coordinates {
-		(2,97.14)(3,110.82)(4,134.83)(5,163)(6,192)
+		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)
 	};
-	\addplot[
-	color=black,
-	mark=square,
-	]
+	\addplot[color=blue,mark=square]
 	coordinates {
-		(2,91.06)(3,97.1)(4,112)(5,133)(6,151)
+		(22233578,100)(22233579,102)(222335710,106)
 	};
-	\addplot[
-	color=blue,
-	mark=square,
-	]
+	\addplot[color=red,mark=square]
 	coordinates {
-		(2,78.58)(3,68.76)(4,67.87)(5,72.83)(6,81.37)(7,91.96)(8,103.69)
+		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)
 	};
-	\addplot[
-	color=green,
-	mark=square,
-	]
+	\addplot[color=red,mark=square]
 	coordinates {
-		(2,77.87)(3,67.17)(4,65.27)(5,69.21)(6,76.74)(7,86.33)(8,97.07)
+	(22233578,95)(22233579,94.9)(222335710,95)
 	};
-	\legend{no transformation,Mapping,BWT,BWT \& Mapping}
+	\legend{with byte mapping, without byte mapping}
 	\end{axis}
 	\end{tikzpicture}
-	\caption{Different run lengths with and without transformations}
+	%}
+	%\end{scaletikzpicturetowidth}
+	\caption{Byte mapping and varying maximum run lengths}
 	\label{fig:3:Different run lengths with and without transformations}
 \end{figure}
 
 \par{
-	TODO: rework \\
-In Section \ref{ch:Conceptual Design:sec:var lengths} different run lengths for different significant bits provided an edge over just fixed maximum run length, so this combination was also tried out. After testing all combinations of possible and reasonable variables it was found that using a Burrows-Wheeler-Transformation and byte remapping as preprocessing steps, parse the transformed data in vertical order and then using 3 bits per run for low significant bits and 7 for the 3 most significant bits, run length encoding performs at its peak. Using this setup, the Calgary Corpus can be compressed down to 58.1 \% of its original size while using only 4.65 $\frac{bits}{symbol}$ as shown in figure \ref{fig:4:Different run lengths for byte mapping and transformation and varying maximum run lengths}. This was the best result achieved so far and the detailed compression results are shown below.
-
-
-\begin{table}[H]
+	TODO: explain
+\begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
 		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
 		\hline
-bib & 111261 & 73843 & 66.37 & 5.31 \\
-book1 & 768771 & 570348 & 74.19 & 5.94 \\
-book2 & 610856 & 409639 & 67.06 & 5.36 \\
-geo & 102400 & 145950 & 142.53 & 11.40 \\
-news & 377109 & 275396 & 73.03 & 5.84 \\
-obj1 & 21504 & 27023 & 125.66 & 10.05 \\
-obj2 & 246814 & 213392 & 86.46 & 6.92 \\
-paper1 & 53161 & 37344 & 70.25 & 5.62 \\
-paper2 & 82199 & 56490 & 68.72 & 5.50 \\
-pic & 513216 & 227914 & 44.41 & 3.55 \\
-progc & 39611 & 28275 & 71.38 & 5.71 \\
-progl & 71646 & 38144 & 53.24 & 4.26 \\
-progp & 49379 & 27029 & 54.74 & 4.38 \\
-trans & 93695 & 49314 & 52.63 & 4.21 \\
+		bib & 111261 & 73843 & 66.37 & 5.31 \\
+		book1 & 768771 & 570348 & 74.19 & 5.94 \\
+		book2 & 610856 & 409639 & 67.06 & 5.36 \\
+		geo & 102400 & 145950 & 142.53 & 11.40 \\
+		news & 377109 & 275396 & 73.03 & 5.84 \\
+		obj1 & 21504 & 27023 & 125.66 & 10.05 \\
+		obj2 & 246814 & 213392 & 86.46 & 6.92 \\
+		paper1 & 53161 & 37344 & 70.25 & 5.62 \\
+		paper2 & 82199 & 56490 & 68.72 & 5.50 \\
+		pic & 513216 & 227914 & 44.41 & 3.55 \\
+		progc & 39611 & 28275 & 71.38 & 5.71 \\
+		progl & 71646 & 38144 & 53.24 & 4.26 \\
+		progp & 49379 & 27029 & 54.74 & 4.38 \\
+		trans & 93695 & 49314 & 52.63 & 4.21 \\
 		\hline
 		all files & 3145718 & 2184197 & 69.43 & 5.55
 	\end{tabular}
@@ -339,20 +326,21 @@ trans & 93695 & 49314 & 52.63 & 4.21 \\
 One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data. But the idea of combing the RLE methods with Huffman encoding still stuck around and was picked up again later on in a modified way in Section \ref{ch:Conceptual Design:sec:Postprocessing}. No further attempts to add or improve preprocessing steps of this kind were made, instead the results were analyzed and compared with other results in section \ref{ch:Evaluation}.
 }
 %% ==============================
-\section{Other Processing Options}
+\subsection{Huffman encoding of the RLE runs}
 %% ==============================
 \label{ch:Conceptual Design:sec:Postprocessing}
-Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but i a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move to Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. However this step is not considered preprocessing anymore but could improve the compression furthermore.
-
+\par{
+Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but i a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move to Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. This step is not really considered preprocessing anymore but could improve the compression furthermore, however the benefit of Huffman encoding is the possibility to output codes of varying length as described in section \ref{ch:Principles of compression:sec:Huffman Coding}. Combining the binary or vertical encoded RLE with a Huffman encoder would be a huge benefit, because as of now the algorithm needs to output a number of bits for each number to encode. Combined, the more frequent short runs of 1 or 2 can be encoded into shorter Huffman codes which should increase the overall compression algorithm. In general it was assumed that there was no longer a benefit in using different maximum run lengths on bits of different significance, because a run of length 1 is going to be encoded with a Huffman code, not with the fixed amount of bits. To reverse the Huffman encoding, the Huffman tree has to be persisted into the file as well.
+}
 %% ==============================
-\section{Implementation Decisions}
+\section{Implementation}
 %% ==============================
 \label{ch:Conceptual Design:sec:Implementation Decisions}
 
 The algorithms described have all been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between native speed and higher language conciseness and fault-tolerance. Also there were some library available for Byte- and Bit-Operations on streams which proved to be quite useful.
 
 %% ==============================
-\section{Implementation Detail}
+\subsection{Implementation Detail}
 %% ==============================
 \label{ch:Conceptual Design:sec:Implementation Detail}
 - detailed information about specific modules and classes\\
