@@ -154,7 +154,7 @@ We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no o
 \[
 \sum_{(s,w)\in C} 2^{-l(w)} \leq 1
 \]
-And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. For decoding it is required to persists the mapping as well.
+And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm	 in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. For decoding it is required to persists the mapping as well.
 
 TODO: fix numbers on vector
 \begin{figure}[h]
@@ -225,28 +225,31 @@ The resulting string L corresponds to the last column of $M$, with characters $M
 TODO: explain reversing a bwt
 }
 
+\subsection{Bijective Burrows-Wheeler-Scott Transformation}
+\par{
+TODO: explain stuff
+}
+
+
 %% ==============================
 \section{State of the Art}
 %% ==============================
 \label{ch:Principles of compression:sec:SOTA}
-State of the art compression\\
-- techniques\\
-- use cases\\
-- limits\\
-
 \par{
-	
+The current state of the art at the time of writing 
 	\begin{table}[h]
-		\begin{tabular}{r|r|r|r}
-			method &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
+		\begin{tabular}{r|r|r|r|r}
+			method & options &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
 			\hline
-			uncompressed & 3,141,622 & 100.0\% & 8.00\\
-			compress & 1,272,772 & 40.0\% & 3.24\\
-			ZIP v2.32 & 1,020,781 & 32.4\% & 2.59\\
-			gzip v1.3.5 & 1,017,624 & 32.3\% & 2.58\\
-			bzip2 v9.12b & 828,347 & 26.3\% & 2.10 \\
-			ppmd & 740,737 & 23.5\% & 1.88\\
-			ZPAQ v7.15& 659,709 & 20.9\% & 1.67 
+			uncompressed & & 3,141,622 & 100.0\% & 8.00\\
+			compress & & 1,272,772 & 40.0\% & 3.24\\
+			gzip v1.10 & -9 & 1,021,720 & 32.3\% & 2.58\\
+			ZIP v3.0 &-9& 1,019,783 & 32.4\% & 2.59\\
+			brotli & -q 11 -w 24 & 826638 & & \\
+			bzip2 v1.0.8 & --best & 832,443 & 26.3\% & 2.10 \\
+			p7zip 16.02 (deflate) & -mx10 & 821,873 & 23.5\% & 1.88\\
+			p7zip 16.02 (ppmd) & -m=PPMd 0=32 & 763,067& & \\
+			ZPAQ v7.15 & -m5 & 659.701 & 20.9\% & 1.67
 		\end{tabular}
 				\label{tab:t20 stat of the art}
 			\caption{State of the Art compression ratios}
