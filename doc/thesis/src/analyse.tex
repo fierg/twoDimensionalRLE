@@ -11,7 +11,7 @@ The following chapter contains a detailed analysis of the problem and some funda
 
 \section{The Calgary corpus}
 \par{
-The Calgary Corpus \cite{calgaryCorpus} is a rather old corpus created by Ian Witten, Tim Bell and John Cleary from the University of Calgary in 1987. It consists of text and some binary data files shown in \ref{tab:t05 The Calgary Corpus} and is still used for comparison between compression algorithms. After some objections were raised \cite{CalgaryCorpusCritic}, it was mostly replaced by the \href{http://corpus.canterbury.ac.nz/}{Canterbury Corpus} but it is still useful for comparing against other compression algorithms.
+The Calgary Corpus \cite{calgaryCorpus} is a rather old corpus created by Ian Witten, Tim Bell and John Cleary from the University of Calgary in 1987. It consists of text and some binary data files shown in \ref{tab:t05 The Calgary Corpus} and is still used for comparison between compression algorithms. After some objections were raised \cite{CalgaryCorpusCritic}, it was mostly replaced by the \href{http://corpus.canterbury.ac.nz/}{Canterbury Corpus} or similar ones but it is still useful for comparing against other compression algorithms. To validate the final results and to insure that the algorithm is not just suited for this corpus, it will be validated on the Canterbury Corpus as well.
 
 \begin{table}[H]
 	\centering
@@ -58,7 +58,7 @@ trans & 93695 & ASCII and control characters\\
 	\begin{tabular}{l|r|r}
 		\label{tab:t4 simple run length eval}
 		
-		bits per rle number &  expansion ratio \% & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number &  expansion ratio \% & bits per symbol in \textit{bps}\\
 		\hline
 		8 & 329 & 26.38\\
 		7 & 288 & 23.11\\
@@ -80,7 +80,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 	\begin{tabular}{l|r|r}
 		\label{tab:t5 run length eval}
 		
-		bits per rle number &  ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number &  ratio in \% & bits per symbol in \textit{bps}\\
 		\hline
 		8 & 165 & 13.20 \\
 		7 & 154 & 12.38\\
@@ -95,16 +95,16 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 
 
 \par{
- However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty. But even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 $\frac{bits}{symbol}$. This is still useful as a kind of a base line. Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
+ However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty. But even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 \textit{bps}. This is still useful as a kind of a base line. Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
 }
 
 \par{
-If we take a more detailed look, we can see that while most files expand with larger RLE numbers regardless which implementation of RLE, but some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding however the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  $1.56 \: \frac{bits}{symbol}$ while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using $2.17 \: \frac{bits}{symbol}$ encoding with 6 bits per run. Now it is quite clear why run length encoding is very suited for monochromatic images where it achieves a compression ratio close to the theoretical expected maximum compression because the file mostly consists of long runs of repeating bytes depicting the same color value.
+If we take a more detailed look, we can see that while most files expand with larger RLE numbers regardless which implementation of RLE, but some files have their minimum size when encoded with higher RLE numbers of up to 7 bit. With the simple binary based RLE, almost all files of the Calgary Corpus expand linear related to the amount of bits used for the encoding however the file \textit{pic} decreases in size until 7 bits per RLE number used to a sizes of just $19.5 \%$ of its original size with only  1.56 \textit{bps} while the other files just doubled or even tripled in size. Using the byte wise operating RLE we see a similar result with the file \textit{pic}, but not as decent with $27.2\%$ of its original size using 2.17 \textit{bps} encoding with 6 bits per run. Now it is quite clear why run length encoding is very suited for monochromatic images where it achieves a compression ratio close to the theoretical expected maximum compression because the file mostly consists of long runs of repeating bytes depicting the same color value.
 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r|r}	
-		file & size original & $\frac{bits}{RLE number}$ & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		file & size original & $\frac{bits}{RLE number}$ & size encoded & ratio in \% & \textit{bps}\\
 		\hline
 		pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
 		 & & 3 & 235067 & 45.80 & 3.66\\
@@ -194,7 +194,7 @@ It might be interesting to see how well the appliance performs using the vertica
 
 \subsection{Huffman encoding of the RLE runs}
 \par{
-Another interesting approach is the improvement achieved by the combination of different methods like performing this modified RLE run on arbitrary data and then encode the results with Huffman codes, using shorter codes for more frequent runs. This idea is not new and also used in the current Fax Transmission Protocol but only for the simple binary RLE in combination with modified Huffman Codes. Other papers also mentioned these combined approaches and seemed to achieved good compression ratios, not much worse than the theoretical limit of around 1.5 $\frac{bits}{symbol}$ shown in Section \ref{ch:Principles of compression:sec:Compression}. This was for example done by M. Burrows and D.J. Wheeler in 1994 with their Transformation, in combination with a Move-to-Front Coder and a Huffman Coder \cite{Burrows94}. Encoding the Calgary Corpus resulted in a decrease in size to just 27\% of its original with a mean $\frac{bits}{symbol}$ of just $2.43$. This approach would no longer be considered preprocessing, but if more compression could be achieved by adding a post-processing step it is still worth trying out. It clearly has some benefits over the encoding of regular RLE numbers with a fixed size because we can encode with varying lengths, which also implies the absence of additional zeros, needed in the initial implementations.}
+Another interesting approach is the improvement achieved by the combination of different methods like performing this modified RLE run on arbitrary data and then encode the results with Huffman codes, using shorter codes for more frequent runs. This idea is not new and also used in the current Fax Transmission Protocol but only for the simple binary RLE in combination with modified Huffman Codes. Other papers also mentioned these combined approaches and seemed to achieved good compression ratios, not much worse than the theoretical limit of around 1.5 \textit{bps} shown in Section \ref{ch:Principles of compression:sec:Compression}. This was for example done by M. Burrows and D.J. Wheeler in 1994 with their Transformation, in combination with a Move-to-Front Coder and a Huffman Coder \cite{Burrows94}. Encoding the Calgary Corpus resulted in a decrease in size to just 27\% of its original with a mean \textit{bps} of just $2.43$. This approach would no longer be considered preprocessing, but if more compression could be achieved by adding a post-processing step it is still worth trying out. It clearly has some benefits over the encoding of regular RLE numbers with a fixed size because we can encode with varying lengths, which also implies the absence of additional zeros, needed in the initial implementations.}
 
 %% ==============================
 \section{Summary}

@@ -236,25 +236,26 @@ TODO: explain stuff
 %% ==============================
 \label{ch:Principles of compression:sec:SOTA}
 \par{
-The current state of the art at the time of writing 
+The current state of the art at the time of writing is depicted in the table below, all algorithms used highest possible compression scheme available. In general there is always a balance between compressed size and compression or decompression speed, where the faster algorithms use mostly some form of dictionary coding sometimes in combination with a Huffman coder to be able to output variable length codes. The more advanced ones like PPMd or ZPAQ use complex context modeling or context mixing approaches where they try to predict he next symbol based on just read symbols. In general these complex methods achieve better compression at the expense of using more space or time. Some modern algorithms have been executed with the Calgary corpus and the results are shown in table \ref{tab:t20 stat of the art}. The 
 	\begin{table}[h]
 		\begin{tabular}{r|r|r|r|r}
-			method & options &  size in bytes & compression & ratio in $\frac{bits}{symbol}$\\
+			method & options &  size in bytes & compression & \textit{bps}\\
 			\hline
 			uncompressed & & 3,141,622 & 100.0\% & 8.00\\
-			compress & & 1,272,772 & 40.0\% & 3.24\\
-			gzip v1.10 & -9 & 1,021,720 & 32.3\% & 2.58\\
+			compress & & 1,272,772 & 40.5\% & 3.24\\
+			gzip v1.10 & -9 & 1,021,720 & 32.5\% & 2.60\\
 			ZIP v3.0 &-9& 1,019,783 & 32.4\% & 2.59\\
-			brotli & -q 11 -w 24 & 826638 & & \\
-			bzip2 v1.0.8 & --best & 832,443 & 26.3\% & 2.10 \\
-			p7zip 16.02 (deflate) & -mx10 & 821,873 & 23.5\% & 1.88\\
-			p7zip 16.02 (ppmd) & -m=PPMd 0=32 & 763,067& & \\
-			ZPAQ v7.15 & -m5 & 659.701 & 20.9\% & 1.67
+			bzip2 v1.0.8 & --best & 832,443 & 26.4\% & 2.11 \\
+			brotli & -q 11 -w 24 & 826,638 & 26.3\%& 2.10\\
+			p7zip 16.02 (deflate) & -mx10 & 821,873 & 26.1\% & 2.08\\
+			p7zip 16.02 (PPMd) & -m=PPMd 0=32 & 763,067& 24.2\% & 1.93\\
+			ZPAQ v7.15 & -m5 & 659.701 & 20.9\% & 1.67\\
+			paq8hp8 & & &
+			
 		\end{tabular}
 				\label{tab:t20 stat of the art}
 			\caption{State of the Art compression ratios}
 	\end{table}
-
 }
 
 %% ==============================

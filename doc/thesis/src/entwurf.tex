@@ -34,7 +34,7 @@ First results of just plain binary RLE on the vertical interpretation improved i
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
-		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number & ratio in \% & \textit{bps}\\
 		\hline
 		8 & 255.22 & 20.41\\
 		7 & 224.45 & 17.95\\
@@ -50,13 +50,13 @@ First results of just plain binary RLE on the vertical interpretation improved i
 }
 
 \par{
-If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of above 1 with 3 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 6 bits per RLE run and only achieves a compression of 3.67 $\frac{bits}{symbol}$ compared to 1.56 $\frac{bits}{symbol}$ with simple binary RLE. These results were quite far from the desired outcome which mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run arose, to solve this issue.  
+If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of above 1 with 3 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 6 bits per RLE run and only achieves a compression of 3.67 \textit{bps} compared to 1.56 \textit{bps} with simple binary RLE. These results were quite far from the desired outcome which mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run arose, to solve this issue.  
 }
 
 \subsection{Varying maximum run lengths}
 \label{ch:Conceptual Design:sec:var lengths}
 \par{
-This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a $\frac{bits}{symbol}$ ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. For reference, this mapping can be described by a vector $v_i$ with 8 components $v_1,v_2,...,v_8$ each with values greater 1. Each component corresponds to the bits per run stored for the bit number $i$ of each byte.
+This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a \textit{bps} ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. For reference, this mapping can be described by a vector $v_i$ with 8 components $v_1,v_2,...,v_8$ each with values greater 1. Each component corresponds to the bits per run stored for the bit number $i$ of each byte.
 }
 \par{
 Testing out every reasonable combination of different run lengths would imply running $8^8$ combinations because every of the 8 bits could be encoded with 2 to 10 bits per run. Assuming around 10 seconds for each encoding round would still result in somewhat around 46 thousand hours of computing which is clearly to much. Even using multi-threading would not resolve this issue so the computation had to be further reduced. By trying only a few specific combinations we assume to be good, we can then selectively small changes to improve further. This way the results were improved and the compression result was lowered around 7 percent points to $112.41\%$ of its original size instead of 127\% with a fix length for every bits position as shown in figure \ref{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}, but this was still far from the desired state. Most files still increased in size except the file \textit{pic}, even though all bits could be encoded differently but the average run length of the lower bits must be very low if 2 bits per RLE number achieved best results. To increase the average run length overall, the already described byte mapping was applied to the input data.
@@ -132,11 +132,11 @@ coordinates {
 \end{figure}
 
 \par{
-Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 2 bits for the most insignificant bits, 3 for the fourth and fifth most insignificant bit 5 for the sixths most one, 7 bits for the second most significant bit and 9 bits for the most significant one yielded the overall best results with 94.9\% of its original size and 7.59 $\frac{bits}{symbol}$ as shown in Figure \ref{fig:2:Byte mapping and varying maximum run lengths}. Some files got a little smaller while other files still expanded which is only somewhat of an enhancement over regular RLE which performs really well on specific files. But on this corpus a slight reduction in size was achieved using preprocessing and a modified RLE.
+Using this combined approach the first time a real compression was achieved for the corpus instead of just one very specific file. The combination of 2 bits for the most insignificant bits, 3 for the fourth and fifth most insignificant bit 5 for the sixths most one, 7 bits for the second most significant bit and 9 bits for the most significant one yielded the overall best results with 94.9\% of its original size and 7.59 \textit{bps} as shown in Figure \ref{fig:2:Byte mapping and varying maximum run lengths}. Some files got a little smaller while other files still expanded which is only somewhat of an enhancement over regular RLE which performs really well on specific files. But on this corpus a slight reduction in size was achieved using preprocessing and a modified RLE.
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
-		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		file & size original & size encoded & ratio in \% & \textit{bps}\\
 		\hline
 bib & 111261 & 111579 & 100.29 & 8.02 \\
 book1 & 768771 & 669578 & 87.10 & 6.97 \\
@@ -167,7 +167,7 @@ Another possible preprocessing step which promised an improvement is the mention
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
-		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number & ratio in \% & \textit{bps}\\
 		\hline
 		3 & 95.41 & 7.63\\
 		2 & 91.39 & 7.31 \\
@@ -182,7 +182,7 @@ While it was only applicable to textual data and very slow, even when divided in
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r}	
-		bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+		bits per rle number & ratio in \% & \textit{bps}\\
 		\hline
 		3 & 91.62 & 7.33\\
 		2 & 89.46 & 7.15
@@ -222,7 +222,7 @@ The simple binary RLE did not really benefit from this transformation which has 
 	\end{table}
 }
 \par{
-Working on the whole input data and no longer on small chunks, this BWTS generates extreme long runs of identical byte values, which in turn enhances the performance of the byte wise RLE vastly. If we take a closer look we can see in table \ref{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation} that all files have a compression ratio below 100 while the total size is nearly reduced to half. The file \textit{geo} is still close to uncompressed but half of the files only need less than 5 $\frac{bits}{symbol}$. The file \textit{pic} is still the best compressible with only 2.12 $\frac{bits}{symbol}$.
+Working on the whole input data and no longer on small chunks, this BWTS generates extreme long runs of identical byte values, which in turn enhances the performance of the byte wise RLE vastly. If we take a closer look we can see in table \ref{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation} that all files have a compression ratio below 100 while the total size is nearly reduced to half. The file \textit{geo} is still close to uncompressed but half of the files only need less than 5 \textit{bps}. The file \textit{pic} is still the best compressible with only 2.12 \textit{bps}.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
@@ -299,7 +299,7 @@ There should still room for some optimizations because as seen in section \ref{c
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
-		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		file & size original & size encoded & ratio in \% & \textit{bps}\\
 		\hline
 		bib & 111261 & 73843 & 66.37 & 5.31 \\
 		book1 & 768771 & 570348 & 74.19 & 5.94 \\
