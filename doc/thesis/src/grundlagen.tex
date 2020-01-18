@@ -6,7 +6,7 @@
 \label{ch:Principles of compression}
 %% ==============================
 \par{
-The basic idea of compression is to remove redundancy in data. Compression can be broken down into two broad categories: Lossless and lossy compression. Lossless compression makes it possible to reproduce the original data exactly while lossy compression allows the some degradation in the encoded data to gain even higher compression at the cost of some of the original information. To understand compression, one first has to understand some basic principles of information theory like entropy and different approaches to compress different types of data with different encoding. We will also show the key differences between probability coding and dictionary coding.}
+The basic idea of compression is to remove redundancy in data since all non random data contains redundant information. Pattern or structure identification and exploitation enables storing the original data in less space. Compression can be broken down into two broad categories: Lossless and lossy compression. Lossless compression makes it possible to reproduce the original data exactly while lossy compression allows the some degradation in the encoded data to gain even higher compression at the cost of some of the original information. To understand compression, one first has to understand some basic principles of information theory like entropy and different approaches to compress different types of data with different encoding. We will also show the key differences between probability coding and dictionary coding.}
 
 %% ==============================
 \section{Compression and Encoding fundamentals}
@@ -66,7 +66,7 @@ encodes each symbol separately instead of the whole input at once, like the Huff
 
 \subsection{Probabilistic Coding}
 \par{
-The general idea behind Probability Coding is to analyze probabilities for messages and encode them in bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding can be further discerned into variable and fixed unique coding, which will represent each message with a bit string with an amount $n$ of bits $n \in N$, for example Huffman coding as type of prefix coding. In contrast to Huffman coding there are also arithmetic codes which can represent a set of messages as a single floating point number $q$ where $0.0 < q < 1.0$. By doing so they can \enquote{fuse} messages together and need less space to represent a set of messages than encoding every message separately.
+The general idea behind Probability Coding is to analyze probabilities for messages and encode them in variable length bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding can be further discerned into variable and fixed unique coding, which will represent each message with a bit string with an amount $n$ of bits $n \in N$, for example Huffman coding as type of prefix coding which will be explained in greater detail in section \ref{ch:Principles of compression:sec:Huffman Coding}. In contrast to Huffman coding there is also arithmetic coding which can represent a set of messages as a single floating point number $q$ where $0.0 < q < 1.0$. By encoding them in nestend intervals in $[0,1]$ determined by a probability distribution, they can \enquote{fuse} messages together and need less space to represent a set of messages than encoding every message separately. Arithmetic coding is usually stronger than Huffman coding but also slower. In 2014 a newer probabilistic approach was produced by Jarek Duda called Asymmetric Numeral Systems (ANS) \cite{DBLP:journals/corr/Duda13}. This method encodes a string of symbols into a single natural number, combining the strength of Arithmetic coding with the speed of Huffman coding.
 }
 
 \subsection{Dictionary Coding}
@@ -262,12 +262,9 @@ The current state of the art at the time of writing is depicted in the table bel
 \section{Limits of compression}
 %% ==============================
 \label{ch:Principles of compression:sec:Limits of Conpression}
-
-- existence of not compressable strings\\
--\url{https://www.quora.com/Is-there-a-theoretical-limit-to-data-compression-If-so-how-was-it-found} \\
-- unable to compress random data\\
-- Kolmogorow-Komplexität	
-
+\par{
+All so far introduced methods and techniques work by removing redundant information but applied to random data without any structure or patterns they will fail to compress. This is explained by the Kolmogorov complexity\cite{kolmogorov} off a string $s$ which is the shortest possible program with $s$ as output. Consider the following two strings of equal length \textit{abababab} and \textit{4c1j5b20}. While the first string can simply be denoted as $4 \times ab$, the other one has obviously no simple representation hence it has a higher Kolmogorov complexity. Using the pigeonhole principle it is also possible to trivially prove this by assuming $s$ is a binary string and $l(s) \: = \: n$. This implies $2^n$ possible string, all unequal. Assuming we can reduce all of them by 1 character, they only need $m = n - 1$ space and can only have $2^m$ possible unequal strings. This results in a contradiction because with lossless compression we need a distinct reverse operation and we cannot decode $2^{n-1}$ distinctly into $2^n$ strings. So to recap, no algorithm can compress all data of a given length, even by just one byte. If this was not true it would result in algorithm that could compress every string, so it could be applied recursively until any string has length 0.
+}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "thesis"
