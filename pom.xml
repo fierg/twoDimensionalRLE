@@ -78,11 +78,14 @@
             <version>28.2-jre</version>
         </dependency>
 
+        <!-- Provides the BWTS and the DivSuvSort -->
+        <!-- https://github.com/flanglet/kanzi/tree/1.6.0 -->
         <dependency>
             <groupId>io.github.flanglet</groupId>
             <artifactId>kanzi</artifactId>
             <version>1.6.0</version>
         </dependency>
+
     </dependencies>
 
 
