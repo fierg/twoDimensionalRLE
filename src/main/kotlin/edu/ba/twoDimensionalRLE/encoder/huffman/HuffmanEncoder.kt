@@ -279,8 +279,12 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
         val stringMapping =
             huffmanMapping.map { entry: Map.Entry<StringBuffer, Byte> -> entry.key.toString() to entry.value }.toMap()
 
-        stream.position++
+        if (stream.offset != 0) {
+            stream.offset = 0
+            stream.position++
+        }
 
+        log.debug("stream at position ${stream.position}:${stream.offset}. Beginning to read encoded runs from file...")
         log.debug("Parsing encoded file with mapping $stringMapping")
         while ((stream.bitPosition + currentMappingSize) <= stream.size * 8 && decodingResult.size < expectedSize) {
             currentPrefixSeen = stream.popNextNBitAsStringBuffer(currentMappingSize)
@@ -290,7 +294,6 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
                     stringMapping.getOrElse(
                         currentPrefixSeen.toString(),
                         { throw IllegalStateException("No mapping found!") })
-                //              log.debug("Decoded 0x${Integer.toHexString(byteDecoded.toUByte().toInt())} , $byteDecoded")
                 decodingResult.add(byteDecoded.toUByte().toInt())
                 stream.bitPosition = stream.bitPosition + currentMappingSize
                 currentMappingSize = smallestMapping
@@ -485,11 +488,18 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
 
         val counts = lineMaps.flatMap { entry -> entry.value }.groupingBy { it }.eachCount()
         val frequencies = IntArray(maxLength)
-        counts.toSortedMap().forEach{ (t, u) -> frequencies[t] = u }
+        counts.toSortedMap().forEach { (t, u) -> frequencies[t] = u }
         val mapping = getMappingFromTree(buildTree(frequencies), StringBuffer())
 
-        writeLengthHeaderToFile(mapping.size,streamOut,log,2)
+        writeLengthHeaderToFile(mapping.size, streamOut, log, 2)
         writeDictionaryToStream(streamOut, mapping)
+
+        if (streamOut.offset != 0) {
+            streamOut.offset = 0
+            streamOut.position++
+        }
+
+        log.debug("stream at position ${streamOut.position}:${streamOut.offset}. Beginning to write encoded runs to file...")
 
         lineMaps.toSortedMap().flatMap { entry -> entry.value }.forEach {
             mapping[it.toByte()]?.writeToBinaryStream(streamOut)
