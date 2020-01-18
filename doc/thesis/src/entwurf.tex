@@ -64,7 +64,7 @@ Testing out every reasonable combination of different run lengths would imply ru
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
-		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		file & size original & size encoded & ratio in \% & \textit{bps}\\
 		\hline
 bib & 111261 & 129424 & 116.32 & 9.31 \\
 book1 & 768771 & 820463 & 106.72 & 8.54 \\
@@ -207,7 +207,7 @@ The simple binary RLE did not really benefit from this transformation which has 
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{r|r|r}	
-			bits per rle number & ratio in \% & bits per symbol in $\frac{bits}{symbol}$\\
+			bits per rle number & ratio in \% & \textit{bps}\\
 			\hline
 			8 & 74.42 & 5.95\\
 			7 & 69.90 & 5.59\\
@@ -226,7 +226,7 @@ Working on the whole input data and no longer on small chunks, this BWTS generat
 \begin{table}[H]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
-		file & size original & size encoded & ratio in \% & $\frac{bits}{symbol}$\\
+		file & size original & size encoded & compression & \textit{bps}\\
 		\hline
 bib & 111261 & 59285 & 53.28 & 4.26 \\
 book1 & 768771 & 590879 & 76.86 & 6.15 \\
@@ -245,7 +245,7 @@ trans & 93695 & 32835 & 35.04 & 2.80 \\
 \hline
 all files & 3145718 & 1855520 & 58.98 & 4.71
 	\end{tabular}
-	\caption{Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}
+	\caption{Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation with 4 bit per run}
 	\label{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}
 \end{table}
 }
@@ -332,6 +332,34 @@ One last option was the encoding of the lowest significant bits with another, mo
 \par{
 Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but i a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move to Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. This step is not really considered preprocessing anymore but could improve the compression furthermore, however the benefit of Huffman encoding is the possibility to output codes of varying length as described in section \ref{ch:Principles of compression:sec:Huffman Coding}. Combining the binary or vertical encoded RLE with a Huffman encoder would be a huge benefit, because as of now the algorithm needs to output a number of bits for each number to encode. Combined, the more frequent short runs of 1 or 2 can be encoded into shorter Huffman codes which should increase the overall compression algorithm. In general it was assumed that there was no longer a benefit in using different maximum run lengths on bits of different significance, because a run of length 1 is going to be encoded with a Huffman code, not with the fixed amount of bits. To reverse the Huffman encoding, the Huffman tree has to be persisted into the file as well.
 }
+
+\par{
+	TODO: explain
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{r|r|r|r|r}	
+			file & size original & size encoded & ratio in \% & \textit{bps}\\
+			\hline
+bib & 111261 & 44156 & 39.69 & 3.17 \\
+book1 & 768771 & 340279 & 44.26 & 3.54 \\
+book2 & 610856 & 243092 & 39.80 & 3.18 \\
+geo & 102400 & 63006 & 61.53 & 4.92 \\
+news & 377109 & 173207 & 45.93 & 3.67 \\
+obj1 & 21504 & 14405 & 66.99 & 5.36 \\
+obj2 & 246814 & 119957 & 48.60 & 3.89 \\
+paper1 & 53161 & 24917 & 46.87 & 3.75 \\
+paper2 & 82199 & 35939 & 43.72 & 3.50 \\
+pic & 513216 & 82136 & 16.00 & 1.28 \\
+progc & 39611 & 18890 & 47.69 & 3.82 \\
+progl & 71646 & 24649 & 34.40 & 2.75 \\
+progp & 49379 & 17416 & 35.27 & 2.82 \\
+trans & 93695 & 31235 & 33.34 & 2.67 \\
+			\hline
+			all files & 3145718 & 1237380 & 39.33 & 3.14
+		\end{tabular}
+		\caption{Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+		\label{tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+	\end{table}
 %% ==============================
 \section{Implementation}
 %% ==============================
