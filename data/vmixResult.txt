@@ -1,0 +1,46 @@
+compressing bib
+111261 bytes -> 17340 bytes in 304.33 s.
+cross entropy: 1.247
+compressing book1
+768771 bytes -> 174886 bytes in 1006.77 s.
+cross entropy: 1.820
+compressing book2
+610856 bytes -> 106921 bytes in 789.73 s.
+cross entropy: 1.400
+compressing compressCmix
+161 bytes -> 107 bytes in 152.61 s.
+cross entropy: 5.317
+compressing geo
+102400 bytes -> 42836 bytes in 353.02 s.
+cross entropy: 3.347
+compressing news
+377109 bytes -> 77584 bytes in 645.18 s.
+cross entropy: 1.646
+compressing obj1
+21504 bytes -> 7063 bytes in 193.19 s.
+cross entropy: 2.628
+compressing obj2
+246814 bytes -> 40434 bytes in 623.90 s.
+cross entropy: 1.311
+compressing paper1
+53161 bytes -> 10909 bytes in 211.27 s.
+cross entropy: 1.642
+compressing paper2
+82199 bytes -> 17273 bytes in 234.86 s.
+cross entropy: 1.681
+compressing pic
+513216 bytes -> 21907 bytes in 673.54 s.
+cross entropy: 0.341
+compressing progc
+39611 bytes -> 8377 bytes in 207.29 s.
+cross entropy: 1.692
+compressing progl
+71646 bytes -> 8991 bytes in 243.12 s.
+cross entropy: 1.004
+compressing progp
+49379 bytes -> 6268 bytes in 219.86 s.
+cross entropy: 1.015
+compressing trans
+93695 bytes -> 10098 bytes in 287.05 s.
+cross entropy: 0.862
+
