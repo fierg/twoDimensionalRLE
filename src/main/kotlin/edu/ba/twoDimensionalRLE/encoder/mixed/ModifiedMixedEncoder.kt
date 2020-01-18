@@ -15,7 +15,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = false
+    private val DEBUG = true
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
@@ -51,7 +51,7 @@ class ModifiedMixedEncoder : Encoder {
         bitsPerRunMap: Map<Int, Int>
     ) {
 
-        log.debug("Encoding ${inputFile} with $bitsPerRunMap")
+        log.info("Encoding ${inputFile} with $bitsPerRunMap")
 
         val analyzer = Analyzer()
         val bwts = BWTSWrapper()
@@ -114,10 +114,8 @@ class ModifiedMixedEncoder : Encoder {
             }
         }
         log.debug("Finished encoding.")
-        if (!DEBUG) {
-            if (applyByteMapping) File(mappedFile!!).delete()
-            if (applyBurrowsWheelerTransformation) File(transformedFile!!).delete()
-        }
+        if (applyByteMapping) File(mappedFile!!).delete()
+        if (applyBurrowsWheelerTransformation) File(transformedFile!!).delete()
     }
 
     fun decodeInternal(
@@ -158,6 +156,8 @@ class ModifiedMixedEncoder : Encoder {
         val mappedFile = if (applyBurrowsWheelerTransformation) "${outputFile}_mapped_tmp" else outputFile
         val decodedFile =
             if (applyByteMapping || applyBurrowsWheelerTransformation) "${outputFile}_dec_tmp" else outputFile
+
+        log.info("Decoding $inputFile")
 
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
             val countMap = parseCountMapFromTail(streamIn)
@@ -214,12 +214,10 @@ class ModifiedMixedEncoder : Encoder {
                 log.debug("Applying bijective Burrows Wheeler Transformation to file...")
                 bwts.invert(File(if (applyByteMapping) mappedFile else decodedFile), File(outputFile))
             }
-            if (!DEBUG) {
-                if (applyBurrowsWheelerTransformation xor applyByteMapping) File(decodedFile).delete()
-                if (applyBurrowsWheelerTransformation && applyByteMapping) {
-                    File(decodedFile).delete()
-                    File(mappedFile).delete()
-                }
+            if (applyBurrowsWheelerTransformation xor applyByteMapping) File(decodedFile).delete()
+            if (applyBurrowsWheelerTransformation && applyByteMapping) {
+                File(decodedFile).delete()
+                File(mappedFile).delete()
             }
         }
     }
@@ -238,7 +236,7 @@ class ModifiedMixedEncoder : Encoder {
 
         while (currentCount < expectedCount) {
             currentNumber = streamIn.readUBits(bitsPerRLEencodedNumber).toInt()
-            if (currentCount + 1 == expectedCount){
+            if (currentCount + 1 == expectedCount) {
                 log.debug("last number parsed: $currentNumber")
             }
             for (i in 0 until currentNumber) {
@@ -263,7 +261,7 @@ class ModifiedMixedEncoder : Encoder {
                 for (i in 0 until it) {
                     streamOut.offset = bitPosition
                     if (currentBit) streamOut += currentBit
-                    if (bitPosition != 7) streamOut.position++
+                    if (!currentBit || bitPosition != 7) streamOut.position++
                 }
                 currentBit = !currentBit
             }
