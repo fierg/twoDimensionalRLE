@@ -7,6 +7,7 @@ import edu.ba.twoDimensionalRLE.encoder.Encoder
 import edu.ba.twoDimensionalRLE.extensions.pow
 import edu.ba.twoDimensionalRLE.model.DataChunk
 import edu.ba.twoDimensionalRLE.tranformation.BurrowsWheelerTransformation
+import edu.ba.twoDimensionalRLE.tranformation.bijectiveJavaWrapper.BWTSWrapper
 import edu.ba.twoDimensionalRLE.tranformation.modified.BurrowsWheelerTransformationModified
 import kanzi.SliceByteArray
 import kanzi.transform.BWTS
@@ -82,7 +83,14 @@ class StringRunLengthEncoder : Encoder {
         applyBurrowsWheelerTransformation: Boolean, byteArraySize: Int, bitsPerRLENumber: Int
     ) {
         log.info("Encoding file $inputFile with regular rle. Output file will be at $outputFile")
-        val input = File(inputFile)
+        val tempFile = outputFile + "_tmp"
+        if (applyBurrowsWheelerTransformation) {
+            val bwts = BWTSWrapper()
+            bwts.transformFile(File(inputFile), File(tempFile))
+        }
+
+
+        val input = if (applyBurrowsWheelerTransformation) File(tempFile) else File(inputFile)
         val output = File(outputFile)
         output.createNewFile()
         var lastSeenByte = 0.toByte()
@@ -108,6 +116,9 @@ class StringRunLengthEncoder : Encoder {
             }
             writer.write(writeAsTwoByte(lastSeenByte, counter))
         }
+
+        if (applyBurrowsWheelerTransformation) File(tempFile).delete()
+
         log.debug("Finished encoding.")
     }
 
@@ -126,7 +137,7 @@ class StringRunLengthEncoder : Encoder {
                     if (lastSeenBit == currentBit) {
                         if (++counter == maxLength) {
                             writeRunToStream(counter, stream, bitPerRun)
-                            writeRunToStream(0,stream,bitPerRun)
+                            writeRunToStream(0, stream, bitPerRun)
                             counter = 0
                         }
                     } else {
@@ -309,7 +320,7 @@ class StringRunLengthEncoder : Encoder {
 
         chunks.forEach { it.appendCurrentChunkToFile(outputFile) }
         var transformedFile: String? = null
-        if(applyBurrowsWheelerTransformationS) {
+        if (applyBurrowsWheelerTransformationS) {
             log.debug("Applying inverse Burrows Wheeler Transformation to file...")
             transformedFile = "${output}_bwt"
             val bwt = BWTS()
@@ -317,7 +328,7 @@ class StringRunLengthEncoder : Encoder {
             val buf2 = ByteArray(buf1.size)
             val sa1 = SliceByteArray(buf1, 0)
             val sa2 = SliceByteArray(buf2, 0)
-            bwt.inverse(sa1,sa2)
+            bwt.inverse(sa1, sa2)
             File(transformedFile).writeBytes(sa2.array)
         }
         log.debug("Finished decoding $input to ${if (transformedFile.isNullOrEmpty()) output else transformedFile}.")
