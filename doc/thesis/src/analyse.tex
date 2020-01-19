@@ -50,14 +50,12 @@ trans & 93695 & ASCII and control characters\\
 }
 
 \par{
-	With rather low expected average run length in general data it was still unclear which amount of bits per run are most suited for the mix of data residing in the corpus, so between 2 and 8 bits per run were tried and the results are shown in table \ref{tab:t4 simple run length eval}. They depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1. For this reason, many implementations combine RLE with other encoding schemes like Huffman encoding to be able to encode runs with variable length, which will be discussed later on.
+	With rather low expected average run length in general data it was still unclear which amount of bits per run are most suited for the mix of data residing in the corpus, so between 2 and 8 bits per run were tried and the results are shown in table \ref{tab:t30 Binary RLE on the Calgary Corpus}. They depict the anticipated, an increase in size regardless of the amount of bits used to encode a run. By using 8 bits to encode a single run, in the worst case scenario a byte which is only alternating values like 01010101, would expand to 8 bytes, all encoding a run of length 1. For this reason, many implementations combine RLE with other encoding schemes like Huffman encoding to be able to encode runs with variable length, which will be discussed later on.
 }
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{l|r|r}
-		\label{tab:t4 simple run length eval}
-		
 		bits per rle number &  expansion ratio \% & \textit{bps}\\
 		\hline
 		8 & 329 & 26.38\\
@@ -69,6 +67,7 @@ trans & 93695 & ASCII and control characters\\
 		2 & 104 & 8.36\\
 	\end{tabular}
 	\caption{Binary RLE on the Calgary Corpus}
+	\label{tab:t30 Binary RLE on the Calgary Corpus}
 \end{table}
 
 \par{
@@ -78,8 +77,6 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 \begin{table}[h]
 	\centering
 	\begin{tabular}{l|r|r}
-		\label{tab:t5 run length eval}
-		
 		bits per rle number &  ratio in \% & \textit{bps}\\
 		\hline
 		8 & 165 & 13.20 \\
@@ -91,6 +88,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 		2 & 109 & 8.74 \\
 	\end{tabular}
 	\caption{Byte-wise RLE on the Calgary Corpus}
+	\label{tab:t31 Byte-wise RLE on the Calgary Corpus}
 \end{table}
 
 
