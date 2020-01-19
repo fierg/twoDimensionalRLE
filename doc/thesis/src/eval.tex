@@ -19,6 +19,28 @@ Moving on to the evaluation, we start by comparing the achieved results using di
 - Benchmark with the Calgary corpus\\
 \url{http://www.data-compression.info/Corpora/} \\
 \ldots
+
+	\begin{table}[h]
+	\begin{tabular}{r|r|r|r|r}
+		method  &  size in bytes & compression & \textit{bps}& time\\
+		\hline
+		uncompressed & 3,145,718 & 100.0\% & 8.00 &\\
+		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s\\
+		modified vertical RLE & 1237380 & 39.3\%& 3.14 & 16.45s\\
+		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s\\
+		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s\\
+		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s\\
+		bzip2 v1.0.8 & 832,443 & 26.4\% & 2.11 & 0.191s\\
+		brotli & 826,638 & 26.3\%& 2.10 & 4.609s\\
+		p7zip 16.02 (deflate) &  821,873 & 26.1\% & 2.08 & 0.431s \\
+		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s\\
+		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s \\
+		paq8hp* & - & - & - & - \\ 
+		cmix v18 & 554,983 & 17.6\% & 1.41 & <3h		
+	\end{tabular}
+	\label{tab:t100benchmark}
+	\caption{Benchmark on the Calgary Corpus}
+\end{table}
 %% ==============================
 \section{Conclusion}
 %% ==============================

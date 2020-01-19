@@ -15,7 +15,7 @@ import java.io.File
 @ExperimentalUnsignedTypes
 class ModifiedMixedEncoder : Encoder {
 
-    private val DEBUG = true
+    private val DEBUG = false
     private val log = Log.kotlinInstance()
 
     private val defaultZerosAfterHeadder = 2
