@@ -9,26 +9,21 @@
 Without further ado, design and implementation of the initial ideas began. As Section \ref{ch:Analysis} showed, there are some potentially promising improvements to be made to run length encoding, but how well they scale and work on a larger input with versatile symbols or bytes has to be determined.
 }
 %% ==============================
-\section{Preprocessing}
-%% ==============================
-\label{ch:Conceptual Design:sec:Preprocessing}
-
-%% ==============================
-\subsection{Vertical Byte Reading}
+\section{Vertical Byte Reading}
 %% ==============================
 \label{ch:Conceptual Design:sec:Parallel Byte Reading}
 \par{
 Implementing the vertical reading of the input shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} was not hard but it should be kept in mind that the size of the input chunks has to be divisible by the size of 8. Otherwise parsing it into an Array of Bytes results in the last Byte having some padding which might cause problems later on.  By collecting the bits into a proprietary data structure, we avoid this problem but working with bytes internally should be easier. For larger files it should also be possible to work in space and writing the output on the fly during the reading process. Nonetheless both ways of collecting all bits of identical significance and writing on the fly are implemented.}
 
-\subsubsection{First Ideas}
+\subsection{First Ideas}
 \par{
 Initially some other ideas have been followed with very poor results. One idea was arranging all input bits in a Matrix or square Matrix in a way it would still be receivable later on. This way other methods from linear algebra would have been applicable to the input data, so that the construction of a triangular matrix or other preprocessing would result in long runs of zeros. Difficulties in the construction and transformation of the Data lead to the abandonment of this approach and the already described vertical interpretation was used further on.}
 
-\subsubsection{Other Difficulties}
+\subsection{Other Difficulties}
 \par{
 Other difficulties arose while performing bit operations, because it became slow on larger workloads. This and other issues where solved by using the Kotlin library  \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}} which also allows most operations to be performed on the stream instead of reading all data to encode and then working in memory.
 
-\subsubsection{Compression improvements trough vertical reading}
+\subsection{Compression improvements trough vertical reading}
 \par{
 First results of just plain binary RLE on the vertical interpretation improved its overall performance and achieved a small edge over regular binary RLE with a slightly smaller expansion but it is still not as good as byte wise RLE with a small run value of 2 bits.
 \begin{table}[H]
@@ -53,7 +48,7 @@ First results of just plain binary RLE on the vertical interpretation improved i
 If we take a closer look on each file, we see similar results compared to the original proposed binary RLE, where most files had a compression ratio of above 1 with 3 bits per RLE encoded number, except for the file \textit{pic}. Average sizes are increasing again with more bits per run up to 2.5 times its original size and also the file \textit{pic} has the best compression ratio. This time although it is at its peak using 6 bits per RLE run and only achieves a compression of 3.67 \textit{bps} compared to 1.56 \textit{bps} with simple binary RLE. These results were quite far from the desired outcome which mainly arose because increasing the bits per run improved the result for the most significant bits but also degraded the results for the other bits. So the idea of encoding the bits of different significance with different RLE schemes with varying bits per run arose, to solve this issue.  
 }
 
-\subsection{Varying maximum run lengths}
+\section{Varying maximum run lengths}
 \label{ch:Conceptual Design:sec:var lengths}
 \par{
 This time the most significant bits have been encoded with more bits per run than the other ones and after bench marking every combination, it turned out, with 2 bits per run and 5 bits per run for the 3 most significant bits, it improved by another 4 percent with most files having a \textit{bps} ratio of only slightly above 9. More specifically some textual files are close to 8, which relates to the earlier mentioned ASCII fragments in UTF-8 encoding. This time higher possible runs on this position resulted in fewer runs in total, so in a better compression overall. Applying this increase to more than the most significant bit lead to a decrease in performance, which most likely related to the shorter runs on lower order bits, seen in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}. Therefore this idea was applied again but with a much finer granularity and every combination of different run lengths of every bit could be tried out. For reference, this mapping can be described by a vector $v_i$ with 8 components $v_1,v_2,...,v_8$ each with values greater 1. Each component corresponds to the bits per run stored for the bit number $i$ of each byte.
@@ -87,7 +82,7 @@ trans & 93695 & 99818 & 106.54 & 8.52 \\
 	\label{tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}
 \end{table}
 
-\subsection{Byte remapping}
+\section{Byte remapping}
 \par{
 As shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} this effect could become useful if it resulted in higher average runs. To apply the mapping, the individual file has to be analyzed at first to find the occurrence of each byte in the input data. We expect a map with the most occurring byte is assigned the lowest value or 0 as byte, the second most frequently read byte the second most which should be 1 and so on. Then while reading the file during late steps, every byte read will be replaced by its mapped value. If a small mapping is generated, lets say with 62 entries for example we know all bytes to encode will have zeros only on the first and second most significant bit value because the highest value after the mapping took place is 61. This should also be taken into account later on during encoding and finding the optimal maximum run lengths.
 To reverse the mapping after decoding the runs, the mapping has do be persisted into the encoded file and parsed back during the decoding process. This is simply done by adding the length of the mapping and then just all mapping keys to the header of the output file. 
@@ -160,7 +155,7 @@ trans & 93695 & 94729 & 101.10 & 8.09 \\
 \end{table}
 }
 
-\subsection{Burrows-Wheeler-Transformation Appliance}
+\section{Burrows-Wheeler-Transformation Appliance}
 \par{
 Another possible preprocessing step which promised an improvement is the mentioned Burrows-Wheeler-Transformation from Section \ref{ch:Principles of compression:sec:Other:subSec:bwt}, initially applied to regular binary and byte wise RLE. By mistake a very simple transformation implementation was chosen, working by adding additional start and stop symbols to the input string (0x02 as STX, start of text and 0x03 as ETX, end of text). Some basic testing and playing around worked great but later on it revealed some major issues. For example the Calgary Corpus consists of more than textual data, in fact the files geo, obj1, obj2 and pic contain of some binary data of include the symbols STX or ETX so we wont be able to apply the transformation to these. Another shortcoming was the very poor time complexity of almost $O (n^2)$ because under the hood, it uses a dual pivot Quick-sort algorithm from the JDK 11, which is typically faster than traditional one pivot Quick-sort. This algorithm offers $\Theta (n \: log(n))$ average time complexity but in the worst case, its time complexity is still cubic. This problem was partially solved by reading the input data in parts and performing the transformation on each part, result in a much smaller length $n$ and thus better run time at the expense of a slightly worse transformation result. As all chunks are individual transformations, they can also be computed in parallel without much effort.
 
@@ -321,7 +316,7 @@ There should still room for some optimizations because as seen in section \ref{c
 One last option was the encoding of the lowest significant bits with another, more suited scheme like Huffman encoding was tried out but with rather poor results. It was found that encoding the last or the last few rows seen in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} with did not improve overall results and it was therefore discarded. This might be related to the high improvement in RLE after a Burrows-Wheeler-Transformation and other factors like additional overhead because the mapping of the Huffman encoding has to be persisted with the encoded data. But the idea of combing the RLE methods with Huffman encoding still stuck around and was picked up again later on in a modified way in Section \ref{ch:Conceptual Design:sec:Postprocessing}. No further attempts to add or improve preprocessing steps of this kind were made, instead the results were analyzed and compared with other results in section \ref{ch:Evaluation}.
 }
 %% ==============================
-\subsection{Huffman encoding of the RLE runs}
+\section{Huffman encoding of the RLE runs}
 %% ==============================
 \label{ch:Conceptual Design:sec:Postprocessing}
 \par{
@@ -351,74 +346,12 @@ trans & 93695 & 31235 & 33.34 & 2.67 \\
 		\caption{Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 		\label{tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 	\end{table}
-%% ==============================
-\section{Implementation}
-%% ==============================
-\label{ch:Conceptual Design:sec:Implementation Decisions}
-
-All algorithms described have been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between a native implementation and higher language conciseness and fault-tolerance. Also there were some libraries available for Byte- and Bit-Operations on streams which proved to be quite useful, although there was almost no documentation available. The main focus is o the encoder and decoder classes but the other modules will be discussed as well. This one and all other libraries are described in section \ref{ch:Conceptual Design:sec:Impl:subsec:libs}.
-
-\subsection{Binary and byte wise RLE}
-\par{
-The simple binary and byte wise RLE are rather trivial and implemented in one encoder, the \textit{StringRunLengthEncoder}. The binary version is implemented with the mentioned BitStream from the IOStreams library. It allows working on a stream and reading and writing bit by bit and also reading the next n bit as signed or unsigned number which comes in handy during decoding. In general, it is called with a variable $b$ bitsPerRun which sets the used bits to store one run. At first a maximum run length is determined by the maximum value $b$ can store as a binary string, $l(b) = n$ implies a maximum value of $2^{n-1}$. Then the input is read consecutively in bits and the runs of equal bits are counted. We are always assuming the run starts with zero, if this is not the case a leading run of 0 is added, which means there are zero times 0 at the beginning. If a run exceeds the maximum run length, the maximum is written and again an artificial zero is added to the output stream to signal a length higher than the maximum. Each run can simply be written to the output stream with the desired amount of bits per run. During decoding, we assume the same $b$ and can then always read $n$ bits of the stream as unsigned value, know each run again and can therefore reconstruct the original data.
-}
-\par{
-Byte wise RLE is working a bit differently but with the same idea of counting $n$ runs of equal information. This time it is applied on a byte level, reading byte after byte. If the next byte is the same as the current one, the counter is incremented, if not the run and the byte value are encoded as pair $(n, byte)$ to the output. The byte value itself still needs 8 bit of information but the run does not. Most raw untreated data does not contain long runs of consecutive identical byte values average run length is rather small. This implied storing a count of 1 or 2 in 8 bits of space which in turn explained the expansion in size seen in table \ref{tab:t31 Byte-wise RLE on the Calgary Corpus}. Therefore this version was also implemented with an arbitrary amount of bits to save per run, to minimize the overhead. If a run exceeds the maximum, which is again determined by the amount of bits stored per run, it is encoded twice, once with the maximum count and once with the remaining count. We do not need a zero run in this version because we also store the value itself, therefore we can count without a zero. This means for an example run of 4 times the value \textit{0xFF} and 4 bits per run saved, it will be encoded as the pair $(0011,0xFF)$.
-}
-\subsection{Vertical binary RLE}
-\par{
-The basic ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. This stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream.
-}
-\par{
-TODO: Decoding
-}
-\subsection{Byte Remapping}
-\par{
-TODO
-}
-\subsection{Burrows Wheeler Transformation}
-\par{
-As mentioned earlier, the Burrows-Wheeler-Transformation is implemented in 3 different versions, starting of with the naive an unsophisticated one. It is implemented with the use of start and stop symbols (0x02 as STX and 0x03 as ETX) and with the creating and sorting of all cyclic rotations of the input string. This can be done for all text input files but not for binary data because files containing the start or stop symbols confused the algorithm and made the inverse transformation impossible. Additionally it is extremely slow due to its at least quadratic complexity, so another idea arose.
-}
-\par{
-TODO: second BWT impl
-}
-
-\par{
-TODO: sophisticated BWTS impl
-}
-\subsection{Huffman encoding}
-
-\subsection{External libraries}
-\label{ch:Conceptual Design:sec:Impl:subsec:libs}
-\subsubsection{IOStreams}
-- \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}}
-\subsubsection{libDivSufSort}
-- \href{https://code.google.com/archive/p/libdivsufsort/}{libDivSufSort}\\
-\subsubsection{libDivSufSort in Java}
-- \href{https://github.com/flanglet/kanzi/releases}{libDivSufSort java impl}\\
-\subsubsection{Others}
-- static log\\
-- kotlin coroutines\\
-- jupiter \& junit5\\
-- assertj\\
-- google guava\\
-
-%% ==============================
-\section{Implementation Evaluation}
-%% ==============================
-\label{ch:Conceptual Design:sec:Implementation Evaluation}
-- evaluation of implementation choices made
 
 
-%% ==============================
 \section{Summary}
-%% ==============================
-\label{ch:Conceptual Design:sec:Summary}
-
-Am Ende sollten ggf. die wichtigsten Ergebnisse nochmal in \emph{einem}
-kurzen Absatz zusammengefasst werden.
-
+\par{
+	TODO
+}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "thesis"
