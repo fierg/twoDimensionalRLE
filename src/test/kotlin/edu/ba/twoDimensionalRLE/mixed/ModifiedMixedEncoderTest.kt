@@ -51,6 +51,7 @@ class ModifiedMixedEncoderTest {
         val context = newFixedThreadPoolContext(10, "co")
 
         for (i in 8..8) {
+            val startTime = System.currentTimeMillis()
             deferred.add(CoroutineScope(context).async {
                 val bitsPerNumberMapping =
                     mapOf(0 to i, 1 to i, 2 to i, 3 to i, 4 to i, 5 to i, 6 to i, 7 to i)
@@ -81,7 +82,7 @@ class ModifiedMixedEncoderTest {
                         log.error(e.toString(), e)
                     }
                 }
-                log.info("Finished encoding of corpus.")
+                log.info("Finished encoding of corpus in ${(System.currentTimeMillis() - startTime).toDouble() / 1000.toDouble()}s.")
 
                 val result = Analyzer().sizeCompare(
                     folderToEncode,
@@ -122,8 +123,12 @@ class ModifiedMixedEncoderTest {
         log.info("creating directory: ${decodeFolder}/CalgaryCorpus/88888888")
         File("${decodeFolder}/CalgaryCorpus/88888888").mkdirs()
 
+
+        val startTime = System.currentTimeMillis()
+
         File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().filter { it.extension == "mixed" }.forEach {
             try {
+
                 mixedEncoder.decodeInternal(
                     "${encodeFolder}/CalgaryCorpus/88888888/${it.name}",
                     "${decodeFolder}/CalgaryCorpus/88888888/${it.nameWithoutExtension}",
@@ -141,10 +146,14 @@ class ModifiedMixedEncoderTest {
                         7 to bitsPerRLERun
                     )
                 )
+
+
             } catch (e: Exception) {
                 log.error(e.toString(), e)
             }
         }
+
+        log.info("Finished decoding of corpus in ${(System.currentTimeMillis() - startTime).toDouble() / 1000.toDouble()}s.")
 
         Analyzer().sizeCompare(folderToEncode, "${decodeFolder}/CalgaryCorpus", "")
     }

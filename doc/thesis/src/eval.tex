@@ -10,7 +10,28 @@ Moving on to the evaluation, we start by comparing the achieved results using di
 \section{Functional Evaluation}
 %% ==============================
 \label{ch:Evaluation:sec:Functional Evaluation}
-
+	\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r|r|r}	
+		file & size original & size encoded & ratio in \% & \textit{bps}\\
+		\hline
+alice29.txt & 152089 & 65445 & 43.03 & 3.44 \\
+asyoulik.txt & 125179 & 59291 & 47.36 & 3.79 \\
+cp.html & 24603 & 11073 & 45.01 & 3.60 \\
+fields.c & 11150 & 5183 & 46.48 & 3.72 \\
+grammar.lsp & 3721 & 1923 & 51.68 & 4.13 \\
+kennedy.xls & 1029744 & 229823 & 22.32 & 1.79 \\
+lcet10.txt & 426754 & 170593 & 39.97 & 3.20 \\
+plrabn12.txt & 481861 & 215628 & 44.75 & 3.58 \\
+ptt5 & 513216 & 82136 & 16.01 & 1.28 \\
+sum & 38240 & 19616 & 51.30 & 4.10 \\
+xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
+		\hline
+		all files & 2814880 & 867322 & 30.81 & 2.46
+	\end{tabular}
+	\caption{Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+	\label{tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+\end{table}
 \ldots
 %% ==============================
 \section{Benchmarks}
@@ -20,17 +41,27 @@ Moving on to the evaluation, we start by comparing the achieved results using di
 \url{http://www.data-compression.info/Corpora/} \\
 \ldots
 
-\subsection{Burrows-Wheeler-Transformation}
-
-}
-
-
-\subsection{Vertical encoding}
-\par{
-
-
-}
-
+	\begin{table}[h]
+	\begin{tabular}{r|r|r|r|r}
+		method  &  size in bytes & compression & \textit{bps}& time\\
+		\hline
+		uncompressed & 3,145,718 & 100.0\% & 8.00 &\\
+		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s\\
+		modified vertical RLE & 1,237,380 & 39.3\%& 3.14 & 16.45s\\
+		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s\\
+		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s\\
+		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s\\
+		bzip2 v1.0.8 & 832,443 & 26.4\% & 2.11 & 0.191s\\
+		brotli & 826,638 & 26.3\%& 2.10 & 4.609s\\
+		p7zip 16.02 (deflate) &  821,873 & 26.1\% & 2.08 & 0.431s \\
+		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s\\
+		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s \\
+		paq8hp* & - & - & - & - \\ 
+		cmix v18 & 554,983 & 17.6\% & 1.41 & <3h		
+	\end{tabular}
+	\label{tab:t100benchmark}
+	\caption{Benchmark on the Calgary Corpus}
+\end{table}
 %% ==============================
 \section{Conclusion}
 %% ==============================
