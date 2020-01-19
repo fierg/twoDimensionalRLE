@@ -158,7 +158,7 @@ class Analyzer {
         originalFiles.filter { it.key.isFile }.forEach { original ->
             if (filterFile.isNullOrEmpty()) {
                 val encodedFile =
-                    encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension }
+                    encodedFiles.filterKeys { it.nameWithoutExtension == original.key.nameWithoutExtension || it.nameWithoutExtension.startsWith(original.key.nameWithoutExtension) }
                 val bitsPerSymbolFile = (encodedFile.values.first() * 8).toDouble() / original.value.toDouble()
 
                 if (texTable)

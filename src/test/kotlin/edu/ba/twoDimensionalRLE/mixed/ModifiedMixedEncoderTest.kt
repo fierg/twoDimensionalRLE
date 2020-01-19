@@ -28,7 +28,7 @@ class ModifiedMixedEncoderTest {
     }
 
     companion object {
-        private const val folderToEncode = "data/corpus/CalgaryCorpus"
+        private const val folderToEncode = "data/corpus/cantrbry"
         private const val encodeFolder = "data/encoded/mod_mixed"
         private const val decodeFolder = "data/decoded/mod_mixed"
     }
@@ -87,7 +87,7 @@ class ModifiedMixedEncoderTest {
                 val result = Analyzer().sizeCompare(
                     folderToEncode,
                     "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i",
-                    "mixed",
+                    null,
                     null,
                     bitsPerNumberMapping,
                     true
