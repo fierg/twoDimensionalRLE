@@ -42,12 +42,15 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 %% ==============================
 \label{ch:Evaluation:sec:Benchmarks}
 - Benchmark with the Calgary corpus\\
-\url{http://www.data-compression.info/Corpora/} \\
+- \url{http://www.data-compression.info/Corpora/} \\
 \ldots
-
+\par{
+TODO: time over both encoding and decoding
+}
 	\begin{table}[h]
-	\begin{tabular}{r|r|r|r|r}
-		method  &  size in bytes & compression & \textit{bps}& time\\
+	\begin{tabular}{r|r|r|r|r|r}
+		 & & & & time\\
+		method  &  size in bytes & compression & \textit{bps}& encoding & decoding\\
 		\hline
 		uncompressed & 3,145,718 & 100.0\% & 8.00 &\\
 		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s\\
