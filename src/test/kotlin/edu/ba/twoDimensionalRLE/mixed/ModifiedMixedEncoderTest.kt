@@ -43,10 +43,6 @@ class ModifiedMixedEncoderTest {
 
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
-
-        if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
-        if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
-        if (applyHuffmanEncoding) log.info("Encoding with huffman encoding instead of fixed size.")
         val deferred = mutableListOf<Deferred<Any>>()
         val context = newFixedThreadPoolContext(10, "co")
 

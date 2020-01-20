@@ -159,6 +159,7 @@ class HuffmanCorpusTest {
         )
     }
 
+    /*
     @Test
     @Order(13)
     fun decodeHuffman_obj1() {
@@ -168,6 +169,7 @@ class HuffmanCorpusTest {
             applyBurrowsWheelerTransformation = true, byteArraySize = byteArraySize, bitsPerRLENumber = bitsPerRLENumber
         )
     }
+    */
 
     @Test
     @Order(14)

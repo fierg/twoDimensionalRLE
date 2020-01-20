@@ -53,6 +53,10 @@ class ModifiedMixedEncoder : Encoder {
 
         log.info("Encoding ${inputFile} with $bitsPerRunMap")
 
+        if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
+        if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
+        if (applyHuffmanEncoding) log.info("Encoding with huffman encoding instead of fixed size.")
+
         val analyzer = Analyzer()
         val bwts = BWTSWrapper()
         var mappedFile: String? = null
