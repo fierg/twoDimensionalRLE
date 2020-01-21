@@ -155,27 +155,17 @@ class StringRunLengthEncoder : Encoder {
 
     fun decodeSimpleBinaryRLE(inputFile: String, outputFile: String, bitPerRun: Int) {
         log.info("Decoding $inputFile with simple binary rle and $bitPerRun bits per run...")
+        var currentBit = false
 
-        val runList = mutableListOf<Int>()
         BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
-            while (streamIn.position < streamIn.size) {
-                val currentRun = streamIn.readBits(bitPerRun, false).toInt()
-                for (i in 0..currentRun) runList.add(currentRun)
+            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+                while (streamIn.position < streamIn.size) {
+                    val currentRun = streamIn.readBits(bitPerRun, false).toInt()
+                    for (i in 0..currentRun) streamOut += currentBit
+                    currentBit = !currentBit
+                }
             }
-        }
 
-        assert(runList.size % 8 == 0)
-        val part = runList.size / 8
-        var currentStart = 0
-        var curentEnd = part
-        val runMap = mutableMapOf<Int, List<Int>>()
-        for (i in 0..7) {
-            runMap[i] = runList.subList(currentStart, curentEnd)
-            currentStart += part
-            curentEnd += part
-        }
-        BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
-            decodeBitPositionOfRunMap(streamOut, runMap)
         }
     }
 

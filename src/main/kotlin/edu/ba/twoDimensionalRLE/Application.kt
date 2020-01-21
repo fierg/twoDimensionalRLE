@@ -24,7 +24,9 @@ open class Application {
                 else Pair(map + (lastKey to map.getOrDefault(lastKey, emptyList()) + elem), lastKey)
             }.first
 
-            if (map.containsKey("-h") || map.containsKey("help") || map.containsKey("--h") || map.containsKey("-help") || map.containsKey("--help") || map.isNullOrEmpty()
+            if (map.containsKey("-h") || map.containsKey("help") || map.containsKey("--h") || map.containsKey("-help") || map.containsKey(
+                    "--help"
+                ) || map.isNullOrEmpty()
             ) {
                 printUsage()
                 exitProcess(0)
@@ -89,7 +91,38 @@ open class Application {
                                 applyByteMapping,
                                 applyBurrowsWheelerTransformation,
                                 applyHuffmanEncoding,
-                                mapOf(0 to 8, 1 to 8, 2 to 8, 3 to 8, 4 to 8, 5 to 8, 6 to 8, 7 to 8)
+                                if (applyHuffmanEncoding) mapOf(
+                                    0 to 8,
+                                    1 to 8,
+                                    2 to 8,
+                                    3 to 8,
+                                    4 to 8,
+                                    5 to 8,
+                                    6 to 8,
+                                    7 to 8
+                                ) else {
+                                    if (applyByteMapping && !applyBurrowsWheelerTransformation) mapOf(
+                                        0 to 2,
+                                        1 to 2,
+                                        2 to 3,
+                                        3 to 3,
+                                        4 to 3,
+                                        5 to 4,
+                                        6 to 5,
+                                        7 to 8
+                                    )
+                                    else if (!applyByteMapping && applyBurrowsWheelerTransformation) mapOf(
+                                        0 to 4,
+                                        1 to 4,
+                                        2 to 4,
+                                        3 to 4,
+                                        4 to 4,
+                                        5 to 6,
+                                        6 to 6,
+                                        7 to 8
+                                    )
+                                    else mapOf(0 to 4, 1 to 4, 2 to 4, 3 to 4, 4 to 5, 5 to 7, 6 to 8, 7 to 8)
+                                }
                             )
                         }
                     }
@@ -111,7 +144,14 @@ open class Application {
                         }
                     }
                     binaryRle -> {
-                        TODO("Not implemented jet")
+                        val encoder = StringRunLengthEncoder()
+                        files.forEach {
+                            encoder.encodeSimpleBinaryRLE(
+                                it,
+                                File(it).nameWithoutExtension,
+                                map["-bin"]?.firstOrNull()?.toIntOrNull() ?: 3
+                            )
+                        }
                     }
                     else -> {
                         val encoder = ModifiedMixedEncoder()
