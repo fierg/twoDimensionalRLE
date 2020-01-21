@@ -2,7 +2,7 @@
 %% $Id: entwurf.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Conceptual Design}
+\chapter{Analysis}
 \label{ch:Conceptual Design}
 %% ==============================
 \par{
@@ -343,16 +343,16 @@ trans & 93695 & 31235 & 33.34 & 2.67 \\
 			\hline
 			all files & 3145718 & 1237380 & 39.33 & 3.14
 		\end{tabular}
-		\caption{Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+		\caption{Calgary Corpus encoded with vertical reading, byte mapping and a BWTS, using Huffman encoding for all counted runs, 8 bit per run}
 		\label{tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 	\end{table}
-\par{
-TODO: find some summarizing words
 }
-
+\par{
+This combination of vertical encoding with byte remapping and the sophisticated BWTS as preprocessing steps so far best results have been found. Although, at first glance it was suggested to eliminate the maximum run restriction to possibly compress all bits of one significance into a single Huffman code, it turned out to be most efficient if the run length process is limited to 8 bits per run. This way still a total of 255 bits of same significance can be encoded into one but there will be only a maximum of 256 different Huffman codes generated. Average Huffman code length will be significantly shorter. Also it makes no sense to use different maximum run lengths for bits of different significance, because there will still be one Huffman code for each different run value.
+}
 \section{Summary}
 \par{
-	TODO
+To finalize, using a composition of preprocessing steps, another data interpretation in form of the vertical reading and optimal prefix codes as encoding due to the Huffman encoder, acceptable results have been achieved. Not only was there a reasonable compression for every file, even the file \textit{pic} was compressed even better than before even though it is highly suited for the original proposed RLE. 
 }
 %%% Local Variables: 
 %%% mode: latex

@@ -253,24 +253,6 @@ class ModifiedMixedEncoder : Encoder {
         }
     }
 
-    private fun decodeBitPositionOfRunMap(
-        streamOut: BitStream,
-        countMap: Map<Int, List<Int>>
-    ) {
-        countMap.toSortedMap().forEach { (bitPosition, rleNumberList) ->
-            streamOut.position = 0
-            var currentBit = false
-
-            rleNumberList.forEach {
-                for (i in 0 until it) {
-                    streamOut.offset = bitPosition
-                    if (currentBit) streamOut += currentBit
-                    if (!currentBit || bitPosition != 7) streamOut.position++
-                }
-                currentBit = !currentBit
-            }
-        }
-    }
 
     private fun parseCountMapFromTail(streamIn: BitStream): MutableMap<Int, Int> {
         log.debug("Trying to parse all number counts...")

@@ -15,7 +15,7 @@ All algorithms described have been implemented using Kotlin, because it can be c
 	The basic ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. This stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream.
 }
 \par{
-	TODO: Decoding
+		
 }
 \section{Byte Remapping}
 \par{

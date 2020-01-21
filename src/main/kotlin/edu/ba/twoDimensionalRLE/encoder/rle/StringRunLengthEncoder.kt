@@ -129,20 +129,19 @@ class StringRunLengthEncoder : Encoder {
 
         log.info("Encoding $inputFile with simple binary rle and $bitPerRun bits per run...")
 
-        BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
-            File(inputFile).readBytes().forEach { byte ->
-                byte.toUByte().toInt().toString(2).padStart(8, '0').forEach { char ->
-                    val currentBit = char == '1'
-
+        BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+            BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+                while (streamIn.position < streamIn.size) {
+                    val currentBit = streamIn.readBit()
                     if (lastSeenBit == currentBit) {
                         if (++counter == maxLength) {
-                            writeRunToStream(counter, stream, bitPerRun)
-                            writeRunToStream(0, stream, bitPerRun)
+                            writeRunToStream(counter, streamOut, bitPerRun)
+                            writeRunToStream(0, streamOut, bitPerRun)
                             counter = 0
                         }
                     } else {
                         if (counter > 0) {
-                            writeRunToStream(counter, stream, bitPerRun)
+                            writeRunToStream(counter, streamOut, bitPerRun)
                             counter = 1
                         } else {
                             counter++
@@ -151,6 +150,32 @@ class StringRunLengthEncoder : Encoder {
                     }
                 }
             }
+        }
+    }
+
+    fun decodeSimpleBinaryRLE(inputFile: String, outputFile: String, bitPerRun: Int) {
+        log.info("Decoding $inputFile with simple binary rle and $bitPerRun bits per run...")
+
+        val runList = mutableListOf<Int>()
+        BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+            while (streamIn.position < streamIn.size) {
+                val currentRun = streamIn.readBits(bitPerRun, false).toInt()
+                for (i in 0..currentRun) runList.add(currentRun)
+            }
+        }
+
+        assert(runList.size % 8 == 0)
+        val part = runList.size / 8
+        var currentStart = 0
+        var curentEnd = part
+        val runMap = mutableMapOf<Int, List<Int>>()
+        for (i in 0..7) {
+            runMap[i] = runList.subList(currentStart, curentEnd)
+            currentStart += part
+            curentEnd += part
+        }
+        BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+            decodeBitPositionOfRunMap(streamOut, runMap)
         }
     }
 
