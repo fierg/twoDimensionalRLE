@@ -1,9 +1,10 @@
 \chapter{Implementation}
 \label{ch:Implementation}
 %% ==============================
-All algorithms described have been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between a native implementation and higher language conciseness and fault-tolerance. Also there were some libraries available for Byte- and Bit-Operations on streams which proved to be quite useful, although there was almost no documentation available. This one and all other libraries are described in section \ref{ch:Conceptual Design:sec:Impl:subsec:libs}. The main focus is on the encoder and decoder classes but the other modules will be discussed as well.
+All algorithms described have been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between a native implementation and higher language conciseness and fault-tolerance. Also there were some libraries available for Byte- and Bit-Operations on streams which proved to be quite useful, although there was almost no documentation available. This one and all other libraries are described in section \ref{ch:Implementation:sec:Impl:subsec:libs}. The main focus is on the encoder and decoder classes but the other modules will be discussed as well.
 
 \section{Binary and byte wise RLE}
+\label{ch:Implementation:bin and byte rle}
 \par{
 	The simple binary and byte wise RLE are rather trivial and implemented together in one encoder, the \textit{StringRunLengthEncoder}. The binary version is implemented with the mentioned BitStream from the IOStreams library. It allows working on a stream and reading and writing bit by bit and also reading the next n bit as signed or unsigned number which comes in handy during decoding. In general, it is called with a variable $b$ bitsPerRun which sets the used bits to store one run. At first a maximum run length is determined by the maximum value $b$ can store as a binary string, $l(b) = n$ implies a maximum value of $2^{n-1}$. Then the input is read consecutively in bits and the runs of equal bits are counted. We are always assuming the run starts with zero, if this is not the case a leading run of 0 is added, which means there are zero times 0 at the beginning. If a run exceeds the maximum run length, the maximum is written and again an artificial zero is added to the output stream to signal a length higher than the maximum. Each run can simply be written to the output stream with the desired amount of bits per run. During decoding, we assume the same $b$ and can then always read $n$ bits of the stream as unsigned value, know each run again and can therefore reconstruct the original data.
 }
@@ -11,40 +12,57 @@ All algorithms described have been implemented using Kotlin, because it can be c
 	Byte wise RLE is working a bit differently but with the same idea of counting $n$ runs of equal information. This time it is applied on a byte level, reading byte after byte. If the next byte is the same as the current one, the counter is incremented, if not the run and the byte value are encoded as pair $(n, byte)$ to the output. The byte value itself still needs 8 bit of information but the run does not. Most raw untreated data does not contain long runs of consecutive identical byte values average run length is rather small. This implied storing a count of 1 or 2 in 8 bits of space which in turn explained the expansion in size seen in table \ref{tab:t31 Byte-wise RLE on the Calgary Corpus}. Therefore this version was also implemented with an arbitrary amount of bits to save per run, to minimize the overhead. If a run exceeds the maximum, which is again determined by the amount of bits stored per run, it is encoded twice, once with the maximum count and once with the remaining count. We do not need a zero run in this version because we also store the value itself, therefore we can count without a zero. This means for an example run of 4 times the value \textit{0xFF} and 4 bits per run saved, it will be encoded as the pair $(0011,0xFF)$ or $001111111111$ as consecutive binary stream.
 }
 \section{Vertical binary RLE}
+\label{ch:Implementation:vertical rle}
 \par{
-	The basic ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. This stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream.
+	Basically the ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. Its stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream. Afterwards, the amount of runs per bit position is written to the tail of the encoded file, without the information how many runs are expected it would be much more difficult to decide which run belongs where, but it is still possible. The overhead of this additional information is around 34 byte, two for each count and a two byte stop symbol which is only needed seven times, no additional stop at the end of the file. Even though it was originally designed to work on chunks of bytes, in the end the transformations worked on the file or on the stream itself, which was significantly faster.
 }
 \par{
-	TODO: Decoding
+	During decoding, the expected amount of runs are parsed from the end if the file. Then the actual decoding happens, with the fixed $n$ bits per code for this bits significance. Knowing the exact amount of RLE numbers for each bit position makes it easy to decode, because the variable length of encoded numbers can be chooses accordingly while reading the stream once. Assuming a starting run on zero, all runs are written back to one file, each bit position sequentially, to then assemble the original data.
 }
 \section{Byte Remapping}
+\label{ch:Implementation:bytemapping}
 \par{
-	TODO
+	To start of with the preprocessing, the byte remapping was implemented. The \emph{Analyzer} is responsible for generating a overall probability distribution over the values of bytes contained in the file. This serves as a input for the map generation, where every byte value is sorted accordingly to its occurrence and mapped to increasing byte values, so the most frequent byte to \textit{0x00}, the second most often to \textit{0x01} and so on. Afterwards, a temporary file is generated where each byte from the original file is mapped. Decoding requires access to the original mapping, therefore it is persisted at the start of the encoded file. To do so, we only need to know the number of mapped values and then the original byte, not the mapped value since we know they are sorted acceding.
 }
 \section{Burrows Wheeler Transformation}
+\label{ch:Implementation:bwt}
 \par{
-	As mentioned earlier, the Burrows-Wheeler-Transformation is implemented in 3 different versions, starting of with the naive an unsophisticated one. It is implemented with the use of start and stop symbols (0x02 as STX and 0x03 as ETX) and with the creating and sorting of all cyclic rotations of the input string. This can be done for all text input files but not for binary data because files containing the start or stop symbols confused the algorithm and made the inverse transformation impossible. Additionally it is extremely slow due to its at least quadratic complexity, so another idea arose.
+	As mentioned earlier, the Burrows-Wheeler-Transformation is implemented in 3 different versions, starting of with the naive an unsophisticated one. The \emph{transformation.BurrowsWheelerTransformation} is implemented with the use of start and stop symbols (0x02 as STX and 0x03 as ETX) and with the creating and sorting of all cyclic rotations of the input string. This can be done for all text input files but not for binary data because files containing the start or stop symbols confused the algorithm and made the inverse transformation impossible. Additionally it is extremely slow due to its at least quadratic complexity, even when working on small chunks which messes up the overall transformation result. It is not further described as it was only used for some initial testing to see if and how much RLE benefits from this transformation. 
 }
 \par{
-	TODO: second BWT impl
+	The second implementation is realized by following the original algorithm description provided in greater detail in the paper by M. Burrows and D. J. Wheeler \cite{Burrows94} (algorithm C and D). The \emph{transformation.BurrowsWheelerTransformationModified} works on parts of the data so the transformation result is still strongly depending of the size of the chunks, but it could at least handle arbitrary input. Higher chunk sizes greatly increased the transformation because more equal characters are in the same chunk but also really slowed down the process. Due to fact that both the mapping and the modified transformation work on an array of bytes and do not interfere with another, they can be performed in any order.
 }
 
 \par{
-	TODO: sophisticated BWTS impl
+	The further on used advanced implementation of the bijective Burrows-Wheeler-Scott-Transformation is ported from Java from an external source and therefore described in section \ref{ch:Implementation:sec:Impl:subsec:libs}.
 }
 \section{Huffman encoding}
+\label{ch:Implementation:Huffman}
 \par{
-TODO
+Following the pseudo-code provided by M. Liśkiewicz and H. Fernau in \cite{entropy-fernau} on page 21 the implementation was straight forward. Internally a small set of data structures are provided for assembling the Huffman tree, a \emph{HuffmanTree}, a \emph{HuffmanNode} and a \emph{HuffmanLeaf} class is implemented. The HuffmanTree is abstract and only holds the frequency of a tree, since every tree itself has its own frequency. It also implements a compareTo function, to draw comparisons between different trees. A HuffmanNode extends the HuffmanTree, consists of a left and right HuffmanTree and has their sum of frequencies as frequency. The Leaf is itself also a tree and holds a value of type byte and a frequency which resembles its occurrence. To build the Huffman tree for a given set of bytes, the algorithm expects an array of integer $I$, assembling the occurrences $o$ of bytes $b \in [ 0,255 ]$ in the form of $I [ b ] = o$. Then a leaf is created for every entry of $I$ with a frequency of $o$ and collected into a PriorityQueue of HuffmanTrees. Then while there are still at least two trees left in the queue, the two lowest frequencies are removed from the queue, merged into a single tree and reinserted into the queue. After the creation of the tree, all paths are followed and every time a leaf is reached, the current path is added to a map in form of a StringBuffer $b$. This buffer contains the path of left and right trees traversed into the original one, adding a zero for every left descent and a one for every right one. Finally the mapping of type byte to StringBuffer is returned. To apply this algorithm to the runs of the RLE encoding, the same is done except that instead byte values, every possible run length value is counted and collected into the same structure.
+}
+\par{
+To reverse this Huffman coding it is required to have access to the performed mapping, otherwise decoding would be impossible. Therefore the map itself is written to the beginning of the file, similar to the mapping from section \ref{ch:Implementation:bytemapping}. This time though we need triplets of values, because the Huffman code can have a variable length, so the mapping is encoded to $(b,l(b),b)$, with $b$ and $l(b)$ each assuming one byte. This also implies a maximum length for Huffman codes of 255. During decoding of the mapping, first the total number of mappings is parsed. Then while there are still more mappings expected, we parse one byte which is the mapping value, then one byte which contains the length of the following mapping as unsigned byte value and then the Huffman code of the given length is parsed bit by bit and saved as a StringBuffer. This way it is possible to write and read the variable length codes continuously from the stream. 
 }
 \section{External libraries}
-\label{ch:Conceptual Design:sec:Impl:subsec:libs}
-\subsection{IOStreams}
+\label{ch:Implementation:sec:Impl:subsec:libs}
+\par{
+To avoid reinventing the wheel, some external libraries are used in throughout this project. Most of them provide a set of sealed functionality, like \emph{io.github.jupf.staticlog} which just facilitate the logging features and are not further interesting, therefore most of them are described in section \ref{ch:Implementation:sec:Impl:subsec:libs:others}, only extensively used ones are descried in greater detail. 
+}
+
+\subsection{IOStreams for Kotlin}
+\label{ch:Implementation:sec:Impl:subsec:libs:iostreams}
 - \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}}
+
+
 \subsection{libDivSufSort}
+\label{ch:Implementation:sec:Impl:subsec:libs:libDivSufSot}
 - \href{https://code.google.com/archive/p/libdivsufsort/}{libDivSufSort}\\
 \subsection{libDivSufSort in Java}
+\label{ch:Implementation:sec:Impl:subsec:libs:libDivSufSort Java}
 - \href{https://github.com/flanglet/kanzi/releases}{libDivSufSort java impl}\\
 \subsection{Others}
+\label{ch:Implementation:sec:Impl:subsec:libs:others}
 - static log\\
 - kotlin coroutines\\
 - jupiter \& junit5\\
@@ -57,6 +75,14 @@ TODO
 %% ==============================
 \label{ch:Implementation:sec:Implementation Evaluation}
 - evaluation of implementation choices made
+\ldots
+
+
+%% ==============================
+\section{Usage}
+%% ==============================
+\label{ch:Implementation:sec:usage}
+TODO
 \ldots
 %%% Local Variables: 
 %%% mode: latex

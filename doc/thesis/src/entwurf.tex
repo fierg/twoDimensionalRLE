@@ -2,7 +2,7 @@
 %% $Id: entwurf.tex 61 2012-05-03 13:58:03Z bless $
 %%
 
-\chapter{Conceptual Design and Implementation}
+\chapter{Analysis}
 \label{ch:Conceptual Design}
 %% ==============================
 \par{
@@ -187,7 +187,7 @@ While it was only applicable to textual data and very slow, even when divided in
 }
 
 \par{
-In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination. To do so, it was first swapped against an sufficient implementation provided by a paper from m. Burrows and D. J. Wheeler \cite{Burrows94} from 1994. Their method is also the one described in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt} and could handle arbitrary input but it also had some downsides like the additional index $I$ of the transformation, which had to be persisted as well. The major downside of this implementation although was the rather slow. To overcome this issue and the saving of additional indices, the implementation used had to be swapped once more against one that was first described by \cite{Burrows-linear-time} in 2009 which claimed to perform in linear time complexity.
+In general a Burrows-Wheeler-Transformation should also increase the runs in the implementation of Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping} so those preprocessing steps were also applied in combination. To do so, it was first swapped against an sufficient implementation provided by a paper from M. Burrows and D. J. Wheeler \cite{Burrows94} from 1994. Their method is also the one described in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt} and could handle arbitrary input but it also had some downsides like the additional index $I$ of the transformation, which had to be persisted as well. The major downside of this implementation although was the rather slow so again the input had to be spliced into small parts. If chunks exceeded a length of more than one kilobyte it became unacceptably slow even though it strongly improved the transformation results so most of the time and in table \ref{tab:t12 Burrows Wheeler Transformation on byte wise RLE} and ref\ref{tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE} the transformation was performed on chunks of size 512 byte. To overcome this degradation of the original algorithm and the necessity of saving  additional indices, the implementation had to be swapped once more against one that was first described by \cite{Burrows-linear-time} in 2009 which claimed to perform in linear time complexity.
 }
 \par{
 In form of the C library \href{https://code.google.com/archive/p/libdivsufsort}{libdivsufsort} a working implementation of BWTS was found, the bijective Burrows-Wheeler-Scott-Transformation described in \cite{DBLP:journals/corr/abs-1201-3077}. This kind of Burrows-Wheeler-Transformation does not require additional information, no start and stop symbols neither and index of its original position. Briefly, it does not construct a matrix of all cyclic rotations, instead it is computed with a suffix array sorted with DivSufSort\cite{DBLP:journals/corr/abs-1710-01896} which is the fastest currently known method of constructing the transformation. To use it properly the code was ported to Kotlin but there are also ports of this library in Java and Go available which are recommended because the original code is neither documented nor readable and the functionality can easily be used via a dependency.
@@ -263,19 +263,19 @@ There should still room for some optimizations because as seen in section \ref{c
 	coordinates {
 		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)
 	};
+	\addplot[color=red,mark=square]
+	coordinates {
+		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)
+	};
 	\addplot[color=blue,mark=square]
 	coordinates {
 		(22233578,100)(22233579,102)(222335710,106)
 	};
 	\addplot[color=red,mark=square]
 	coordinates {
-		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)
-	};
-	\addplot[color=red,mark=square]
-	coordinates {
 	(22233578,95)(22233579,94.9)(222335710,95)
 	};
-	\legend{with byte mapping, without byte mapping}
+	\legend{without byte mapping, with byte mapping}
 	\end{axis}
 	\end{tikzpicture}
 	%}
@@ -285,7 +285,6 @@ There should still room for some optimizations because as seen in section \ref{c
 \end{figure}
 
 \par{
-	TODO: explain
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|r|r|r|r}	
@@ -320,7 +319,7 @@ One last option was the encoding of the lowest significant bits with another, mo
 %% ==============================
 \label{ch:Conceptual Design:sec:Postprocessing}
 \par{
-Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but i a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move-to-Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. This step is not really considered preprocessing anymore but could improve the compression furthermore, however the benefit of Huffman encoding is the possibility to output codes of varying length as described in section \ref{ch:Principles of compression:sec:Huffman Coding}. Combining the binary or vertical encoded RLE with a Huffman encoder would be a huge benefit, because as of now the algorithm needs to output a number of bits for each number to encode. Combined, the more frequent short runs of 1 or 2 can be encoded into shorter Huffman codes which should increase the overall compression algorithm. In general it was assumed that there was no longer a benefit in using different maximum run lengths on bits of different significance, because a run of length is going to be encoded with a Huffman code, not with just a fixed amount of bits. To reverse the Huffman encoding, the Huffman tree has to be persisted into the file as well.
+Another step worth mentioning was the encoding using Huffman codes after the Run length encoding was performed, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but in a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move-to-Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. This step is not really considered preprocessing anymore but could improve the compression furthermore, however the benefit of Huffman encoding is the possibility to output codes of varying length as described in section \ref{ch:Principles of compression:sec:Huffman Coding}. Combining the binary or vertical encoded RLE with a Huffman encoder would be a huge benefit, because as of now the algorithm needs to output a number of bits for each number to encode. Combined, the more frequent short runs of 1 or 2 can be encoded into shorter Huffman codes which should increase the overall compression algorithm. In general it was assumed that there was no longer a benefit in using different maximum run lengths on bits of different significance, because a run of length is going to be encoded with a Huffman code, not with just a fixed amount of bits. To reverse the Huffman encoding, the Huffman tree has to be persisted into the file as well.
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{r|r|r|r|r}	
@@ -343,16 +342,16 @@ trans & 93695 & 31235 & 33.34 & 2.67 \\
 			\hline
 			all files & 3145718 & 1237380 & 39.33 & 3.14
 		\end{tabular}
-		\caption{Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
+		\caption{Calgary Corpus encoded with vertical reading, byte mapping and a BWTS, using Huffman encoding for all counted runs, 8 bit per run}
 		\label{tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 	\end{table}
-\par{
-TODO: find some summarizing words
 }
-
+\par{
+This combination of vertical encoding with byte remapping and the sophisticated BWTS as preprocessing steps so far best results have been found. Although, at first glance it was suggested to eliminate the maximum run restriction to possibly compress all bits of one significance into a single Huffman code, it turned out to be most efficient if the run length process is limited to 8 bits per run. This way still a total of 255 bits of same significance can be encoded into one during the RLE step, but there will be only a maximum of 256 different Huffman codes generated. Average Huffman code length will be significantly shorter. Also it makes no sense to use different maximum run lengths for bits of different significance, because there will still be one Huffman code for each different run value.
+}
 \section{Summary}
 \par{
-	TODO
+To finalize, using a composition of preprocessing steps, another data interpretation in form of the vertical reading and optimal prefix codes as encoding due to the Huffman encoder, acceptable results have been achieved. Not only was there a reasonable compression for every file, even the file \textit{pic} was compressed even better than before even though it is highly suited for the original proposed RLE. 
 }
 %%% Local Variables: 
 %%% mode: latex

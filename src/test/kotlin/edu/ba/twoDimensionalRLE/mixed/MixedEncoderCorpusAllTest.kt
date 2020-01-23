@@ -6,7 +6,6 @@ import edu.ba.twoDimensionalRLE.encoder.mixed.MixedEncoder
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.nio.file.Files
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
@@ -34,7 +33,7 @@ class MixedEncoderCorpusAllTest {
     @Order(2)
     fun encodeAndDecodeCorpus2BitRle_bwt() {
 
-        for (bitsPerRLENumber in 2..8) {
+        for (bitsPerRLENumber in 3..3) {
 
             val applyByteMapping = false
             val applyBWT = false

@@ -29,7 +29,7 @@ class MixedEncoder : Encoder {
 
     private val analyzer = Analyzer()
     private val binaryRunLengthEncoder = BinaryRunLengthEncoder()
-    private val DEBUG = true
+    private val DEBUG = false
 
     private val log = Log.kotlinInstance()
 

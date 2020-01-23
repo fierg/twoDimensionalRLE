@@ -6,6 +6,7 @@ A two dimensional RLE (run length encoding) implementation for one dimensional i
 - Clone Project
 - build Project and all dependencies with maven `mvn clean install`
 - if dependencies still missing ([jcenter bug](https://jfrog.com/blog/secure-jcenter-with-https)), run the dep.sh skript and try again
+- alternatively you can just run the build.sh script
 - to build jar run `mvn package -DskipTests`
 - further usage visible when run with `java -jar target/twoDimensionalRLE-1.0-SNAPSHOT-jar-with-dependencies.jar --help`
 

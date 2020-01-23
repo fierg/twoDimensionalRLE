@@ -1,5 +1,5 @@
 package edu.ba.twoDimensionalRLE.encoder.huffman
 
-abstract class HuffmanTree(var freq: Int) : Comparable<HuffmanTree> {
-    override fun compareTo(other: HuffmanTree) = freq - other.freq
+abstract class HuffmanTree(var frequency: Int) : Comparable<HuffmanTree> {
+    override fun compareTo(other: HuffmanTree) = frequency - other.frequency
 }

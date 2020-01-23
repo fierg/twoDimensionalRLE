@@ -129,20 +129,19 @@ class StringRunLengthEncoder : Encoder {
 
         log.info("Encoding $inputFile with simple binary rle and $bitPerRun bits per run...")
 
-        BitStream(File(outputFile).openBinaryStream(false)).use { stream ->
-            File(inputFile).readBytes().forEach { byte ->
-                byte.toUByte().toInt().toString(2).padStart(8, '0').forEach { char ->
-                    val currentBit = char == '1'
-
+        BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+            BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+                while (streamIn.position < streamIn.size) {
+                    val currentBit = streamIn.readBit()
                     if (lastSeenBit == currentBit) {
                         if (++counter == maxLength) {
-                            writeRunToStream(counter, stream, bitPerRun)
-                            writeRunToStream(0, stream, bitPerRun)
+                            writeRunToStream(counter, streamOut, bitPerRun)
+                            writeRunToStream(0, streamOut, bitPerRun)
                             counter = 0
                         }
                     } else {
                         if (counter > 0) {
-                            writeRunToStream(counter, stream, bitPerRun)
+                            writeRunToStream(counter, streamOut, bitPerRun)
                             counter = 1
                         } else {
                             counter++
@@ -151,6 +150,22 @@ class StringRunLengthEncoder : Encoder {
                     }
                 }
             }
+        }
+    }
+
+    fun decodeSimpleBinaryRLE(inputFile: String, outputFile: String, bitPerRun: Int) {
+        log.info("Decoding $inputFile with simple binary rle and $bitPerRun bits per run...")
+        var currentBit = false
+
+        BitStream(File(inputFile).openBinaryStream(true)).use { streamIn ->
+            BitStream(File(outputFile).openBinaryStream(false)).use { streamOut ->
+                while (streamIn.position < streamIn.size) {
+                    val currentRun = streamIn.readBits(bitPerRun, false).toInt()
+                    for (i in 0..currentRun) streamOut += currentBit
+                    currentBit = !currentBit
+                }
+            }
+
         }
     }
 

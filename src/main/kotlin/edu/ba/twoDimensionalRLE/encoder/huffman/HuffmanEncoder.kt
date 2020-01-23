@@ -12,7 +12,6 @@ import loggersoft.kotlin.streams.openBinaryStream
 import java.io.File
 import java.util.*
 import kotlin.experimental.or
-import kotlin.math.max
 
 @ExperimentalUnsignedTypes
 class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
@@ -324,6 +323,7 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
 
         huffmanMapping.forEach { (byte, mapping) ->
             stream.write(byte)
+            assert(getLengthOfMapping(mapping) < 256, lazyMessage = { "Huffman mapping to long!" })
             stream.write(getLengthOfMapping(mapping))
             mapping.writeToBinaryStream(stream)
         }
@@ -467,7 +467,7 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
     private fun printCodes(tree: HuffmanTree, prefix: StringBuffer) {
         when (tree) {
             is HuffmanLeaf -> {
-                log.debug("${tree.value.toChar()} / ${tree.value} / ${tree.value.toUByte().toInt()}\t${tree.freq}\t$prefix")
+                log.debug("${tree.value.toChar()} / ${tree.value} / ${tree.value.toUByte().toInt()}\t${tree.frequency}\t$prefix")
                 mapping[tree.value] = StringBuffer(prefix.toString())
             }
             is HuffmanNode -> {
