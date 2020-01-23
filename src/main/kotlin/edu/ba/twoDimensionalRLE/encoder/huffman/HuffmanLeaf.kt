@@ -1,3 +1,3 @@
 package edu.ba.twoDimensionalRLE.encoder.huffman
 
-class HuffmanLeaf(freq: Int, var value: Byte) : HuffmanTree(freq)
+class HuffmanLeaf(frequency: Int, var value: Byte) : HuffmanTree(frequency)
