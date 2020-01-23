@@ -5,7 +5,11 @@
 \chapter{Principles of compression}
 \label{ch:Principles of compression}
 %% ==============================
+\par{
+Throughout this paper we fix the finite non-empty alphabet $\Sigma$ and assume that $\Sigma$ is equipped with a linear order $\leq$. A word $w$ is a sequence $a_1,...,a_n$ of letters $a_i \in \Sigma$, $1 \leq i \leq n$. The set of all such sequences is denoted by $\Sigma^*$ which is the free monoid over $\Sigma$, with concatenation as composition and with the empty word $\varepsilon$ as neutral element. The set $\Sigma^+ = \Sigma^*$ \textbackslash $\: \varepsilon$ consists of all non-empty words. Each word induces a labeling function $\lambda(w)$ as a labeled linear order where position $i$ of $w$ is labeled by $a_i \in \Sigma$ and we write $\lambda_w (i) = a_i$.
 
+If, for words $u, \: v$,  $u = v$ or $u$ is lexicographically smaller than $v$ we write $u \leq v$ in the context of the order of letters.  The ordered conjugacy class of a word $w \in \Sigma^n$ as $[w] = (w_q,...,w_n)$. The unordered conjugacy class of $w$ is the set $\{w_1, ... , w_n\}$. Whenever there is no confusion we can abuse the notation and also denote the unordered conjugacy class for $w$ s $[w]$. This is for example the case if $w$ is somehow distingushed in it conjugacy class for example if $w$ is a Lyndon word. A \emph{Lyndon word} is the unique minimal element within its conjugacy class. More formally, let $[w] = (w,w_2,...w_n)$, then $w \: \in \Sigma^+$ is a Lyndon word if $w<w_i$ for all $i \: \in \{2,...,n\}$.
+}
 
 %% ==============================
 \section{Compression and Encoding fundamentals}
@@ -87,7 +91,7 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 %% ==============================
 \label{ch:Principles of compression:sec:Run Length Encoding}
 \par{
-	Run length coding might count as the simplest coding scheme that makes use of context and repeating occurrences as described in the Section \ref{ch:Introduction:sec:Motivation}. While the example made earlier was in textual representation, it is best suited and mostly used for pallet based bitmap images \cite{palette-image} such as fax transmissions or computer icons.
+	Run length coding might count as the simplest probability coding scheme that makes use of context and repeating occurrences as described in the Section \ref{ch:Introduction:sec:Motivation}. While the example made earlier was in textual representation, it is best suited and mostly used for pallet based bitmap images \cite{palette-image} such as fax transmissions or computer icons.
 }
 
 \subsection{The History}
@@ -96,7 +100,7 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
  The ITU-T T4 (Group 3) standard for Facsimile (fax) machines \cite{ITU} is still in force for all devices used over regular phone lines. Each transmission sends a black and white image, where each pixel is called a \textit{pel} and with a horizontal resolution of $8.05 \: \frac{pels}{mm}$ and the vertical resolution depending on the mode. To encode each sequence of black and white pixels, the T4 standard uses RLE to encode each sequence of black and white pixels and since there are only two values, only the run length itself has to be encoded. It is assumed that the first run is always a white run, so there is a dummy white pel at the beginning of each sequence. For example, the sequence $bbbbwwbbbbb$ can be encoded as 1,4,2,5 with the leading white dummy pixel.
 }
 \par{
-To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding can be used do code the sequence, since shorter run lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of the average run lengths counted, the T4 defined a set of static Huffman codes, using different codes for the black and white pixels. This way for example 20 consecutive white pels  are a white run with length 20 an so the message can be encoded and transmitted as the code-word \enquote{0001000}, requiring only 7 bit instead of 20, seen in row 6 column 2 in table \ref{tab:t1:static huffman codes}. Since a fax typically contains more white, the white runs are more frequent and thus get shorter code-words which is explained in greater detail in section \ref{ch:Principles of compression:sec:Huffman Coding}. Since the appearance of text usually only needs a few consecutive black pels, short black runs of length 2 or 3 appear to be the most frequent seen runs so to save space they are encoded in the overall shortest codes. Runs of more than 64 have to be encoded in multiple Huffman codes, for example a run of 150 has to be encoded with the Huffman code of 128 followed by the code for 22.
+To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding (explained in section \ref{ch:Principles of compression:sec:Huffman Coding}) can be used do code the sequence, since shorter run lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of the average run lengths counted, the T4 defined a set of static Huffman codes, using different codes for the black and white pixels. This way for example 20 consecutive white pels  are a white run with length 20 an so the message can be encoded and transmitted as the code-word \enquote{0001000}, requiring only 7 bit instead of 20, seen in row 6 column 2 in table \ref{tab:t1:static huffman codes}. Since a fax typically contains more white, the white runs are more frequent and thus get shorter code-words which is explained in greater detail in section \ref{ch:Principles of compression:sec:Huffman Coding}. Since the appearance of text usually only needs a few consecutive black pels, short black runs of length 2 or 3 appear to be the most frequent seen runs so to save space they are encoded in the overall shortest codes. Runs of more than 64 have to be encoded in multiple Huffman codes, for example a run of 150 has to be encoded with the Huffman code of 128 followed by the code for 22.
 }
 \begin{table}
 	\centering
@@ -183,58 +187,87 @@ There are other well known methods like Move-to-Front coding or arithmetic codin
 \label{ch:Principles of compression:sec:Other:subSec:bwt}
 
 \par{
-The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $S$ of $n$ characters by forming the $n$ cyclic rotations of S, sorting them lexicographical, and extracting the last character of each of the rotations. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of rotations. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string S given only L and the Index $I$ \cite{Burrows-linear-time}.
+The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $w$ of $n$ characters by forming the $n$ cyclic rotations of $w$, sorting them lexicographical, and extracting the last character of each of the rotations. Each rotation is induced by a righ shift of the original word. The right-shift of a word $w=a_1 ... a_n$ is dented as $r(w) = a_na_1...a_{n-1}$ and the $i$-fold right shift $r^i(w)$ is defined inductively by $r^0(w) = w$ and $r^{i+1}(w) = r(r^i(w))) $ which is also defined for $i \grq n$ as $r^i(w)=r^j(w)$ where $j = i \: mod \: n$. The result of this transformation is a string L, consisting of these last characters of each sorted rotation. The algorithm also has to add special termination symbols or compute the index $I$ of the original string S in the sorted list of rotations. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string S given only L and the Index $I$ \cite{Burrows-linear-time}.
 }
 
 \par {
-As an example of the creation of L, given the input string S = ‘abraca’, $n = 6$, and the alphabet
-$X = \{a,b,c,r\}$. Create a $N \times N$ matrix $M$ whose elements are characters, and
-whose rows are rotations of S. Sort all rotations in lexicographical order.
+As an example of the creation of L, given the input string $w = crabab$, $n = 6$, and the alphabet $\Sigma = \{a,b,c,r\}$ with $a \textless b \textless c \textless r $. Create a $N \times N$ matrix $M$ whose elements are characters, and
+whose rows are rotations of $w$. Sort all rotations in lexicographical order.
 }
 
 \par{
-In this example, the index is $I = 1$ and the matrix $M$ is
+In this example, the index is $I = 4$ and the matrix $M$ is
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|l|l|l|l|l|l}
-		row 0 & a & a & b & r & a & c\\
+		row 1 & a & b & a & b & c & r\\
 		\hline
-		row 1 & a & b & r & a & c & a\\
+		row 2 & a & b & c & r & a & b\\
 		\hline
-		row 2 & a & c & a & a & b & r\\
+		row 3 & b & a & b & c & r & a\\
 		\hline
-		row 3 & b & r & a & c & a & a\\
+		row 4 & b & c & r & a & b & a\\
 		\hline
-		row 4 & c & a & a & b & r & a\\
+		row 5 & c & r & a & b & a & b\\
 		\hline
-		row 5 & r & a & c & a & a & b
+		row 6 & r & a & b & a & b & c
 		\label{tab:t10 bwt-example}
 	\end{tabular}
 	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
 \end{table}
-The resulting string L corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, I)$, in the example, $L = ‘caraab’$ and $I = 1$. Obviously the string L contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}.
+The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = ‘rbaabc’$ and $i = 5$. Obviously the string $L$ contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series.
 }
 
 \subsection{Inverse Burrows-Wheeler-Transformation}
 \label{ch:Principles of compression:sec:Other:subSec:bwtInverse}
-
 \par{
-TODO: explain reversing a bwt
+ The BWT is invertible and given $(BWT(w), i)$ where $i$ is the index of $w$ in $M(w)$ one can reconstruct the word $w$. There is a formal proof \cite{kufleitner2009bijective} available for this as well as the bijective variant described in the next section. To abstract the idea of inverting the permutation using only $L$ and $i$ is described by the following process by carrying on with the example. We now reconstruct the original word from the pair $(L,i)$ by first calculating the standard permutation of $L$ by writing $L$ column-wise, add positions, and then sort the pairs lexicographically.
+ \begin{table}[h]
+ 	\centering
+ 	\begin{tabular}{l|l|l}
+		word & word with position & sorted\\
+		\hline
+		r & (r,1) & (a,3) \\
+		b & (b,2) & (a,4) \\
+		a & (a,3) & (b,2) \\
+		a & (a,4) & (b,5) \\
+		b & (b,5) & (c,6) \\
+		c & (c,6) & (r,1)
+ 		\label{tab:t11 standard permutation}
+ 	\end{tabular}
+ 	\caption{Standard permutation generation of the word $L$}
+ \end{table}
+}
+\par{
+This yields the standard permutation of:
+\begin{gather}  
+\pi_L = 
+\begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6\\ 3 & 4 & 2 & 5 & 6 & 1 \end{pmatrix}
+\end{gather}
+Following $\pi^1_L(5)$ to $\pi^6_L(5)$ gives us a sequence of positions with $\pi_L(5)=6$ as a beginning, described by:
+\begin{gather} 
+6 \xrightarrow[]{\pi_L} 1 \xrightarrow[]{\pi_L} 3 \xrightarrow[]{\pi_L} 2 \xrightarrow[]{\pi_L} 4 \xrightarrow[]{\pi_L} 5
+\end{gather}
+If this sequence is applied to the labeling function of the word $L$ it results in 
+\begin{gather}  
+\lambda_L(6) \: \lambda_L(1) \: \lambda_L(3) \: \lambda_L(2) \: \lambda_L(4) \: \lambda_L(5)
+= crabab = w
+\end{gather}
+This shows that it is possible to reconstruct the word $w$ given the transformation $BWT(w)$ ad the index $i$.
 }
 
 \subsection{Bijective Burrows-Wheeler-Scott Transformation}
 \par{
-TODO: explain stuff
-}
 
+}
 
 %% ==============================
 \section{State of the Art}
 %% ==============================
 \label{ch:Principles of compression:sec:SOTA}
 \par{
-The current state of the art at the time of writing is depicted in the table below, all algorithms used highest possible compression scheme available. In general there is always a balance between compressed size and compression or decompression speed, where the faster algorithms use mostly some form of dictionary coding sometimes in combination with a Huffman coder to be able to output variable length codes. The more advanced ones like PPMd or ZPAQ use complex context modeling or context mixing approaches where they generate a probability distribution for the next symbol based on just read symbols. In general these complex methods achieve better compression at the expense of using more space or time. The currently modern and most used algorithms have been executed with the Calgary corpus and the results are shown in table \ref{tab:t20 stat of the art}, all files were processed separately. Algorithms like \textit{compress}, \textit{gzip} and \textit{ZIP} use a dictionary based method like LZ77 or some derivative and achieve reasonable compression at very fast rates. \textit{bzip2} and \textit{p7zip} use a Burrows-Wheeler-Transformation (described in \ref{ch:Principles of compression:sec:Other:subSec:bwt}) and then a combination of different techniques to improve performance. They sometimes even offer explicit choosing of a method, like \textit{7zip} which achieves even better compression when using an advanced probabilistic method called Prediction by partial matching, also implemented but with even better results by \textit{ZPAQ} which performs even better while still maintaining reasonable speeds. In the last decade methods like \textins{zstandard} developed by Facebook or \textit{brotli} developed by Google arose, mostly implementing ANS and other methods arose but they are either desired to be just faster or designed for a different task like \textit{brotli} for HTML and JSON compression and do not achieved best results on this corpus. In the context of the \href{http://prize.hutter1.net/}{hutter prize}, a competitive compression challenge, other advanced probabilistic methods were developed like \textit{paq8hp1} to \textit{paq8hp12}, a series of algorithms by Alexander Rhatushnyak \cite{mahoney2011large} which won the challenge. A more recent fork of \textit{paq8} from 2014 is the current leader, \textit{cmix}. It is still the best performing algorithm on this list and achieved by far the best results on the Calgary corpus at expense of almost 3 hours of computing and 32GB of needed ram, displayed in \ref{tab:t100benchmark}. Unfortunately it was not possible to run the paq8hp* variants due to an major bug in the only available releases.
+The current state of the art at the time of writing is depicted in the table below, all algorithms used highest possible compression scheme available. In general there is always a balance between compressed size and compression or decompression speed, where the faster algorithms use mostly some form of dictionary coding sometimes in combination with a Huffman coder to be able to output variable length codes. The more advanced ones like PPMd or ZPAQ use complex context modeling or context mixing approaches where they generate a probability distribution for the next symbol based on just read symbols. In general these complex methods achieve better compression at the expense of using more space or time. The currently modern and most used algorithms have been executed with the Calgary corpus and the results are shown in table \ref{tab:t20 stat of the art}, all files were processed separately. Algorithms like \textit{compress}, \textit{gzip} and \textit{ZIP} use a dictionary based method like LZ77 or some derivative and achieve reasonable compression at very fast rates. \textit{bzip2} and \textit{p7zip} use a Burrows-Wheeler-Transformation (described in \ref{ch:Principles of compression:sec:Other:subSec:bwt}) and then a combination of different techniques to improve performance. They sometimes even offer explicit choosing of a method, like \textit{7zip} which achieves even better compression when using an advanced probabilistic method called Prediction by partial matching, also implemented but with even better results by \textit{ZPAQ} which performs even better while still maintaining reasonable speeds. In the last decade methods like \textins{zstandard} developed by Facebook or \textit{brotli} developed by Google arose, mostly implementing ANS and other methods arose but they are either desired to be just faster or designed for a different task like \textit{brotli} for HTML and JSON compression and do not achieved best results on this corpus. In the context of the \href{http://prize.hutter1.net/}{hutter prize}, a competitive compression challenge, other advanced probabilistic methods were developed like \textit{paq8hp1} to \textit{paq8hp12}, a series of algorithms by Alexander Rhatushnyak \cite{mahoney2011large} which won the challenge. A more recent fork of \textit{paq8} from 2014 is the current leader, \textit{cmix}. It is still the best performing algorithm on this list and achieved by far the best results on the Calgary corpus at expense of almost 3 hours of computing and 32GB of needed ram, displayed in \ref{tab:t100benchmark}. Unfortunately it was not possible to run the paq8hp* variants due to an major bug in the only available releases. Most algorithms are available from the default repositories of your Linux distribution, or in the case of Fedora and CentOS, pre-installed with your operating system. The paq8hp* algorithms can be found on the Hutter price website and cmix is developed on \href{https://github.com/byronknoll/cmix}{github}.
 	\begin{table}[h]
 		\begin{tabular}{r|r|r|r|r}
 			method & options &  size in bytes & compression & \textit{bps}\\

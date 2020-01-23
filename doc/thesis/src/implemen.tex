@@ -12,29 +12,29 @@ All algorithms described have been implemented using Kotlin, because it can be c
 }
 \section{Vertical binary RLE}
 \par{
-	Basically the ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. Its stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream. Afterwards, the amount of runs per bit position is written to the tail of the encoded file, without the information how many runs are expected it would be much more difficult to decide which run belongs where, but it is still possible. The overhead of this additional information is around 34 byte, two for each count and a two byte stop symbol which is only needed seven times, no additional stop at the end of the file.
+	Basically the ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. Its stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream. Afterwards, the amount of runs per bit position is written to the tail of the encoded file, without the information how many runs are expected it would be much more difficult to decide which run belongs where, but it is still possible. The overhead of this additional information is around 34 byte, two for each count and a two byte stop symbol which is only needed seven times, no additional stop at the end of the file. Even though it was originally designed to work on chunks of bytes, in the end the transformations worked on the file or on the stream itself, which was significantly faster.
 }
 \par{
-	During decoding, the expected amount of runs are parsed from the end if the file. Then the actual decoding happens, with the fixed $n$ bits per code for this bits significance. 
+	During decoding, the expected amount of runs are parsed from the end if the file. Then the actual decoding happens, with the fixed $n$ bits per code for this bits significance. Knowing the exact amount of RLE numbers for each bit position makes it easy to decode, because the variable length of encoded numbers can be chooses accordingly while reading the stream once. Assuming a starting run on zero, all runs are written back to one file, each bit position sequentially, to then assemble the original data.
 }
 \section{Byte Remapping}
 \par{
-	TODO
+	To start of with the preprocessing, the byte remapping was implemented. The \emph{Analyzer} is responsible for generating a overall probability distribution over the values of bytes contained in the file. This serves as a input for the map generation, where every byte value is sorted accordingly to its occurrence and mapped to increasing byte values, so the most frequent byte to \textit{0x00}, the second most often to \textit{0x01} and so on. Afterwards, a temporary file is generated where each byte from the original file is mapped. Decoding requires access to the original mapping, therefore it is persisted at the start of the encoded file. To do so, we only need to know the number of mapped values and then the original byte, not the mapped value since we know they are sorted acceding.  
 }
 \section{Burrows Wheeler Transformation}
 \par{
-	As mentioned earlier, the Burrows-Wheeler-Transformation is implemented in 3 different versions, starting of with the naive an unsophisticated one. It is implemented with the use of start and stop symbols (0x02 as STX and 0x03 as ETX) and with the creating and sorting of all cyclic rotations of the input string. This can be done for all text input files but not for binary data because files containing the start or stop symbols confused the algorithm and made the inverse transformation impossible. Additionally it is extremely slow due to its at least quadratic complexity, so another idea arose.
+	As mentioned earlier, the Burrows-Wheeler-Transformation is implemented in 3 different versions, starting of with the naive an unsophisticated one. The \emph{transformation.BurrowsWheelerTransformation} is implemented with the use of start and stop symbols (0x02 as STX and 0x03 as ETX) and with the creating and sorting of all cyclic rotations of the input string. This can be done for all text input files but not for binary data because files containing the start or stop symbols confused the algorithm and made the inverse transformation impossible. Additionally it is extremely slow due to its at least quadratic complexity, even when working on small chunks which messes up the overall transformation result. It is not further described as it was only used for some initial testing to see if and how much RLE benefits from this transformation. 
 }
 \par{
-	TODO: second BWT impl
+	The second implementation is realized by following the original algorithm description provided in greater detail in the paper by M. Burrows and D. J. Wheeler \cite{Burrows94} (algorithm C and D). The \emph{transformation.BurrowsWheelerTransformationModified} works on parts of the data so the transformation result is still strongly depending of the size of the chunks, but it could at least handle arbitrary input. Higher chunk sizes greatly increased the transformation because more equal characters are in the same chunk but also really slowed down the process. Due to fact that both the mapping and the modified transformation work on an array of bytes and do not interfere with another, they can be performed in any order.
 }
 
 \par{
-	TODO: sophisticated BWTS impl
+	TODO describe sophisiticated BWTS
 }
 \section{Huffman encoding}
 \par{
-TODO
+
 }
 \section{External libraries}
 \label{ch:Conceptual Design:sec:Impl:subsec:libs}
@@ -57,6 +57,14 @@ TODO
 %% ==============================
 \label{ch:Implementation:sec:Implementation Evaluation}
 - evaluation of implementation choices made
+\ldots
+
+
+%% ==============================
+\section{Usage}
+%% ==============================
+\label{ch:Implementation:sec:usage}
+TODO
 \ldots
 %%% Local Variables: 
 %%% mode: latex
