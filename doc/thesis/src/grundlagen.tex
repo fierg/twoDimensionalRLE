@@ -6,9 +6,7 @@
 \label{ch:Principles of compression}
 %% ==============================
 \par{
-Throughout this paper we fix the finite non-empty alphabet $\Sigma$ and assume that $\Sigma$ is equipped with a linear order $\leq$. A word $w$ is a sequence $a_1,...,a_n$ of letters $a_i \in \Sigma$, $1 \leq i \leq n$. The set of all such sequences is denoted by $\Sigma^*$ which is the free monoid over $\Sigma$, with concatenation as composition and with the empty word $\varepsilon$ as neutral element. The set $\Sigma^+ = \Sigma^*$ \textbackslash $\: \varepsilon$ consists of all non-empty words. Each word induces a labeling function $\lambda(w)$ as a labeled linear order where position $i$ of $w$ is labeled by $a_i \in \Sigma$ and we write $\lambda_w (i) = a_i$.
-
-If, for words $u, \: v$,  $u = v$ or $u$ is lexicographically smaller than $v$ we write $u \leq v$ in the context of the order of letters.  The ordered conjugacy class of a word $w \in \Sigma^n$ as $[w] = (w_q,...,w_n)$. The unordered conjugacy class of $w$ is the set $\{w_1, ... , w_n\}$. Whenever there is no confusion we can abuse the notation and also denote the unordered conjugacy class for $w$ s $[w]$. This is for example the case if $w$ is somehow distingushed in it conjugacy class for example if $w$ is a Lyndon word. A \emph{Lyndon word} is the unique minimal element within its conjugacy class. More formally, let $[w] = (w,w_2,...w_n)$, then $w \: \in \Sigma^+$ is a Lyndon word if $w<w_i$ for all $i \: \in \{2,...,n\}$.
+Throughout this work a finite non-empty alphabet $\Sigma$ is assumed and $\Sigma$ is equipped with a linear order $\leq$. A word $w$ is a sequence $a_1,...,a_n$ of letters $a_i \in \Sigma$, $1 \leq i \leq n$. The set of all such sequences is denoted by $\Sigma^*$ which is the free monoid over $\Sigma$, with concatenation as composition and with the empty word $\varepsilon$ as neutral element. The set $\Sigma^+ = \Sigma^*$ \textbackslash $\: \varepsilon$ consists of all non-empty words. Each word induces a labeling function $\lambda(w)$ as a labeled linear order where position $i$ of $w$ is labeled by $a_i \in \Sigma$ and we write $\lambda_w (i) = a_i$. If, for words $u, \: v$,  $u = v$ or $u$ is lexicographically smaller than $v$ we write $u \leq v$ in the context of the order over the alphabet.  The ordered conjugacy class of a word $w \in \Sigma^n$ as $[w] = (w_q,...,w_n)$. The unordered conjugacy class of $w$ is the set $\{w_1, ... , w_n\}$. Whenever there is no confusion we can abuse the notation and also denote the unordered conjugacy class for $w$ s $[w]$. This is for example the case if $w$ is somehow distinguished in it conjugacy class for example if $w$ is a Lyndon word. A \emph{Lyndon word} is the unique minimal element within its conjugacy class. More formally, let $[w] = (w,w_2,...w_n)$, then $w \: \in \Sigma^+$ is a Lyndon word if $w<w_i$ for all $i \: \in \{2,...,n\}$.
 }
 
 %% ==============================
@@ -222,7 +220,7 @@ The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with char
 \subsection{Inverse Burrows-Wheeler-Transformation}
 \label{ch:Principles of compression:sec:Other:subSec:bwtInverse}
 \par{
- The BWT is invertible and given $(BWT(w), i)$ where $i$ is the index of $w$ in $M(w)$ one can reconstruct the word $w$. There is a formal proof \cite{kufleitner2009bijective} available for this as well as the bijective variant described in the next section. To abstract the idea of inverting the permutation using only $L$ and $i$ is described by the following process by carrying on with the example. We now reconstruct the original word from the pair $(L,i)$ by first calculating the standard permutation of $L$ by writing $L$ column-wise, add positions, and then sort the pairs lexicographically.
+ The BWT is invertible and given $(L, i)$ where $i$ is the index of $w$ in $M(w)$ one can reconstruct the word $w$. There is a formal proof \cite{kufleitner2009bijective} available for this as well as the bijective variant described in the next section. To abstract the idea of inverting the permutation using only $L$ and $i$ is described by the following process by carrying on with the example. We now reconstruct the original word from the pair $(L,i)$ by first calculating the standard permutation of $L$ by writing $L$ column-wise, add positions, and then sort the pairs lexicographically.
  \begin{table}[h]
  	\centering
  	\begin{tabular}{l|l|l}
@@ -259,7 +257,7 @@ This shows that it is possible to reconstruct the word $w$ given the transformat
 
 \subsection{Bijective Burrows-Wheeler-Scott Transformation}
 \par{
-
+Although, the bijective variant (abbreviated with BWTS) is mostly used further on it its rather complicated because it maps a word $w$ with $l(w)$ to another word with equal length without any start or stop symbols and no additional index. It strongly relies on the Lyndon factorization, because calculating the BWT of a Lyndon word $v$ always returns 1 as index since we know that $v$ is always the first element in $M$. Then one can calculate the BWT over all Lyndon factors of the input data, without additional information needed, a proof for this is also mentioned in \cite{kufleitner2009bijective}.
 }
 
 %% ==============================

@@ -30,9 +30,12 @@ All algorithms described have been implemented using Kotlin, because it can be c
 }
 
 \par{
-	TODO describe sophisiticated BWTS
+	TODO: soph BWTS impl
 }
 \section{Huffman encoding}
+\par{
+Following the pseudo-code provided by M. Liśkiewicz and H. Fernau in \cite{entropy-fernau} on page 21 the implementation was straight forward. Internally a small set of data structures are provided for assembling the Huffman tree, a \emph{HuffmanTree}, a \emph{HuffmanNode} and a \emph{HuffmanLeaf} class is implemented. The HuffmanTree is abstract and only holds the frequency of a tree, since every tree itself has its own frequency. It also implements a compareTo function, to draw comparisons between different trees. A HuffmanNode extends the HuffmanTree, consists of a left and right HuffmanTree and has their sum of frequencies as frequency. The Leaf is itself also a tree and holds a value of type byte and a frequency which resembles its occurrence. To build the Huffman tree for a given set of bytes, the algorithm expects an array of integer $I$, assembling the occurrences $o$ of bytes $b \in [ 0,255 ]$ in the form of $I [ b ] = o$. Then a leaf is created for every entry of $I$ with a frequency of $o$ and collected into a PriorityQueue of HuffmanTrees. Then while there are still at least two trees left in the queue, the two lowest frequencies are removed from the queue, merged into a single tree and reinserted into the queue. After the creation of the tree, all paths are followed and every time a leaf is reached, the current path is added to a map in form of a StringBuffer. This buffer contains the path of left and right trees traversed into the original one, adding a zero for every left descent and a one for every right one. Finally the mapping of type byte to StringBuffer is returned.
+}
 \par{
 
 }
