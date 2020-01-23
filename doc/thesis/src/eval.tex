@@ -11,7 +11,7 @@ Moving on to the evaluation, we start by comparing the achieved results using di
 %% ==============================
 \label{ch:Evaluation:sec:Functional Evaluation}
 \par{
-The functional evaluation was performed in two steps. The first question is weather the algorithm works and no data is lost during the process of encoding. The decoder shows that this is the case and all information can be reconstructed, hence the suggested algorithm works as intended. The next question was, if it is just a method suited for this corpus and as it turned out, it performed even better on the newer and more frequently suggested Canterbury corpus than id did on the Calgary corpus. Also the abstinence of internal operations and large or complex data structures to hold all th input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 16 seconds but the decoding is  
+The functional evaluation was performed in two steps. The first question is weather the algorithm works and no data is lost during the process of encoding. The decoder shows that this is the case and all information can be reconstructed, hence the suggested algorithm works as intended. The next question was, if it is just a method suited for this corpus and as it turned out, it performed even better on the newer and more frequently suggested Canterbury corpus than it did on the Calgary corpus. Also the abstinence of internal operations and large or complex data structures to hold all thw input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 16 seconds but the decoding is  
 }
 
 \par{
@@ -44,20 +44,17 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 \section{Benchmarks}
 %% ==============================
 \label{ch:Evaluation:sec:Benchmarks}
-- Benchmark with the Calgary corpus\\
-- \url{http://www.data-compression.info/Corpora/} \\
-\ldots
 \par{
-TODO: time over both encoding and decoding
+	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on a AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage.
 }
 	\begin{table}[h]
 	\begin{tabular}{r|r|r|r|r|r}
-		 & & & & time\\
-		method  &  size in bytes & compression & \textit{bps}& encoding & decoding\\
+		method  &  size in bytes & compression & \textit{bps} & \multicolumn{2}{c}{time }\\
+		& & & & encoding & decoding\\
 		\hline
 		uncompressed & 3,145,718 & 100.0\% & 8.00 &\\
 		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s\\
-		modified vertical RLE & 1,237,380 & 39.3\%& 3.14 & 16.45s\\
+		modified vertical RLE & 1,237,380 & 39.3\%& 3.14 & 6.840s & 15.637s\\
 		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s\\
 		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s\\
 		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s\\
@@ -67,7 +64,7 @@ TODO: time over both encoding and decoding
 		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s\\
 		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s \\
 		paq8hp* & - & - & - & - \\ 
-		cmix v18 & 554,983 & 17.6\% & 1.41 & <3h		
+		cmix v18 & 554,983 & 17.6\% & 1.41 & >3h		
 	\end{tabular}
 	\label{tab:t100benchmark}
 	\caption{Benchmark on the Calgary Corpus}

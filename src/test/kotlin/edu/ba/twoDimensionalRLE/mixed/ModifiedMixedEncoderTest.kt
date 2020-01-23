@@ -44,30 +44,31 @@ class ModifiedMixedEncoderTest {
         val resultMap = mutableMapOf<Map<Int, Int>, Long>()
 
         val deferred = mutableListOf<Deferred<Any>>()
-        val context = newFixedThreadPoolContext(10, "co")
+        val context = newFixedThreadPoolContext(12, "co")
 
         for (i in 8..8) {
             val startTime = System.currentTimeMillis()
-            deferred.add(CoroutineScope(context).async {
-                val bitsPerNumberMapping =
-                    mapOf(0 to i, 1 to i, 2 to i, 3 to i, 4 to i, 5 to i, 6 to i, 7 to i)
+            val bitsPerNumberMapping =
+                mapOf(0 to i, 1 to i, 2 to i, 3 to i, 4 to i, 5 to i, 6 to i, 7 to i)
 
-                if (File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").exists()) {
-                    log.info("deleting directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
-                    File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
-                    File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
+            if (File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").exists()) {
+                log.info("deleting directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
+                File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
+                File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").deleteRecursively()
 
 
-                }
-                log.info("creating directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
-                File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
-                File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
+            }
+            log.info("creating directory: ${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i")
+            File("${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
+            File("${decodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i").mkdirs()
 
-                File(folderToEncode).listFiles().forEach {
+            File(folderToEncode).listFiles().forEachIndexed { index, file ->
+                deferred.add(CoroutineScope(context).async {
+
                     try {
                         mixedEncoder.encodeInternal(
-                            "${folderToEncode}/${it.name}",
-                            "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i/${it.name}.mixed",
+                            "${folderToEncode}/${file.name}",
+                            "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i/${file.name}.mixed",
                             applyByteMapping,
                             applyBurrowsWheelerTransformation,
                             applyHuffmanEncoding,
@@ -77,26 +78,28 @@ class ModifiedMixedEncoderTest {
                     } catch (e: Exception) {
                         log.error(e.toString(), e)
                     }
-                }
-                log.info("Finished encoding of corpus in ${(System.currentTimeMillis() - startTime).toDouble() / 1000.toDouble()}s.")
+                    return@async index
+                })
+            }
+            runBlocking {
+                return@runBlocking deferred.map { it.await() }
+            }
 
-                val result = Analyzer().sizeCompare(
-                    folderToEncode,
-                    "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i",
-                    "mixed",
-                    null,
-                    bitsPerNumberMapping,
-                    true
-                )
-                resultMap[bitsPerNumberMapping] = result
-                return@async result
-            })
+            log.info("Finished encoding of corpus in ${(System.currentTimeMillis() - startTime).toDouble() / 1000.toDouble()}s.")
+            Analyzer().sizeCompare(
+                folderToEncode,
+                "${encodeFolder}/CalgaryCorpus/$i$i$i$i$i$i$i$i",
+                "mixed",
+                null,
+                bitsPerNumberMapping,
+                true
+            )
+
+
         }
 
 
-        runBlocking {
-            return@runBlocking deferred.map { it.await() }
-        }
+
 
         log.info("all combinations tried. result:")
         println(
@@ -121,34 +124,44 @@ class ModifiedMixedEncoderTest {
 
 
         val startTime = System.currentTimeMillis()
+        val deferred = mutableListOf<Deferred<Any>>()
+        val context = newFixedThreadPoolContext(12, "co")
 
-        File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().filter { it.extension == "mixed" }.forEach {
-            try {
+        File("${encodeFolder}/CalgaryCorpus/88888888").listFiles().filter { it.extension == "mixed" }
+            .forEachIndexed { index, file ->
+                deferred.add(CoroutineScope(context).async {
 
-                mixedEncoder.decodeInternal(
-                    "${encodeFolder}/CalgaryCorpus/88888888/${it.name}",
-                    "${decodeFolder}/CalgaryCorpus/88888888/${it.nameWithoutExtension}",
-                    applyByteMapping,
-                    applyBurrowsWheelerTransformation,
-                    applyHuffmanEncoding,
-                    mapOf(
-                        0 to bitsPerRLERun,
-                        1 to bitsPerRLERun,
-                        2 to bitsPerRLERun,
-                        3 to bitsPerRLERun,
-                        4 to bitsPerRLERun,
-                        5 to bitsPerRLERun,
-                        6 to bitsPerRLERun,
-                        7 to bitsPerRLERun
-                    )
-                )
+                    try {
+
+                        mixedEncoder.decodeInternal(
+                            "${encodeFolder}/CalgaryCorpus/88888888/${file.name}",
+                            "${decodeFolder}/CalgaryCorpus/88888888/${file.nameWithoutExtension}",
+                            applyByteMapping,
+                            applyBurrowsWheelerTransformation,
+                            applyHuffmanEncoding,
+                            mapOf(
+                                0 to bitsPerRLERun,
+                                1 to bitsPerRLERun,
+                                2 to bitsPerRLERun,
+                                3 to bitsPerRLERun,
+                                4 to bitsPerRLERun,
+                                5 to bitsPerRLERun,
+                                6 to bitsPerRLERun,
+                                7 to bitsPerRLERun
+                            )
+                        )
 
 
-            } catch (e: Exception) {
-                log.error(e.toString(), e)
+                    } catch (e: Exception) {
+                        log.error(e.toString(), e)
+                    }
+                    return@async index
+                })
             }
-        }
 
+        runBlocking {
+            return@runBlocking deferred.map { it.await() }
+        }
         log.info("Finished decoding of corpus in ${(System.currentTimeMillis() - startTime).toDouble() / 1000.toDouble()}s.")
 
         Analyzer().sizeCompare(folderToEncode, "${decodeFolder}/CalgaryCorpus", "")
@@ -166,7 +179,7 @@ class ModifiedMixedEncoderTest {
         if (applyByteMapping) log.info("Encoding with mapping as preprocessing.")
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         val deferred = mutableListOf<Deferred<Any>>()
-        val context = newFixedThreadPoolContext(10, "co")
+        val context = newFixedThreadPoolContext(12, "co")
 
         for (i in 8..8) {
             for (j in 8..8) {

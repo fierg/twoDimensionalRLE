@@ -323,6 +323,7 @@ class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
 
         huffmanMapping.forEach { (byte, mapping) ->
             stream.write(byte)
+            assert(getLengthOfMapping(mapping) < 256, lazyMessage = { "Huffman mapping to long!" })
             stream.write(getLengthOfMapping(mapping))
             mapping.writeToBinaryStream(stream)
         }
