@@ -11,11 +11,7 @@ Moving on to the evaluation, we start by comparing the achieved results using di
 %% ==============================
 \label{ch:Evaluation:sec:Functional Evaluation}
 \par{
-The functional evaluation was performed in two steps. The first question is weather the algorithm works and no data is lost during the process of encoding. The decoder shows that this is the case and all information can be reconstructed, hence the suggested algorithm works as intended. The next question was, if it is just a method suited for this corpus and as it turned out, it performed even better on the newer and more frequently suggested Canterbury corpus than it did on the Calgary corpus. Also the abstinence of internal operations and large or complex data structures to hold all thw input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 16 seconds but the decoding is  
-}
-
-\par{
-	TODO
+The functional evaluation was performed in two steps. The first question is weather the algorithm works and no data is lost during the process of encoding. The decoder shows that this is the case and all information can be reconstructed, hence the suggested algorithm works as intended. The next question was, if it is just a method suited for this corpus and as it turned out, it performed even better on the newer and more frequently suggested Canterbury corpus than it did on the Calgary corpus.
 }
 	\begin{table}[h]
 	\centering
@@ -39,36 +35,45 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 	\caption{Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 	\label{tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 \end{table}
-\ldots
+
+\par{
+Abstinence of internal operations and large or complex data structures to hold all the input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 6.8 seconds but the decoding is rather slow with 15.6 seconds although is has to be mentioned that there is still some potential in performance optimization and parallelization.
+}
+
 %% ==============================
 \section{Benchmarks}
 %% ==============================
 \label{ch:Evaluation:sec:Benchmarks}
 \par{
-	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on a AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage.
+	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on a AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage. The algorithm cmix explicitly demanded 32 GB of ram which could not be provided, which in turn lead to a lot of paging and thus, very poor timing benchmark results.
 }
 	\begin{table}[h]
 	\begin{tabular}{r|r|r|r|r|r}
 		method  &  size in bytes & compression & \textit{bps} & \multicolumn{2}{c}{time }\\
 		& & & & encoding & decoding\\
 		\hline
-		uncompressed & 3,145,718 & 100.0\% & 8.00 &\\
-		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s\\
+		uncompressed & 3,145,718 & 100.0\% & 8.00 & &\\
+		compress & 1,250,382 & 40.4\% & 3.24 & 0.039s & 0.025s\\
 		modified vertical RLE & 1,237,380 & 39.3\%& 3.14 & 6.840s & 15.637s\\
-		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s\\
-		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s\\
-		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s\\
-		bzip2 v1.0.8 & 832,443 & 26.4\% & 2.11 & 0.191s\\
-		brotli & 826,638 & 26.3\%& 2.10 & 4.609s\\
-		p7zip 16.02 (deflate) &  821,873 & 26.1\% & 2.08 & 0.431s \\
-		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s\\
-		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s \\
-		paq8hp* & - & - & - & - \\ 
-		cmix v18 & 554,983 & 17.6\% & 1.41 & >3h		
+		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s & 0.025s\\
+		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s & 0.022s\\
+		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s & 0.011s\\
+		bzip2 v1.0.8 & 832,443 & 26.4\% & 2.11 & 0.191s & 0.088s\\
+		brotli & 826,638 & 26.3\%& 2.10 & 4.609s & 0.015s\\
+		p7zip 16.02 (deflate) &  794,098 & 26.1\% & 2.08 & 0.431s & 0.045s \\
+		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s & 0.282s\\
+		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s & 7.735s\\
+		paq8hp* & - & - & - & - & -\\ 
+		cmix v18 & 554,983 & 17.6\% & 1.41 & >3h & >2h		
 	\end{tabular}
 	\label{tab:t100benchmark}
 	\caption{Benchmark on the Calgary Corpus}
 \end{table}
+
+\par{
+
+}
+
 %% ==============================
 \section{Conclusion}
 %% ==============================
