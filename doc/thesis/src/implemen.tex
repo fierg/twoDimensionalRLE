@@ -67,7 +67,7 @@ The original code for the modified BWTS algorithm and the necessary sorting algo
 Porting the Java implementation provided by \href{https://github.com/flanglet/kanzi/releases}{kanzi} \cite{kanzi}, a collection of state of the art compression methods, all available in Java, C++ and Go, was easy but also gratuitous, since there are releases available for the Java version which is still maintained at a high frequency. To use them we simply add the dependency to our maven project. This library basically provides one functionality, the implementation of a sophisticated bijective Burrows-Wheeler-Scott-Transformation in linear time.
 }
 \par{
-
+To skim over its functionality, it provides somewhat of a clean API to work with advanced compression algorithms in Java, most noticeable \emph{DivSufSort} and \emph{BWTS}. The BWTS class offers just the two directions of the transformation as methods, both working on arrays of bytes, which requires reading all the input into memory. At first the whole input is spliced into Lyndon words. The suffix array is 
 }
 
 \subsection{Others}
