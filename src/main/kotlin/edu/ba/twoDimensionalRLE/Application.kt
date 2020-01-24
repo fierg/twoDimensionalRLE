@@ -18,6 +18,7 @@ open class Application {
             var applyHuffmanEncoding = false
             var binaryRle = false
             var byteWiseRle = false
+            var debugLog = false
 
             val map = args.fold(Pair(emptyMap<String, List<String>>(), "")) { (map, lastKey), elem ->
                 if (elem.startsWith("-")) Pair(map + (elem to emptyList()), elem)
@@ -35,6 +36,12 @@ open class Application {
             val files: List<String>
             files = if (map.containsKey("-f")) map.getValue("-f") else emptyList()
 
+            if (files.isEmpty()) {
+                println("No file provided! nothing to do.")
+                printUsage()
+                exitProcess(0)
+            }
+
 
             if (map.containsKey("-c") && map.containsKey("-d")) {
                 println("Invalid arguments -c and -d!")
@@ -46,20 +53,21 @@ open class Application {
             if (map.containsKey("-bin")) binaryRle = true
             if (map.containsKey("-byte")) byteWiseRle = true
             if (binaryRle && byteWiseRle) {
-                println("Invalid arguments!")
+                println("Invalid arguments -bin and -byte!")
                 printUsage()
                 exitProcess(1)
             }
             if (map.containsKey("-bwt")) applyBurrowsWheelerTransformation = true
             if (map.containsKey("-map")) applyByteMapping = true
             if (map.containsKey("-huf")) applyHuffmanEncoding = true
+            if (map.containsKey("-D")) debugLog = true
 
 
 
             if (!decompress) {
                 when {
                     byteWiseRle -> {
-                        val encoder = StringRunLengthEncoder()
+                        val encoder = StringRunLengthEncoder(debugLog)
                         files.forEach {
                             encoder.encodeVarLength(
                                 it,
@@ -73,7 +81,7 @@ open class Application {
                         }
                     }
                     binaryRle -> {
-                        val encoder = StringRunLengthEncoder()
+                        val encoder = StringRunLengthEncoder(debugLog)
                         files.forEach {
                             encoder.encodeSimpleBinaryRLE(
                                 it,
@@ -84,7 +92,7 @@ open class Application {
                     }
                     else -> {
                         files.forEach {
-                            val encoder = ModifiedMixedEncoder()
+                            val encoder = ModifiedMixedEncoder(debugLog)
                             encoder.encodeInternal(
                                 it,
                                 "$it.mixed",
@@ -130,7 +138,7 @@ open class Application {
             } else {
                 when {
                     byteWiseRle -> {
-                        val encoder = StringRunLengthEncoder()
+                        val encoder = StringRunLengthEncoder(debugLog)
                         files.forEach {
                             encoder.decodeVarLength(
                                 it,
@@ -144,7 +152,7 @@ open class Application {
                         }
                     }
                     binaryRle -> {
-                        val encoder = StringRunLengthEncoder()
+                        val encoder = StringRunLengthEncoder(debugLog)
                         files.forEach {
                             encoder.encodeSimpleBinaryRLE(
                                 it,
@@ -154,7 +162,7 @@ open class Application {
                         }
                     }
                     else -> {
-                        val encoder = ModifiedMixedEncoder()
+                        val encoder = ModifiedMixedEncoder(debugLog)
                         files.forEach {
                             encoder.decodeInternal(
                                 it,
@@ -173,7 +181,7 @@ open class Application {
 
         private fun printUsage() {
             println("Advanced RLE Encoder\n")
-            println("Usage:\n [action] [method] [preprocessing] [files...]\n")
+            println("Usage:\n [action] [method] [preprocessing] -f [files...]\n")
             println("ACTION:")
             println("-c \t\t compress file (default)")
             println("-d \t\t decompress file\n")
@@ -183,8 +191,8 @@ open class Application {
             println("-byte #N \t byte wise reading (with N bits per RLE encoded number, default 3)\n")
             println("PREPROCESSING:")
             println("-bwt \t apply Burrows-Wheeler-Transformation during encoding")
-            println("-m \t\t apply Byte-mapping during encoding")
-            println("-h \t\t encode with Huffman encoding\n")
+            println("-map \t\t apply Byte-mapping during encoding")
+            println("-huf \t\t encode with Huffman encoding\n")
             println("DEBUG:")
             println("-D \t debug log level")
         }

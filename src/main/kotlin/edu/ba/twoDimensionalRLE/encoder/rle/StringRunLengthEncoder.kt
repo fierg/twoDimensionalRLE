@@ -19,7 +19,7 @@ import java.io.FileOutputStream
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
-class StringRunLengthEncoder : Encoder {
+class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
 
     private val log = Log.kotlinInstance()
     private val DEBUG = false
@@ -29,6 +29,7 @@ class StringRunLengthEncoder : Encoder {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
         if (!DEBUG) log.logLevel = LogLevel.INFO
+        if (DEBUGLOG) log.logLevel = LogLevel.DEBUG
     }
 
     companion object {

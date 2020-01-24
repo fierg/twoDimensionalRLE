@@ -13,7 +13,7 @@ import java.io.File
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
-class ModifiedMixedEncoder : Encoder {
+class ModifiedMixedEncoder(var DEBUGLOG: Boolean = false) : Encoder {
 
     private val DEBUG = false
     private val log = Log.kotlinInstance()
@@ -25,6 +25,7 @@ class ModifiedMixedEncoder : Encoder {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
         if (!DEBUG) log.logLevel = LogLevel.INFO
+        if (DEBUGLOG) log.logLevel = LogLevel.DEBUG
 
     }
 

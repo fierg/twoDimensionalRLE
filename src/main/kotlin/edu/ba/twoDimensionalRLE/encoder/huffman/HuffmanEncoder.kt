@@ -14,17 +14,18 @@ import java.util.*
 import kotlin.experimental.or
 
 @ExperimentalUnsignedTypes
-class HuffmanEncoder(val debug: Boolean) : Encoder, RangedEncoder {
+class HuffmanEncoder(var DEBUGLOG: Boolean = false) : Encoder, RangedEncoder {
     private val log = Log.kotlinInstance()
     val mapping = mutableMapOf<Byte, StringBuffer>()
     private val byteSize = 8
-    private val DEBUG = debug
+    private val DEBUG = false
 
     init {
         log.newFormat {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
         if (!DEBUG) log.logLevel = LogLevel.INFO
+        if (DEBUGLOG) log.logLevel = LogLevel.DEBUG
     }
 
     override fun encodeChunkBinRLE(chunk: DataChunk, range: IntRange, bitsPerNumber: Int, byteSize: Int): DataChunk {
