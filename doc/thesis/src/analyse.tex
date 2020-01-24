@@ -6,7 +6,7 @@
 %% ==============================
 
 \par{
-The following chapter contains a detailed analysis of the problem and the resulting design decisions with some further requirements for the algorithm. To have a comparison to some extent, the initial performance analysis was performed on the Calgary corpus but the results of the unmodified run length coding algorithm where very underwhelming as expected.
+The following chapter contains a detailed analysis of the problem and the resulting design decisions with some further requirements for the algorithm. To have a comparison to some extent, the initial performance analysis was performed on the Calgary corpus but the results of the unmodified run length coding algorithm were very underwhelming as expected.
 }
 
 \section{The Calgary corpus}
@@ -93,7 +93,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 
 
 \par{
- However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger that 4 occurred, which lead to the conclusion, two bit for the run count should be plenty. But even with a run size of just two bits, there is still a increase in size of about 9\% and uses 8.74 \textit{bps}. This is still useful as a kind of a base line. Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
+ However after some analysis of the corpus data, it was shown that most runs had a value of one and almost no runs larger than 4 occurred, which lead to the conclusion, two bit for the run count should be plenty. But even with a run size of just two bits, there is still an increase in size of about 9\% and uses 8.74 \textit{bps}. This is still useful as a kind of a base line. Interestingly the binary implementation performs better on 2 bits per RLE number (4 \% increase in size) than the byte implementation (9 \% increase in size) but also worse with a higher amount of bits per run, where it expands the data to more than triple in size. It is unclear which kind of implementation will profit most of preprocessing, so both will be further analyzed, but the benefit of byte wise RLE is the better worst case performance of 1.5 up to 2 times the original size compared to binary RLE with up to 4.5 times the original size.
 }
 
 \par{

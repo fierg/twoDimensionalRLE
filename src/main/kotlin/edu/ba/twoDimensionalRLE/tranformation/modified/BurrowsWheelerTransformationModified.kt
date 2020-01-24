@@ -1,5 +1,42 @@
 package edu.ba.twoDimensionalRLE.tranformation.modified
 
+/*
+MIT License
+
+Copyright (c) 2019 Sven Fiergolla
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+    This Implementation is partially aligned with the modified version by Burrows and Wheeler:
+
+    see http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.121.6177&rep=rep1&type=pdf
+
+    The Transformation could also be improved.
+    Instead of creating the Matrix M with all cyclic rotations, this can also be done in linear time and space by building a suffix tree,
+    which then can be walked in lexicographical order to recover the sorted suffixes.
+    See McCreight’s suffix tree construction algorithm:
+
+    E.M. McCreight. A space economical suffix tree construction algorithm. Journal of the ACM, Vol. 32, No. 2, April 1976, pp. 262–272.
+ */
+
 import com.google.common.primitives.SignedBytes
 import de.jupf.staticlog.Log
 import edu.ba.twoDimensionalRLE.extensions.shift
@@ -9,7 +46,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.lang.IllegalArgumentException
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
@@ -22,22 +58,6 @@ class BurrowsWheelerTransformationModified {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
     }
-
-    /*
-
-    This Implementation is partially aligned with the modified version by Burrows and Wheeler:
-
-    see http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.121.6177&rep=rep1&type=pdf
-
-    The Transformation could also be improved.
-    Instead of creating the Matrix M with all cyclic rotations, this can also be done in linear time and space by building a suffix tree,
-    which then can be walked in lexicographical order to recover the sorted suffixes.
-    See McCreight’s suffix tree construction algorithm:
-
-    E.M. McCreight. A space economical suffix tree construction algorithm. Journal of the ACM, Vol. 32, No. 2, April 1976, pp. 262–272.
-
-     */
-
 
     fun transform(input: String): Pair<String, Int> {
         val table = Array(input.length) { input.substring(it) + input.substring(0, it) }
@@ -67,7 +87,7 @@ class BurrowsWheelerTransformationModified {
     fun inverseTransform(L: String, index: Int): String {
 
         // corresponding to D1. [find first characters of rotations]
-    //    val F = L.toCharArray().sortedArray()
+        //    val F = L.toCharArray().sortedArray()
 
         // corresponding to D2. [build list of predecessor characters]
         val P = IntArray(L.length)
@@ -102,7 +122,7 @@ class BurrowsWheelerTransformationModified {
     fun inverseTransformByteArray(L: ByteArray, index: Int): ByteArray {
 
         // corresponding to D1. [find first characters of rotations]
-   //     val F = L.sortedArray()
+        //     val F = L.sortedArray()
 
         // corresponding to D2. [build list of predecessor characters]
         val P = IntArray(L.size)
