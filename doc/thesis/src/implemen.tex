@@ -1,7 +1,7 @@
 \chapter{Implementation}
 \label{ch:Implementation}
 %% ==============================
-All algorithms described have been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between a native implementation and higher language conciseness and fault-tolerance. Also there were some libraries available for Byte- and Bit-Operations on streams which proved to be quite useful, although there was almost no documentation available. This one and all other libraries are described in section \ref{ch:Implementation:sec:Impl:subsec:libs}. The main focus is on the encoder and decoder classes but the other modules will be discussed as well.
+All algorithms described have been implemented using Kotlin, because it can be compiled for the Java Virtual Machine as well as native, so it seemed like a good balance between a native implementation and higher language conciseness and fault-tolerance. Also there were some libraries available for Byte- and Bit-Operations on streams which proved to be quite useful, although there was almost no documentation available. This one and all other libraries are described in section \ref{ch:Implementation:sec:Impl:subsec:libs}. The main focus is on the encoder and decoder classes but the other modules will be discussed as well. The project is realized as a maven project, to simplify dependency management. 
 
 \section{Binary and byte wise RLE}
 \label{ch:Implementation:bin and byte rle}
@@ -14,10 +14,10 @@ All algorithms described have been implemented using Kotlin, because it can be c
 \section{Vertical binary RLE}
 \label{ch:Implementation:vertical rle}
 \par{
-	Basically the ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. Its stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream. Afterwards, the amount of runs per bit position is written to the tail of the encoded file, without the information how many runs are expected it would be much more difficult to decide which run belongs where, but it is still possible. The overhead of this additional information is around 34 byte, two for each count and a two byte stop symbol which is only needed seven times, no additional stop at the end of the file. Even though it was originally designed to work on chunks of bytes, in the end the transformations worked on the file or on the stream itself, which was significantly faster.
+	Basically the ideas described in sections \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading} and \ref{ch:Conceptual Design:sec:Parallel Byte Reading} where only a small variance compared to regular binary RLE. It is realized with the use of BitStreams again. Its stream interface offers a position $p$, which corresponds to the byte value and a offset $o$, which is a bit value with significance $o$ of byte $p$, which allows reading all bits of the same significance in order. This was done for significance zero to seven to read all bits in a vertical manner as in the examples. Then each run is again counted with the same method including a maximum run length defined by the amount of bits used to count a run and the runs are then written with the fixed amount of bits to the output stream. Afterwards, the amount of runs per bit position is written to the tail of the encoded file, without the information how many runs are expected it would be much more difficult to decide which run belongs where, but it is still possible. The average overhead of this additional information is around 34 byte, two for each count and a two byte stop symbol which is only needed seven times, no additional stop at the end of the file. Even though it was originally designed to work on chunks of bytes, in the end the transformations worked on the file or on the stream itself, which was significantly faster.
 }
 \par{
-	During decoding, the expected amount of runs are parsed from the end if the file. Then the actual decoding happens, with the fixed $n$ bits per code for this bits significance. Knowing the exact amount of RLE numbers for each bit position makes it easy to decode, because the variable length of encoded numbers can be chooses accordingly while reading the stream once. Assuming a starting run on zero, all runs are written back to one file, each bit position sequentially, to then assemble the original data.
+	During decoding, the expected amount of runs are parsed from the end if the file. Then the actual decoding happens, with the fixed $n$ bits per code for this bits significance. Knowing the exact amount of RLE numbers for each bit position makes it easy to decode, because the variable length of encoded numbers can be chosen accordingly while reading the stream once. Assuming a starting run on zero, all runs are written back to one file, each bit position sequentially, to then assemble the original data. This is done for each bit position in sequential order so we need to write 8 times to the output file. It might be worth trying out building the byte stream in memory and the write the output only once, which might be faster but also requires more internal data structures and holding the whole file in memory at once.
 }
 \section{Byte Remapping}
 \label{ch:Implementation:bytemapping}
@@ -52,15 +52,24 @@ To avoid reinventing the wheel, some external libraries are used in throughout t
 
 \subsection{IOStreams for Kotlin}
 \label{ch:Implementation:sec:Impl:subsec:libs:iostreams}
-- \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{IOStreams for Kotlin}}
-
+\par{
+Alexander Kornilov created and released this library, which was found in the \href{https://discuss.kotlinlang.org/t/i-o-streams-for-kotlin/9802}{Kotlin forum}} and is currently hosted on \href{https://sourceforge.net/projects/kotlin-utils/}{Sourceforge}. It has a very light documentation \cite{IoStreamsKotlin} and is released with an Apache v2.0 license. It has to be mentioned that for the time being there is only a pre-release available, this version 0.33 is used throughout this project. Moving to this library rendered it possible to work entirely on streams of data as well as reading the next $n$ bit(s). This greatly improved the performance of the initial algorithm and reduced required data structures and memory. There was also some odd or unexpected behavior seen which might be changed in further versions, for example if the stream is currently at the first byte and we want to write to its bit with the highest significance. This represents a so called bit offset of 7, so we can write the position as 0:7. Writing a 1 or setting this bit to true advances the position of the stream to the next byte and offset zero, so 1:0 while writing a 0 keeps the stream at its current position so it is still at 0:7 and the next bit gets written on the same position. Basically the interface provides good functionality with the drawback of some inconsistencies.
+}
 
 \subsection{libDivSufSort}
 \label{ch:Implementation:sec:Impl:subsec:libs:libDivSufSot}
-- \href{https://code.google.com/archive/p/libdivsufsort/}{libDivSufSort}\\
+\par{
+The original code for the modified BWTS algorithm and the necessary sorting algorithms called \emph{DivSufSort} for efficient suffix array sorting was provided by Yuta Mori in the library \href{https://github.com/y-256/libdivsufsort}{libDivSufSort} \cite{LibDivSufSort}. The code is available under the MIT license at Github but written in C and thus, rather hard to use from Kotlin. Further research lead to a port to Java which uses the same structures and methods but is already close to the desired state, since Kotlin enables using Java classes by default.
+}
 \subsection{libDivSufSort in Java}
 \label{ch:Implementation:sec:Impl:subsec:libs:libDivSufSort Java}
-- \href{https://github.com/flanglet/kanzi/releases}{libDivSufSort java impl}\\
+\par{
+Porting the Java implementation provided by \href{https://github.com/flanglet/kanzi/releases}{kanzi} \cite{kanzi}, a collection of state of the art compression methods, all available in Java, C++ and Go, was easy but also gratuitous, since there are releases available for the Java version which is still maintained at a high frequency. To use them we simply add the dependency to our maven project. This library basically provides one functionality, the implementation of a sophisticated bijective Burrows-Wheeler-Scott-Transformation in linear time.
+}
+\par{
+
+}
+
 \subsection{Others}
 \label{ch:Implementation:sec:Impl:subsec:libs:others}
 - static log\\
