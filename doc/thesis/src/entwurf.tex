@@ -89,8 +89,6 @@ To reverse the mapping after decoding the runs, the mapping has do be persisted 
 }
 \par{
 After some analysis it was found that the effect was also seen in the second and third most significant bit, as higher value bytes became unlikely in the input data after the remapping so the idea of varying maximum run lengths for different significant bits became more appealing again. To determine the best combination of maximum run lengths and how many most significant bits should be encoded with a higher maximum run length, most promising looking combinations of these were tested and the results plotted below.
-
-TODO: fix axis
 }
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -103,6 +101,7 @@ xlabel={$\frac{bits}{run}$},
 ylabel={Compression ratio},
 symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,222335710},
 x tick label style={font=\small,text width=1cm,align=center},
+xtick=data,
 enlargelimits=true,
 ymax=120,
 legend pos=north west,
@@ -253,29 +252,27 @@ There should still room for some optimizations because as seen in section \ref{c
 	ylabel={Compression ratio},
 	symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,222335710},
 	x tick label style={font=\small,text width=1cm,align=center},
+	xtick=data,
 	enlargelimits=true,
 	ymax=120,
 	legend pos=north west,
 	ymajorgrids=true,
-	grid style=dashed
+	grid style=dashed,
+	ybar
 	]
-	\addplot[color=blue,mark=square]
+	\addplot[color=blue,fill]
 	coordinates {
-		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)
+		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)	(22233578,100)(22233579,102)(222335710,106)
 	};
-	\addplot[color=red,mark=square]
+	\addplot[color=red,fill]
 	coordinates {
-		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)
+		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
 	};
-	\addplot[color=blue,mark=square]
+	\addplot[color=black,fill]
 	coordinates {
-		(22233578,100)(22233579,102)(222335710,106)
+		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
 	};
-	\addplot[color=red,mark=square]
-	coordinates {
-	(22233578,95)(22233579,94.9)(222335710,95)
-	};
-	\legend{without byte mapping, with byte mapping}
+	\legend{no preprocessing,byte mapping,byte mapping \& BWT}
 	\end{axis}
 	\end{tikzpicture}
 	%}
