@@ -36,6 +36,7 @@ open class Application {
         @JvmStatic
         fun main(args: Array<String>) {
 
+            var vertBitRLEset = false
             var decompress = false
             var applyBurrowsWheelerTransformation = false
             var applyByteMapping = false
@@ -66,21 +67,40 @@ open class Application {
                 exitProcess(0)
             }
 
+            if (map.containsKey("-m"))
 
-            if (map.containsKey("-c") && map.containsKey("-d")) {
-                println("Invalid arguments -c and -d!")
-                printUsage()
-                exitProcess(1)
-            } else if (map.containsKey("-d")) {
-                decompress = true
-            }
+
+                if (map.containsKey("-c") && map.containsKey("-d")) {
+                    println("Invalid arguments -c and -d!")
+                    printUsage()
+                    exitProcess(1)
+                } else if (map.containsKey("-d")) {
+                    decompress = true
+                }
+
+            if (map.containsKey("-v")) vertBitRLEset = true
             if (map.containsKey("-bin")) binaryRle = true
             if (map.containsKey("-byte")) byteWiseRle = true
-            if (binaryRle && byteWiseRle) {
-                println("Invalid arguments -bin and -byte!")
+            if ((binaryRle && byteWiseRle) || (binaryRle && vertBitRLEset) || (vertBitRLEset && byteWiseRle)) {
+                println("Invalid arguments! Only one method usable.")
                 printUsage()
                 exitProcess(1)
             }
+
+            var userBitsTousemap: Map<Int, Int>? = null
+
+            if (map.containsKey("-v")) {
+                val bitsToUse = map.getValue("-v").first()
+                if (Regex("(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)").matches(bitsToUse)) {
+                    userBitsTousemap = mutableMapOf()
+                    val bitsToUseMatches =
+                        Regex("(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)").find(bitsToUse)
+                    for (i in 0..7) {
+                        userBitsTousemap[i] = bitsToUseMatches!!.groupValues[i + 1].toInt()
+                    }
+                }
+            }
+
             if (map.containsKey("-bwt")) applyBurrowsWheelerTransformation = true
             if (map.containsKey("-map")) applyByteMapping = true
             if (map.containsKey("-huf")) applyHuffmanEncoding = true
@@ -123,7 +143,7 @@ open class Application {
                                 applyByteMapping,
                                 applyBurrowsWheelerTransformation,
                                 applyHuffmanEncoding,
-                                if (applyHuffmanEncoding) mapOf(
+                                if (applyHuffmanEncoding) userBitsTousemap ?: mapOf(
                                     0 to 8,
                                     1 to 8,
                                     2 to 8,
@@ -133,26 +153,28 @@ open class Application {
                                     6 to 8,
                                     7 to 8
                                 ) else {
-                                    if (applyByteMapping && !applyBurrowsWheelerTransformation) mapOf(
-                                        0 to 2,
-                                        1 to 2,
-                                        2 to 3,
-                                        3 to 3,
-                                        4 to 3,
-                                        5 to 4,
-                                        6 to 5,
-                                        7 to 8
-                                    )
-                                    else if (!applyByteMapping && applyBurrowsWheelerTransformation) mapOf(
-                                        0 to 4,
-                                        1 to 4,
-                                        2 to 4,
-                                        3 to 4,
-                                        4 to 4,
-                                        5 to 6,
-                                        6 to 6,
-                                        7 to 8
-                                    )
+                                    if (applyByteMapping && !applyBurrowsWheelerTransformation) userBitsTousemap
+                                        ?: mapOf(
+                                            0 to 2,
+                                            1 to 2,
+                                            2 to 3,
+                                            3 to 3,
+                                            4 to 3,
+                                            5 to 4,
+                                            6 to 5,
+                                            7 to 8
+                                        )
+                                    else if (!applyByteMapping && applyBurrowsWheelerTransformation) userBitsTousemap
+                                        ?: mapOf(
+                                            0 to 4,
+                                            1 to 4,
+                                            2 to 4,
+                                            3 to 4,
+                                            4 to 4,
+                                            5 to 6,
+                                            6 to 6,
+                                            7 to 8
+                                        )
                                     else mapOf(0 to 4, 1 to 4, 2 to 4, 3 to 4, 4 to 5, 5 to 7, 6 to 8, 7 to 8)
                                 }
                             )
@@ -210,7 +232,7 @@ open class Application {
             println("-c \t\t compress file (default)")
             println("-d \t\t decompress file\n")
             println("METHOD:")
-            println("-v \t\t vertical reading (default)")
+            println("-v #,#,#,#,#,#,#,#\t\t vertical reading (default), optional run lengths used on bit of significance 1 to 8")
             println("-bin #N \t binary reading (with N bits per RLE encoded number, default 3)")
             println("-byte #N \t byte wise reading (with N bits per RLE encoded number, default 3)\n")
             println("PREPROCESSING:")
