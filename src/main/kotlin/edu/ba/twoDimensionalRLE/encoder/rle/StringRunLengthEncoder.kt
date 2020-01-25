@@ -152,6 +152,7 @@ class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
                 }
             }
         }
+        log.info("Finished encoding $inputFile.")
     }
 
     fun decodeSimpleBinaryRLE(inputFile: String, outputFile: String, bitPerRun: Int) {
@@ -166,8 +167,8 @@ class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
                     currentBit = !currentBit
                 }
             }
-
         }
+        log.info("Finished encoding $inputFile.")
     }
 
     fun encodeVarLength(
@@ -188,7 +189,7 @@ class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
         var chunkSize = chunkSize
 
         if (applyBurrowsWheelerTransformationS) {
-            log.debug("Applying bijective Burrows Wheeler Transformation to file...")
+            log.debug("Applying bijective Burrows Wheeler Transformation...")
             val bwts = BWTS()
             transformedFile = "${outputFile}_bwt_tmp"
             val buf1 = File(inputFile).readBytes()
@@ -247,7 +248,8 @@ class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
                 writeRunToStream(counter, stream, bitPerRun)
             }
         }
-        log.debug("Finished encoding.")
+        if (applyBurrowsWheelerTransformationS) File(transformedFile!!).delete()
+        log.info("Finished encoding.")
     }
 
 
@@ -340,7 +342,7 @@ class StringRunLengthEncoder(var DEBUGLOG: Boolean = false) : Encoder {
             log.debug("Applying inverse Burrows Wheeler Transformation to file...")
             transformedFile = "${output}_bwt"
             val bwt = BWTS()
-            val buf1 = File(inputFile).readBytes()
+            val buf1 = File(outputFile).readBytes()
             val buf2 = ByteArray(buf1.size)
             val sa1 = SliceByteArray(buf1, 0)
             val sa2 = SliceByteArray(buf2, 0)
