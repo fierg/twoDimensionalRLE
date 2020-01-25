@@ -149,20 +149,30 @@ We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no o
 \[
 \sum_{(s,w)\in C} 2^{-l(w)} \leq 1
 \]
-And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm	 in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. For decoding it is required to persists the mapping as well.
+And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm	 in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c into another tree. This is resembled in figure \ref{fig:M1:example Huffman tree} with the tree leafs in green and the two generated trees in red with the combined frequency. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. Obviously the most frequent symbol is assigned the shortest code and all codes are prefix free. the For decoding it is required to persists the mapping as well.
 
-TODO: fix numbers on vector
 \begin{figure}[h]
 	\centering
-	\begin{tikzpicture}[->,>=stealth',level/.style={sibling distance = 5cm/#1,
-		level distance = 1.5cm}] 
-	\node [arn_n] {}
-	child{ node [arn_n] { } 
-		child{ node [arn_n] {b}}
-		child{ node [arn_n] {a}}                            
-	}
-	child{ node [arn_n] {c}}; 
-	\end{tikzpicture}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw=red}]
+\node (B) at (1.25,2) {3};
+\node (C) at (2.5,4) {8};
+\end{scope}
+\begin{scope}[every node/.style={circle,thick,draw=green}]
+\node (A) at (0,0) {a,2};
+\node (D) at (2.5,0) {b,1};
+\node (F) at (5,0) {c,5} ;
+\end{scope}
+
+\begin{scope}[>={Stealth[black]},
+every node/.style={fill=white,circle}]
+\path [->] (A) edge node {$0$} (B);
+\path [->] (B) edge node {$0$} (C);
+\path [->] (D) edge node {$1$} (B);
+\path [->] (C) edge node {$1$} (F);
+
+\end{scope}
+\end{tikzpicture}
 	\caption{example Huffman Tree with 3 Leaf Nodes} \label{fig:M1:example Huffman tree}
 \end{figure}
 }
