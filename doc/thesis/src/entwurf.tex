@@ -89,15 +89,16 @@ width=\textwidth,
 height=0.45\textwidth,
 axis x line=center,
 axis y line=left,
-xlabel={$\frac{bits}{run}$},
+xlabel={bits per run},
 ylabel={Compression ratio},
 symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,222335710},
 x tick label style={font=\small,text width=1cm,align=center},
 xtick=data,
+x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
 enlargelimits=true,
 ymax=115,
 	legend style={
-	at={(0.5,-0.2)},
+	at={(0.5,1.2)},
 	anchor=north,
 	legend columns=-1,
 	/tikz/every even column/.append style={column sep=0.5cm}
@@ -245,15 +246,16 @@ There should still be room for some optimizations because as seen in Section \re
 	height=0.45\textwidth,
 	axis x line=center,
 	axis y line=left,
-	xlabel={$\frac{bits}{run}$},
+	xlabel={bits per run},
+	x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
 	ylabel={Compression ratio},
-	symbolic x coords={22223436,22223437,22333458,22233579,44444668,44444679,44445788,444457810},
+	symbolic x coords={22223437,22333458,22233579,44444668,44444679,44445788,444457810},
 	x tick label style={font=\small,text width=1cm,align=center},
 	xtick=data,
 	enlargelimits=true,
 	ymax=135,
 	legend style={
-	at={(0.5,-0.2)},
+	at={(0.5,1.2)},
 	anchor=north,
 	legend columns=-1,
 	/tikz/every even column/.append style={column sep=0.5cm}
@@ -264,15 +266,15 @@ There should still be room for some optimizations because as seen in Section \re
 	]
 	\addplot[color=blue,fill]
 	coordinates {
-		(22223436,112.55)(22223437,112.4)(22333458,120.4 )(22233579,125.6)(44444668,147.2)(44444679,151.3)(44445788,159.7)(444457810,160.8)
+		(22223437,112.4)(22333458,120.4 )(22233579,125.6)(44444668,147.2)(44444679,151.3)(44445788,159.7)(444457810,160.8)
 		};
 	\addplot[color=red,fill]
 	coordinates {
-		(22223436,103.3)(22223437,102.6)(22333458,98.2 )(22233579,94.99)(44444668,115.7)(44444679,115.1)(44445788,118)(444457810,118)
+		(22223437,102.6)(22333458,98.2 )(22233579,94.99)(44444668,115.7)(44444679,115.1)(44445788,118)(444457810,118)
 	};
 	\addplot[color=black,fill]
 	coordinates {
-		(22223436,99.73)(22223437,98.8)(22333458,86.1 )(22233579,85.3)(44444668,71.2)(44444679,70.3)(44445788,69.6)(444457810,69.4)
+		(22223437,98.8)(22333458,86.1 )(22233579,85.3)(44444668,71.2)(44444679,70.3)(44445788,69.6)(444457810,69.4)
 	};
 	\legend{no preprocessing,byte mapping,byte mapping \& BWT}
 	\end{axis}
