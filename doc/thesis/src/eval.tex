@@ -35,9 +35,8 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 	\caption{Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 	\label{tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 \end{table}
-
 \par{
-Abstinence of internal operations and large or complex data structures to hold all the input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 6.8 seconds but the decoding is rather slow with 15.6 seconds although is has to be mentioned that there is still some potential in performance optimization and parallelization.
+	The two desired goals could also be achieved, a significant compression for the whole corpus is possible while even improving against regular RLE on files highly suited for this method and the results are pretty similar on both corpora.
 }
 
 %% ==============================
@@ -45,7 +44,7 @@ Abstinence of internal operations and large or complex data structures to hold a
 %% ==============================
 \label{ch:Evaluation:sec:Benchmarks}
 \par{
-	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on a AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage. The algorithm cmix explicitly demanded 32 GB of ram which could not be provided, which in turn lead to a lot of paging and thus, very poor timing benchmark results.
+	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on an AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage. The algorithm cmix explicitly demanded 32 GB of ram which could not be provided, which in turn lead to a lot of paging and thus, very poor timing benchmark results.
 }
 	\begin{table}[h]
 	\begin{tabular}{r|r|r|r|r|r}
@@ -69,18 +68,17 @@ Abstinence of internal operations and large or complex data structures to hold a
 	\label{tab:t100benchmark}
 	\caption{Benchmark on the Calgary Corpus}
 \end{table}
-
 \par{
-
+	Avoiding internal operations and large or complex data structures to hold all the input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 6.8 seconds but the decoding is rather slow with 15.6 seconds although is has to be mentioned that there is still some potential in performance optimization and parallelization.
 }
 
 %% ==============================
 \section{Conclusion}
 %% ==============================
 \label{ch:Evaluation:sec:Conclusion}
-
-Am Ende sollten ggf. die wichtigsten Ergebnisse nochmal in \emph{einem} kurzen Absatz zusammengefasst werden.
-
+\par{
+In conclusion, the desired state was achieved and it was shown that with the help of preprocessing and a different encoding technique, RLE can achieve compression results comparable to modern methods. It is still far from opposing a real competition, neither in speed nor compression ratios, but it is only a few percent points behind daily used algorithms. Possible additional improvements will be discussed in the next section, although at this point one has to decide if compression or speed should be in the main focus. Anyhow, to show the efficiency of the suggested preprocessing methods it is definitely adequate.
+}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "thesis"

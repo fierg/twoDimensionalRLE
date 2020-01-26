@@ -141,7 +141,7 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
                 }
             }
         }
-        log.debug("Finished encoding.")
+        log.info("Finished encoding.")
         if (applyByteMapping) File(mappedFile!!).delete()
         if (applyBurrowsWheelerTransformation) File(transformedFile!!).delete()
     }
