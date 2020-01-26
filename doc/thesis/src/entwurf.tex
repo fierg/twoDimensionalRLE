@@ -95,8 +95,13 @@ symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,2223357
 x tick label style={font=\small,text width=1cm,align=center},
 xtick=data,
 enlargelimits=true,
-ymax=120,
-legend pos=north west,
+ymax=115,
+	legend style={
+	at={(0.5,-0.2)},
+	anchor=north,
+	legend columns=-1,
+	/tikz/every even column/.append style={column sep=0.5cm}
+},	
 ymajorgrids=true,
 grid style=dashed,
 ybar]
@@ -242,27 +247,32 @@ There should still be room for some optimizations because as seen in section \re
 	axis y line=left,
 	xlabel={$\frac{bits}{run}$},
 	ylabel={Compression ratio},
-	symbolic x coords={22223436,22223437,22223438,22223439,22233578,22233579,222335710},
+	symbolic x coords={22223436,22223437,22333458,22233579,44444668,44444679,44445788,444457810},
 	x tick label style={font=\small,text width=1cm,align=center},
 	xtick=data,
 	enlargelimits=true,
-	ymax=120,
-	legend pos=north west,
+	ymax=135,
+	legend style={
+	at={(0.5,-0.2)},
+	anchor=north,
+	legend columns=-1,
+	/tikz/every even column/.append style={column sep=0.5cm}
+	},	
 	ymajorgrids=true,
 	grid style=dashed,
 	ybar
 	]
 	\addplot[color=blue,fill]
 	coordinates {
-		(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)	(22233578,100)(22233579,102)(222335710,106)
-	};
+		(22223436,112.55)(22223437,112.4)(22333458,120.4 )(22233579,125.6)(44444668,147.2)(44444679,151.3)(44445788,159.7)(444457810,160.8)
+		};
 	\addplot[color=red,fill]
 	coordinates {
-		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
+		(22223436,103.3)(22223437,102.6)(22333458,98.2 )(22233579,94.99)(44444668,115.7)(44444679,115.1)(44445788,118)(444457810,118)
 	};
 	\addplot[color=black,fill]
 	coordinates {
-		(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
+		(22223436,99.73)(22223437,98.8)(22333458,86.1 )(22233579,85.3)(44444668,71.2)(44444679,70.3)(44445788,69.6)(444457810,69.4)
 	};
 	\legend{no preprocessing,byte mapping,byte mapping \& BWT}
 	\end{axis}
@@ -309,7 +319,7 @@ One last option was the encoding of the lowest significant bits with another, mo
 \label{ch:Conceptual Design:sec:Postprocessing}
 \par{
 Encoding produced run lengths using Huffman codes was implemented, similar to the Fax Transmission Standard mentioned in section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}, but in a dynamic way instead of predefined static codes. This idea was also used by Burrows and Wheeler in their paper \cite{Burrows94} but instead of RLE they combined a Move to Front Coder with their transformation and then encoded the result using Huffman codes. This way it would be possible to encode more frequent results of the Move-to-Front Encoder or the Run Length Encoder could be encoded into shorter codes and thus save even more space. This step is not really considered preprocessing anymore but could improve the compression furthermore, however the benefit of Huffman encoding is the possibility to output codes of varying length as described in section \ref{ch:Principles of compression:sec:Huffman Coding}. Combining the binary or vertical encoded RLE with a Huffman encoder would be a huge benefit, because as of now the algorithm needs to output a number of bits for each number to encode. Combined, the more frequent short runs of 1 or 2 can be encoded into shorter Huffman codes which should increase the overall compression algorithm. In general it was assumed that there was no longer a benefit in using different maximum run lengths on bits of different significance, because a run of length is going to be encoded with a Huffman code, not with just a fixed amount of bits. To reverse the Huffman encoding, the Huffman tree has to be persisted into the file as well.
-	\begin{table}[h]
+	\begin{table}[H]
 		\centering
 		\begin{tabular}{r|r|r|r|r}	
 			file & size original & size encoded & ratio in \% & \textit{bps}\\
@@ -336,7 +346,7 @@ trans & 93695 & 31235 & 33.34 & 2.67 \\
 	\end{table}
 }
 \par{
-This combination of vertical encoding with byte remapping and the sophisticated BWTS as preprocessing steps so far best results have been found. Although, at first glance it was suggested to eliminate the maximum run restriction to possibly compress all bits of one significance into a single Huffman code, it turned out to be most efficient if the run length process is limited to 8 bits per run. This way still a total of 255 bits of same significance can be encoded into one during the RLE step, but there will be only a maximum of 256 different Huffman codes generated. Average Huffman code length will be significantly shorter. Also it makes no sense to use different maximum run lengths for bits of different significance, because there will still be one Huffman code for each different run value.
+This combination of vertical encoding with byte remapping and the sophisticated BWTS as preprocessing steps so far best results have been found. Although, at first glance it was suggested to eliminate the maximum run restriction to possibly compress all bits of one significance into a single Huffman code, it turned out to be most efficient if the run length process is limited to 8 bits per run. This way still a total of 255 bits of same significance can be encoded into one during the RLE step, but there will be only a maximum of 256 different Huffman codes generated. Average Huffman code length will be significantly shorter. Also it makes no sense to use different maximum run lengths for bits of different significance, because there will still be one Huffman code for each different run value. The results are depicted in table \ref{tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}.
 }
 \section{Summary}
 \par{
