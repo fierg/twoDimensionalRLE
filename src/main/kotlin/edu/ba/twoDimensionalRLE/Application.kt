@@ -247,8 +247,8 @@ open class Application {
             println("Advanced RLE Encoder\n")
             println("Usage:\n [action] [method] [preprocessing] -f [files...]\n")
             println("ACTION:")
-            println("-c \t\t\t\t compress file (default)")
-            println("-d \t\t\t\t decompress file\n")
+            println("-c \t\t\t compress file (default)")
+            println("-d \t\t\t decompress file\n")
             println("METHOD:")
             println("-v #,#,#,#,#,#,#,#\t vertical reading (default), optional run lengths used on bit of significance 1 to 8 (N in range [2,32])")
             println("-bin #N \t\t binary reading (with N bits per RLE encoded number, default 3)")
@@ -258,7 +258,7 @@ open class Application {
             println("-map \t\t\t apply Byte-mapping during encoding")
             println("-huf \t\t\t encode with Huffman encoding\n")
             println("DEBUG:")
-            println("-D \t\t\t\t debug log level")
+            println("-D \t\t\t debug log level")
         }
     }
 }
