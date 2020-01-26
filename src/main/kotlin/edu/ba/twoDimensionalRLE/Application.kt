@@ -89,15 +89,24 @@ open class Application {
 
             var userBitsTousemap: Map<Int, Int>? = null
 
-            if (map.containsKey("-v")) {
-                val bitsToUse = map.getValue("-v").first()
+            if (map.containsKey("-v") && !map["-v"].isNullOrEmpty()) {
+                val bitsToUse = (map["-v"] ?: error("Unexpected mapping parsed!")).first()
                 if (Regex("(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)").matches(bitsToUse)) {
                     userBitsTousemap = mutableMapOf()
                     val bitsToUseMatches =
                         Regex("(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)").find(bitsToUse)
                     for (i in 0..7) {
-                        userBitsTousemap[i] = bitsToUseMatches!!.groupValues[i + 1].toInt()
+                        if (bitsToUseMatches!!.groupValues[i + 1].toInt() in 2..32) userBitsTousemap[i] = bitsToUseMatches!!.groupValues[i + 1].toInt() else {
+                            println("bit per run has to bin range [2,32]!")
+                            printUsage()
+                            exitProcess(1)
+                        }
                     }
+                } else {
+                    println("Unexpected mapping parsed!")
+                    println("expecting 8 comma separated numbers: -v N,N,N,N,N,N,N,N")
+                    printUsage()
+                    exitProcess(1)
                 }
             }
 
@@ -175,7 +184,16 @@ open class Application {
                                             6 to 6,
                                             7 to 8
                                         )
-                                    else mapOf(0 to 4, 1 to 4, 2 to 4, 3 to 4, 4 to 5, 5 to 7, 6 to 8, 7 to 8)
+                                    else userBitsTousemap ?: mapOf(
+                                        0 to 4,
+                                        1 to 4,
+                                        2 to 4,
+                                        3 to 4,
+                                        4 to 5,
+                                        5 to 7,
+                                        6 to 8,
+                                        7 to 8
+                                    )
                                 }
                             )
                         }
@@ -232,7 +250,7 @@ open class Application {
             println("-c \t\t compress file (default)")
             println("-d \t\t decompress file\n")
             println("METHOD:")
-            println("-v #,#,#,#,#,#,#,#\t\t vertical reading (default), optional run lengths used on bit of significance 1 to 8")
+            println("-v #,#,#,#,#,#,#,#\t\t vertical reading (default), optional run lengths used on bit of significance 1 to 8 (N in range [2,32])")
             println("-bin #N \t binary reading (with N bits per RLE encoded number, default 3)")
             println("-byte #N \t byte wise reading (with N bits per RLE encoded number, default 3)\n")
             println("PREPROCESSING:")
