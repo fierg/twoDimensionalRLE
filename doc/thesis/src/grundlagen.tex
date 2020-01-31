@@ -66,7 +66,7 @@ The general idea behind Probability Coding is to analyze probabilities for messa
 Dictionary Coding is best suited for data with a small amount of repeating patterns like a text containing repeated words. In this case it is very effective to save the patterns just once and refer to them if they are used later on in the text. If we know a lot about the text itself in advance, a static dictionary is sufficient but in general we want to compress an arbitrary text. This requires a more general approach as used by the well known LZ77 and LZ88 algorithms described by Jacob Ziv and Abraham Lempel \cite{lz}. They use a so called sliding window principle, a buffer moving across the input in the case of LZ77 or a dynamic dictionary in the implementation of LZ78. Both of them are still used in modified versions in real world applications as described in Section \ref{ch:Principles of compression:sec:SOTA}, although mostly implemented in newer variants or derivatives.
 }
 \par{
-The main difference between probabilistic coding and dictionary coding is, that the so far presented probability based methods like RLE or Huffman Coding are working on single characters or bytes whereas the dictionary based methods encode groups of characters of varying length. This is a clear advantage in terms of compression performance on every day data because of its repeating patterns most textual data has, as shown in Section \ref{ch:Analysis:sec:Initial Findings}, and has been overcome by sophisticated probabilistic methods like arithmetic coding or ASN.
+The main difference between probabilistic coding and dictionary coding is, that the so far presented probability based methods like RLE or Huffman Coding are working on single characters or bytes whereas the dictionary based methods encode groups of characters of varying length. This is a clear advantage in terms of compression performance on every day data because of its repeating patterns most textual data has, as shown in Section \ref{ch:Analysis:sec:Initial Findings}, and has been overcome by sophisticated probabilistic methods like arithmetic coding or ANS.
 }
 
 
@@ -261,7 +261,7 @@ The current state of the art at the time of writing is depicted in the Table \re
 			ZIP v3.0 &-9& 1,019,783 & 32.4\% & 2.59 \\
 			zstandard 1.4.2& --ultra-23 -long=30 & 887,004 & 28.1\% & 2.25\\
 			bzip2 v1.0.8 & --best & 832,443 & 26.4\% & 2.11 \\
-			brotli & -q 11 -w 24 & 826,638 & 26.3\%& 2.10\\
+			brotli 1.0.7 & -q 11 -w 24 & 826,638 & 26.3\%& 2.10\\
 			p7zip 16.02 (deflate) & a -mx10 & 821,873 & 26.1\% & 2.08 \\
 			p7zip 16.02 (PPMd) & a -mm=ppmd o=32 & 763,067& 24.2\% & 1.93 \\
 			ZPAQ v7.15 & -m5 & 659,700 & 20.9\% & 1.67  \\

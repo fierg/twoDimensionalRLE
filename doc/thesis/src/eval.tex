@@ -4,7 +4,7 @@
 \chapter{Evaluation}
 \label{ch:Evaluation}
 %% ==============================
-Moving on to the evaluation, we start by comparing the achieved results using different preprocessing options or combination of those. To start of it is clear that the best compression ratio was not accomplished by using a combination of different mapping techniques and a vertical interpretation of the input data but we now take a closer look at the discrepancy between each result. It is also clear that with the help of such methods, run length encoding can become a suitable compression algorithm for more than just pellet based images although it is clearly not as sophisticated as advanced state of the art compression methods mentioned in section \ref{ch:Principles of compression:sec:SOTA}.
+Moving on to the evaluation, we start by comparing the achieved results using different preprocessing options or combination of those. To start of it is clear that the best compression ratio was accomplished by using a combination of different mapping techniques and a vertical interpretation of the input data but we now take a closer look at the discrepancy between each result. It is also clear that with the help of such methods, run length encoding can become a suitable compression algorithm for more than just pellet based images although it is clearly not as sophisticated as advanced state of the art compression methods mentioned in section \ref{ch:Principles of compression:sec:SOTA}.
 
 %% ==============================
 \section{Functional Evaluation}
@@ -44,7 +44,7 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 %% ==============================
 \label{ch:Evaluation:sec:Benchmarks}
 \par{
-	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on an AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage. The algorithm cmix explicitly demanded 32 GB of ram which could not be provided, which in turn lead to a lot of paging and thus, very poor timing benchmark results.
+	To benchmark the proposed algorithms, it was compared against the state of the art on the same hardware. All benchmarks were performed on an AMD Ryzen 5 2600X six core processor (12 threads) with a 3.6 GHz base clock and a 4.2 GHz boost clock speed. For memory, 16GB 3200MHz ram and a Samsung evo ssd was used for persistent storage. The algorithm cmix explicitly demanded 32 GB of ram which could not be provided, which in turn lead to a lot of paging and thus, very poor timing benchmark results. Also, all algorithms were written in C and executed as binary executable, while the proposed algorithm \emph{modified vertical RLE} was written in Kotlin and executed on the GraalVM \cite{vsipek2019exploring}.
 }
 	\begin{table}[h]
 	\begin{tabular}{r|r|r|r|r|r}
@@ -52,13 +52,13 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 		& & & & encoding & decoding\\
 		\hline
 		uncompressed & 3,145,718 & 100.0\% & 8.00 & &\\
-		compress 4.2 & 1,250,382 & 40.4\% & 3.24 & 0.039s & 0.025s\\
+		compress 4.2.4 & 1,250,382 & 40.4\% & 3.24 & 0.039s & 0.025s\\
 		modified vertical RLE & 1,237,380 & 39.3\%& 3.14 & 6.840s & 15.637s\\
 		gzip v1.10 & 1,021,720 & 32.4\% & 2.60 & 0.232s & 0.025s\\
 		ZIP v3.0 & 1,019,783 & 32.4\% & 2.59 & 0.214s & 0.022s\\
 		zstandard 1.4.2& 887,004 & 28.1\% & 2.25 & 0.951s & 0.011s\\
 		bzip2 v1.0.8 & 832,443 & 26.4\% & 2.11 & 0.191s & 0.088s\\
-		brotli & 826,638 & 26.3\%& 2.10 & 4.609s & 0.015s\\
+		brotli 1.0.7 & 826,638 & 26.3\%& 2.10 & 4.609s & 0.015s\\
 		p7zip 16.02 (deflate) &  794,098 & 26.1\% & 2.08 & 0.431s & 0.045s \\
 		p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s & 0.282s\\
 		ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s & 7.735s\\
@@ -69,7 +69,7 @@ xargs.1 & 4227 & 2515 & 59.50 & 4.76 \\
 	\caption{Benchmark on the Calgary Corpus.}
 \end{table}
 \par{
-	Avoiding internal operations and large or complex data structures to hold all the input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 6.8 seconds but the decoding is rather slow with 15.6 seconds although is has to be mentioned that there is still some potential in performance optimization and parallelization.
+	Avoiding internal operations and large or complex data structures to hold all the input data or even collecting the values of same significance in memory into byte arrays greatly improved time performance of the algorithm described. Encoding is reasonable fast with measured 6.8 seconds but the decoding is rather slow with 15.6 seconds although it has to be mentioned that there is still some potential in performance optimization and parallelization. The main reason for this margin between encoding and decoding speed is most likely due to the multiple writing of the output file, since each bit position has to be decoded separately so in the worst case a single byte need to be written 8 times if it contains $0xFF$. 
 }
 
 %% ==============================
