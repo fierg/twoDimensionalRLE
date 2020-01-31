@@ -9,7 +9,7 @@
 The following chapter contains a detailed analysis of the problem and the resulting design decisions with some further requirements for the algorithm. To have a comparison to some extent, the initial performance analysis was performed on the Calgary corpus but the results of the unmodified run length coding algorithm were very underwhelming as expected.
 }
 
-\section{The Calgary corpus}
+\section{The Calgary Corpus}
 \par{
 The Calgary Corpus \cite{calgaryCorpus} is a rather old corpus created by Ian Witten, Tim Bell and John Cleary from the University of Calgary in 1987. It consists of text and some binary data files shown in \ref{tab:t05 The Calgary Corpus} and is still used for comparison between compression algorithms. After some objections were raised \cite{CalgaryCorpusCritic}, it was mostly replaced by the \href{http://corpus.canterbury.ac.nz/}{Canterbury Corpus} or similar ones but it is still useful for comparing against other compression algorithms. To validate the final results and to insure that the algorithm is not just suited for this corpus, it will be validated on the Canterbury Corpus as well.
 
@@ -33,7 +33,7 @@ progl & 71646 &  Source code in Lisp\\
 progp & 49379 & Source code in Pascal\\
 trans & 93695 & ASCII and control characters\\	 
 	\end{tabular}
-	\caption{The Calgary Corpus}
+	\caption{The Calgary Corpus.}
 	\label{tab:t05 The Calgary Corpus}
 \end{table}	
 }
@@ -66,7 +66,7 @@ trans & 93695 & ASCII and control characters\\
 		3 & 131 & 10.50\\
 		2 & 104 & 8.36\\
 	\end{tabular}
-	\caption{Binary RLE on the Calgary Corpus}
+	\caption{Binary RLE on the Calgary Corpus.}
 	\label{tab:t30 Binary RLE on the Calgary Corpus}
 \end{table}
 
@@ -87,7 +87,7 @@ RLE is also applicable on a byte level, because there should be repetitions of a
 		3 & 116 & 9.29\\
 		2 & 109 & 8.74 \\
 	\end{tabular}
-	\caption{Byte-wise RLE on the Calgary Corpus}
+	\caption{Byte-wise RLE on the Calgary Corpus.}
 	\label{tab:t31 Byte-wise RLE on the Calgary Corpus}
 \end{table}
 
@@ -112,7 +112,7 @@ If we take a more detailed look, we can see that while most files expand with la
 		 & & 7 & 100098 & 19.50 & 1.56\\
 		 & & 8 & 101014 & 19.68 & 1.57\\		 
 	\end{tabular}
-	\caption{The file \textit{pic} with increasing bits per RLE encoded number}
+	\caption{The file \textit{pic} with increasing bits per RLE encoded number.}
 	\label{tab:t40 The file pic with increasing bits per RLE encoded number}
 \end{table}	
 }
@@ -134,7 +134,7 @@ The broad idea of preprocessing is to manipulate the input data in a way that re
 To understand how a Burrows-Wheeler-Transformation improves the effectiveness of compression, consider the effect in a common word in English text. Examine the letter ‘t’ in the word ‘the’, in an input string holding multiple instances of this word. Sorting all rotations of a string results in all rotations starting with ‘he ’ will be sorted together and most of them are going to to end in the letter ‘t’. This implies that the transformed string L has a large number of the letter t, combined with some other characters, such as space, ‘s’, ‘T’, and ‘S’. This is true for all characters, so any substring of L is likely to contain a large number of some distinct characters. \enquote{The overall effect is that the probability that given character $c$ will occur at a given point in L is very high if $c$ occurs near that point in L, and is low otherwise} \cite{Burrows94}. It is obvious that this should always improve the performance of byte level RLE because the transformation is taking place at character level but it should not effect the binary implementations. 
 }
 
-\subsection{Vertical byte reading}
+\subsection{Vertical Byte Reading}
 \label{ch:Analysis:sec:Improvements by Preprocessing:subSec:vertReading}
 Instead of performing compute intense operation on the data, we could also interpret the data in a different way and apply the original run length encoding on binary data. This idea is also know for binary RLE on images, where the encoding in the image follows a specific path. By reading the data in chunks of a fixed size, it is possible to read all most significant bits of all bytes, then the second most significant bits of all bytes and so on. This interpretation results in longer runs as shown in the example below.
 
@@ -149,7 +149,7 @@ Reading the data in a different way, all most significant bits, then al second m
 Now we have 5 runs of length 6, 2 runs of length 3, 3 runs of length 2 and just 6 runs of length 1 as opposed by the simple interpretation. This is because the binary similarity between the used characters, as the character for a and b only differ in one bit. It is clear that simply a different way of reading the input does not compress the actual data, instead it enables a better application of existing compressions. 
 }
 
-\subsection{Byte remapping}
+\subsection{Byte Remapping}
 \label{ch:Analysis:sec:Improvements by Preprocessing:subSec:byteRemapping}
 \par{
 The effect of very long runs in the last example was mainly because the binary representations of the used characters are very similar, so the range of byte values used was very small (between a = 97 and r = 114). Introducing other used symbols like uppercase letters, space or new lines, the used range expands.
@@ -172,7 +172,7 @@ One idea to solve the shorter runs might be a dynamic byte remapping, as the inp
 Using this method, the 4 most significant bits all result in zero columns, even row 5 has long runs while it is worth noting that the mapping itself has to be persisted in the encoded file as well. It is also still unclear if this idea scales well or is applicable to other files.
 }
 
-\subsection{Combined approaches}
+\subsection{Combined Approaches}
 \par{
 The idea of combining different compression methods into a superior method is not new and was also performed on RLE as mentioned in Section \ref{ch:Principles of compression:sec:Run Length Encoding:subSec:History}. While the idea of encoding the RLE numbers with Huffman codes is already known and analyzed, it is mostly in a static sense and optimized for special purpose applications. However the vertical byte reading enables new approaches, even more in combination with the idea of byte remapping and might become applicable to more than just binary Fax transmissions or DNA sequencing \cite{rle-bio},\cite{rle-dna} with longer runs of any kind in average.
 }
@@ -180,7 +180,7 @@ The idea of combining different compression methods into a superior method is no
 It might be interesting to see how well the appliance performs using the vertical binary encoding, in combination with the byte mapping. We expect the more significant the bit, the longer the runs because alternating values should be mostly on the lower significance bits. Using larger run length numbers for these rows while using smaller RLE numbers or even another encoding scheme like simple Huffman encoding we should improve our initial results.
 }
 
-\subsection{Huffman encoding of the RLE runs}
+\subsection{Huffman Encoding of the RLE Runs}
 \par{
 Another interesting approach is the improvement achieved by the combination of different methods like performing this modified RLE run on arbitrary data and then encode the results with Huffman codes, using shorter codes for more frequent runs. This idea is not new and also used in the current Fax Transmission Protocol but only for the simple binary RLE in combination with modified Huffman Codes. Other papers also mentioned these combined approaches and seemed to achieved good compression ratios, not much worse than the theoretical limit of around 1.5 \textit{bps} shown in Section \ref{ch:Principles of compression:sec:Compression}. This was for example done by M. Burrows and D.J. Wheeler in 1994 with their Transformation, in combination with a Move-to-Front Coder and a Huffman Coder \cite{Burrows94}. Encoding the Calgary Corpus resulted in a decrease in size to just 27\% of its original with a mean \textit{bps} of just $2.43$. This approach would no longer be considered preprocessing, but if more compression could be achieved by adding a post-processing step it is still worth trying out. It clearly has some benefits over the encoding of regular RLE numbers with a fixed size because we can encode with varying lengths, which also implies the absence of additional zeros, needed in the initial implementations.}
 

@@ -10,7 +10,7 @@ Throughout this work a finite alphabet $\Sigma$ is assumed with a linear order $
 }
 
 %% ==============================
-\section{Compression and Encoding fundamentals}
+\section{Compression and Encoding Fundamentals}
 %% ==============================
 \label{ch:Principles of compression:sec:Compression}
 \par{
@@ -49,7 +49,7 @@ So the entropy 	also describes the theoretical amount of bits needed to persist 
 	2. & 0.94 & 0.01 & 0.01 & 0.01 & 0.01 & 0.322
 	\label{tab:heisetabelle}
 \end{tabular}
-	\caption{Entropy in relation to the Probability of Symbols}
+	\caption{Entropy in relation to the probability of symbols.}
 \end{table}
 }
 \subsection{General Analysis}
@@ -89,7 +89,7 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 	Run length coding might count as the simplest probability coding scheme that makes use of context and repeating occurrences as described in the Section \ref{ch:Introduction:sec:Motivation}. While the example made earlier was in textual representation, it is best suited and mostly used for pallet based bitmap images \cite{palette-image} such as fax transmissions or computer icons.
 }
 
-\subsection{The History}
+\subsection{History}
 \label{ch:Principles of compression:sec:Run Length Encoding:subSec:History}
 \par{
  The ITU-T T4 (Group 3) standard for Facsimile (fax) machines \cite{ITU} is still in force for all devices used over regular phone lines. Each transmission sends a black and white image, where each pixel is called a \textit{pel} and with a horizontal resolution of $8.05 \: \frac{pels}{mm}$ and the vertical resolution depending on the mode. To encode each sequence of black and white pixels, the T4 standard uses RLE to encode each sequence of black and white pixels and since there are only two values, only the run length itself has to be encoded. It is assumed that the first run is always a white run, so there is a dummy white pel at the beginning of each sequence. For example, the sequence $bbbbwwbbbbb$ can be encoded as 1,4,2,5 with the leading white dummy pixel.
@@ -114,7 +114,7 @@ To further reduce the RLE encoded sequence, a probability coding procedure like 
 		128+ & 10010 & 000011001000
 		\label{tab:t1:static huffman codes}
 	\end{tabular}
-	\caption{T4 static Huffman codes}
+	\caption{T4 static Huffman codes.}
 \end{table}
 \par{
 By combining RLE with a probabilistic approach, the compression ratio increases because we no longer have to encode a run of length 1 or 2 with a fixed size of bits each instead we can write a recognizable Huffman code of varying length, which will be explored in grater detail later on as well as the decoding of the shown Huffman codes.}
@@ -164,14 +164,14 @@ every node/.style={fill=white,circle}]
 
 \end{scope}
 \end{tikzpicture}
-	\caption{example Huffman Tree with 3 Leaf Nodes} \label{fig:M1:example Huffman tree}
+	\caption{Example Huffman tree with 3 leaf nodes.} \label{fig:M1:example Huffman tree}
 \end{figure}
 }
 \par{
 Decoding is very trivial due to the prefix codes used b this algorithm. Reading bit by bit one can always see if a code is matching one of the mapping and if not, another bit is read. As soon as the parsed content matches a mapped code, we can decode it to the original symbol because there can not be a longer matching mapping. Due to the implementation via a Priority queue, which needs $O(log \: n)$ time per insertion and a tree with $n$ leaves has $2n-1$ nodes let this algorithm perform in $O(n \: log \: n)$ time where $n$ is the number of symbols.
 }
 
-\section{Other methods}
+\section{Other Methods}
 \label{ch:Principles of compression:sec:Other}
 \par{
 There are other well known methods like Move-to-Front coding or arithmetic coding also applied in different compression algorithms with different methods and therefore their own pros and cons. But other than Huffman coding, no further probability coding approach will be discussed nor implemented in this scope. But its worth mentioning that real world applications are mostly combinations of methods, like Deflate\cite{deutsch1996rfc1951} which uses LZSS\cite{10.1145/322344.322346} (derivative of LZ77) and Huffman encoding or more recent ones like the PAQ family which is using a context mixing algorithm \cite{mahoney2009data}. Some combinations and PAQ implementations can be found in table \ref{tab:t20 stat of the art} where the state of the art compression methods and algorithms are discussed.
@@ -202,7 +202,7 @@ As an example of the creation of $L$, given the input string $w = abcabr$, $n = 
 		\hline
 		row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
 	\end{tabular}
-	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
+	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
 \end{table}
 The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = rcaabb$ and $i = 1$. Obviously the string $L$ contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series. Also this depicts that the word w is coincidentally in row one of $M$ and is therefore a Lyndon word, because it is the smallest in its conjugacy class.
 }
@@ -224,7 +224,7 @@ The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with char
 		b & (b,6) & (r,1)
  		\label{tab:t11 standard permutation}
  	\end{tabular}
- 	\caption{Standard permutation generation of the word $L$}
+ 	\caption{Standard permutation generation of the word $L$.}
  \end{table}
 }
 \par{
@@ -275,12 +275,12 @@ The current state of the art at the time of writing is depicted in the table bel
 			cmix v18 & -c -d & 554,983 & 17.6\% & 1.41 		
 		\end{tabular}
 				\label{tab:t20 stat of the art}
-			\caption{State of the Art compression ratios}
+			\caption{State of the art compression ratios.}
 	\end{table}
 }
 
 %% ==============================
-\section{Limits of compression}
+\section{Limits of Compression}
 %% ==============================
 \label{ch:Principles of compression:sec:Limits of Conpression}
 \par{
