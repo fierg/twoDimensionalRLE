@@ -1,0 +1,237 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[]{csquotes}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage[margin=1in]{geometry}
+
+\author{Sven Fiergolla}
+\title{Dokumentation zum Konvertierer und Interpreter für Turingmaschinen}
+
+\newcommand{\ilc}{\texttt}
+
+\begin{document}
+\maketitle
+
+
+\section*{Einführung}
+\paragraph{}
+Wie in \enquote{A Universal Turing Machine with Two Internal States} von Claude E. Shannon beschrieben, lässt sich jede Turingmaschine in eine TM mit nur zwei Zuständen überführen.\\
+Im Folgenden wird die Implementierung, der im Paper beschrieben Konvertierung, dokumentiert und erläutert. Zudem wird der Interpreter erläutert.
+\par
+
+\section*{Funktionalität \& Abhängigkeiten der verwendeten Klassen}
+\subsection*{Konvertierer (Package \ilc{construction})}
+\paragraph{}
+Für die Konvertierung einer TM nach dem beschrieben Verfahren werden eine Reihe neuer Symbole benötigt, da die Information des aktuellen Zustandes in die Symbole übertragen wird. Anschließend müssen die Übergänge der TM und das Startsymbol (das Symbol unter dem Lesekopf zum ersten Schritt) angepasst werden. Dazu existieren die Klassen \ilc{ComplexSymbol} und \ilc{TMConstructor}.\par
+
+\subsection*{\ilc{ComplexSymbol}}
+\paragraph{}
+Nach Shannon's Verfahren, müssen zu jedem elementaren Symbol der ursprünglichen TM, pro Zustand, 4 neue Symbole erstellt werden. Dazu werden die Konstanten aus der Dummy-Klasse \ilc{ComlexSymbol} verwendet.\par
+
+\subsection*{\ilc{TM2Generator}}
+\paragraph{}
+Die Klasse \ilc{TM2Generator} kann mit Hilfe der Funktion \ilc{readTMfromFile(String path)} bzw. über den Konstruktor, eine Turingmaschine im beschrieben \ilc{.tur}-Format einlesen. Nun lässt sich die Funktion \ilc{generate2StateTM()} anwenden, welche 4 weitere Funktionen aufruft:\par
+\subsubsection*{\ilc{generateComSymbolTable()}}
+\paragraph*{}
+Die von der neuen TM benötigten Symbole werden pro Symbol von der Methode \ilc{generateSymbolArray (String symbol, String[] states)} mit Hilfe von \ilc{ComplexSymbol} für alle Zustände in je 4 Variationen erstellt und anschließend im \ilc{String[][] compSymbolTable} gehalten. Sind $A_1,A_2$ \dots $A_m$ die Symbole der ursprünglichen TM und $q_0, q_1$ \dots $q_n$, so ist das Array \ilc{compSymbolTable} anschließen wie folgt aufgebaut:
+
+\begin{center}
+\begin{tabular}{c|c||c||c}
+$A_{0,q_0,-,R}$ & $A_{1,q_0,-,R}$ & \dots & $A_{m,q_0,-,R}$\\
+\hline
+$A_{0,q_0,-,L}$ & $A_{1,q_0,-,L}$ & \dots & $A_{m,q_0,-,L}$\\
+\hline
+$A_{0,q_0,+,R}$ & $A_{1,q_0,+,R}$ & \dots & $A_{m,q_0,+,R}$\\
+\hline
+$A_{0,q_0,+,L}$ & $A_{1,q_0,+,L}$ & \dots & $A_{m,q_0,+,L}$\\
+\hline
+$A_{0,q_1,-,R}$ & $A_{1,q_1,-,R}$ & \dots & $A_{m,q_1,-,R}$\\
+\hline
+$A_{0,q_1,-,L}$ & $A_{1,q_1,-,L}$ & \dots & $A_{m,q_1,-,L}$\\
+\hline
+\hline
+\dots & \dots & \dots & \dots \\
+\hline
+\hline
+$A_{0,q_n,+,L}$ & $A_{1,q_n,+,L}$ & \dots & $A_{m,q_n,+,L}$\\
+\end{tabular}
+\end{center}
+\par
+
+\subsubsection*{\ilc{generateNativeTransitions()}}
+\paragraph*{}
+Damit die neue TM im wesentlichen wie die ursprüngliche TM agiert, werden die alten Übergänge modifiziert. Nach Shannon's Konstruktion muss folgende Gleichung gelten:
+\begin{equation}
+\delta(A_i,q_j) \to (A_k,q_l,{R \atop L}) \Rightarrow \delta(B_{i,j,-,x},\alpha) \to (B_{k,l,+,{R \atop L} },{\beta \atop \alpha},{R \atop L})
+\end{equation}
+Jeder ursprüngliche Übergang aus dem \ilc{transitions}-Array wird wie folgt bearbeitet:\\
+Zu Beginn werden die Indizes der Symbole und Zustände analysiert, sodass bekannt ist, welche Position die Symbole und Zustände in \ilc{sigma} und \ilc{states} haben. Ist der alte Übergang aus Zustand $q_j$ mit Symbol $A_i$, so ist der neue Übergang aus dem Symbol im \ilc{compSymbolTable} der Zeile $4\cdot j$ und $4\cdot j+1$ (da der Übergang aus beiden Symbolen mit $-$ im Index existiert) und Spalte $i$.\\
+Je nach Richtung des alten Übergangs wird nun ein neuer Übergang erstellt. Ist die Richtung \ilc{R}, so wird das neue Symbol \ilc{R} im Index haben, die Richtung des Übergangs ist ebenfalls \ilc{R} und der Folgezustand wird $\beta$ sein (analog bei ursprünglicher Kopfbewegung nach links).\\
+Das auszugebende Symbol wird ähnlich aus der \ilc{compSymbolTable} ermittelt. Ist das auszugebenden Symbol im alten Übergang $A_k$ und der Folgezustand $q_l$ , so wird für den neuen Übergang das passende auszugebende Symbol aus der Tabelle der komplexen Symbole ermittelt. Es befindet sich in der Zeile $4\cdot l +2$ wenn der ursprüngliche Übergang mit Kopfbewegung nach rechts ist (sonst in der Zeile $4\cdot l +3)$ und in der Spalte $k$.\\
+Anschließend sind die Übergänge äquivalent von der TM mit nur 2 Zuständen zu realisieren.\par
+
+\subsubsection*{\ilc{generateCompTransitions()}}
+\paragraph*{}
+Die neue TM benötigt eine Reihe Hilfsübergänge, um elementare Symbole in komplexe umzuwandeln und umgekehrt sowie für die sogenannte \enquote{bouncing operation}, der von Shannon beschriebenen Vorgehensweise die Information des Zustandes in Symbole auslagern und diese Information, zwischen den Feldern des Bandes einer TM, zu verschieben.\\
+Die benötigten Übergänge lauten:\\
+\begin{center}
+\begin{tabular}{c c|c||c|c|c}
+\textbf{Gleichung}&\textbf{Symbol} & \textbf{Zustand $\Rightarrow$} & \textbf{Symbol} & \textbf{Zustand} &\textbf{Richtung} \\
+\hline
+(1) & $B_i$ & $\alpha$  & $B_{i,1,-,R}$  & $\alpha$ & $R$\\
+\hline
+(2) & $B_i$ & $\beta$  & $B_{i,1,-,L}$  & $\alpha$ & $L$\\
+\hline
+(3) & $B_{i,j,-,x}$ & $\alpha$ oder $\beta$  & $B_{i,(j+1),-,x}$  & $\alpha$ & $x\in \{ R,L \}$\\
+\hline
+(4) & $B_{i,j,+,x}$ & $\alpha$ oder $\beta$  & $B_{i,(j-1),+,x}$  & $\beta$ & $x\in \{ R,L \}$\\
+\hline
+(5) & $B_{i,1,+,x}$ & $\alpha$ oder $\beta$  & $B_i$  & $\alpha$ & $x\in \{ R,L \}$\\
+\end{tabular}
+\end{center}
+Nach Gleichung $(1)$ existiert ein Übergang zwischen jedem elementaren
+Symbol $B_i$ in Zustand $\alpha$, zu dem komplexem Symbol mit gleichem Index
+welches sich in der ersten Zeile der Tabelle befindet, mit Folgezustand $\alpha$
+und Richtung R.\\
+Nach Gleichung $(2)$ existiert ein Übergang zwischen jedem elementaren
+Symbol $B_i$ in Zustand $\beta$, zu dem komplexem Symbol mit gleichem Index
+welches sich in der zweiten Zeile der Tabelle befindet, mit Folgezustand
+$\alpha$ und Richtung L.\\
+Nach Gleichung $(3)$ existiert ein Übergang zwischen einem komplexen
+Symbol mit $-$ im Index aus Zustand $\beta$, zu dem komplexen Symbol in
+der gleichen Spalte und 4 Zeilen weiter mit Folgezustand $\alpha$. Dies gilt
+für beide Richtungsindizes \ilc{R} und \ilc{L}.\\
+Nach Gleichung $(4)$ existiert ein Übergang zwischen einem komplexen
+Symbol mit $+$ im Index aus Zustand $\alpha$ oder $\beta$, zu dem komplexen
+Symbol in der gleichen Spalte und $4$ Zeilen zurück mit Folgezustand $\beta$.
+Dies gilt für beide Richtungsinzes \ilc{R} und \ilc{L} und natürlich nur für Symbole ab Zeile $4$.\\
+Nach Gleichung $(5)$ existiert ein Übergang zwischen einem komplexen
+Symbol aus der 1. und 2. Spalte, aus Zustand $\alpha$ oder $\beta$, zu dem
+elementaren Symbol mit gleichem Index. Abhängig vom Zustand ist die
+Richtungsänderung \ilc{R} oder \ilc{L}.\\
+Alle modifizierten nativen und Hilfsübergänge werden in der Liste \ilc{transitionsNew} gespeichert und nach erfolgreicher Konvertierung in die neue \ilc{.tur}-Datei geschrieben.\par
+
+\subsubsection*{\ilc{modifyInitialSymbol()}}
+\paragraph*{}
+Shannon nennt in seinem Paper bei der Beschreibung des Beispiels als induktive Annahme, dass das Symbol unter dem Lesekopf bereits ein komplexes ist. Dies bedeutet, dass das erste Symbol der neuen TM mit nur 2 Zuständen, im Startsymbol bereits die Information über den Aktuellen Zustand hält. Ist dies nicht der Fall, so läuft die TM endlos nach links auf der Suche nach dem ersten komplexen Zeichen welches Information über den aktuellen Zustand innehält.\\
+Folglich muss das Symbol unter dem Lesekopf beim Start der TM angepasst werden, in das äquivalente komplexe Symbol, welches den Startzustand der ursprünglichen TM behält. Dies ist nach Konvention des \ilc{.tur}-Formats das erste Symbol der \ilc{compSymbolTable}.\par
+
+\subsection*{Interpreter}
+\paragraph*{}
+Um die Turingmaschinen vor und nach der Modifizierung ausführen beziehungsweise visualisieren zu können, ist ein Interpreter für Turingmaschinen von nöten, welcher das Dateiformat interpretieren kann. Dazu existieren die folgenden Klassen.\par
+
+\subsection*{\ilc{State}}
+\paragraph*{}
+Ein State kapselt im wesentlichen nicht mehr als den Namen des Zustands und die Information, ob der Zustand final, wenn ja, akzeptierend oder ablehnend ist. Nach Konvention endet der Name eines Finalzustandes mit f, der Name eines ablehnenden Zustandes mit d (für \textit{decline}) und der Name eines akzeptierenden Zustandes mit a (für \textit{accept}).\\
+Diese Konvention wird auch bei der TM mit nur 2 Zuständen genutzt. In dem Fall sind die beiden Zustände der Maschine $\alpha$ und $\beta$ nicht final, jedoch ist die Information des aktuellen Zustandes in die Symbole kodiert. Hat eine solche TM ein Eingabeband abgearbeitet, erreicht sie ein Symbol für das sie keinen Übergang besitzt (falls in der original TM aus dem final/akzeptierenden/ablehnenden Zustand kein Übergang existiert). In diesem Fall lässt sich der in das Symbol eingebettete Zustand analysieren und es lässt sich entscheiden, ob und welcher Finalzustand äquivalent ist. So lässt sich auch bei der Simulation der TM mit nur 2 Zutsänden das Terminieren der TM erkennen und auswerten.\par
+
+\subsection*{\ilc{Tape}}
+\paragraph*{}
+Das Band der simulierten TM wird durch die Klasse \ilc{Tape} realisiert. Sie speichert das aktuelle Symbol sowie die linke und rechte Seite des Bands durch zwei Stacks. Zudem werden die Basisoperationen Kopfbewegung nach \ilc{L} oder \ilc{R} unterstützt.\\
+Das Lesen und Schreiben eines Tapes aus einer Datei wird ebenfalls durch diese Klasse realisiert, zudem werden die Bandinhalte im Falle der Simulation einer TM mit nur zwei Zuständen vereinfacht um die Lesbarkeit zu gewährleisten.\par
+
+\subsection*{\ilc{Transition}}
+\paragraph*{}
+Eine Instanz der Klasse \ilc{Transition} speichert den Folgeschritt aus einem Übergang, sprich den neuen Zustand, das auszugebende Symbol und die Richtung der Kopfbewegung dieses Übergangs. Damit ist diese Klasse ebenfalls reine Kapselung von Daten und hat an sich keinerlei eigene Funktionalität.
+\par
+\subsection*{\ilc{TuringMachine}}
+\paragraph*{}
+Die eigentliche TM und deren Simulation wird durch die Klasse \ilc{TuringMachine} realisiert. Sie besteht aus einer Reihe statischer Indizes, einem aktuellen Zustand gespeichert in \ilc{currentState}, einem Tape und einer Übergangstabelle. Diese wird durch eine doppelt verschachtelte Map realisiert, sodass einem Zustand, eine Reihe Eingabesymbole zugeordnet sind, und jeder Zustands/Eingabesymbol-Kombination nur ein Übergang in Form einer \ilc{Transition}.
+Die Listen \ilc{history} und \ilc{historyDetails} speichern zudem den Verlauf und genaue Einzelheiten des Ablaufs der TM.\\
+Neben einfachen Utilities-Methoden die das Lesen und Schreiben einer TM aus einer Datei ermöglichen, hat die Klasse die folgenden wichtigen Funktionen:\par
+\subsubsection*{\ilc{setTransitionMap(String[] states, String[] transitionsArray)}}
+\paragraph*{}
+Diese Methode erstellt aus der eingelesenen TM die bereits beschriebene, doppelt verschachtelte (Hash)Map aus Zustand, eingelesenes Symbol $\rightarrow$ Übergang. Dazu werden alle Übergänge nacheinander in die Map eingefügt. Wird ein neuer Übergang an die Position eines bereits existierenden Übergangs eingefügt, ist die zu simulierende TM nicht deterministisch und der Prozess wird abgebrochen.\par
+\subsubsection*{\ilc{step()}}
+Die Methode \ilc{step()} reslisiert einen Schritt der TM. Mit dem aktuellen Zustand und Symbol wird aus der \ilc{transitions}-Map der passende Übergang herausgesucht. Anschließend wird das aktuelle Symbol verändert und eine Kopfbewegung und Zustandsänderung ausgeführt.
+\subsubsection*{\ilc{run(long timeoutMili, boolean twoStates)}}
+\paragraph*{}
+Durch den Aufruf der Methode \ilc{run} wird die TM bis ausgeführt bis sie terminiert oder kein passender Übergang existiert. Wird eine TM mit nur zwei Zuständen gestartet, so existiert irgendwann kein passender Übergang mehr, da die ursprüngliche TM terminiert wäre und in einen FInalzustand gewechselt hätte. Nun kann entschieden werden, ob das aktuelle Symbol einen akzeptierenden oder terminierenden Zustand innehält und so das Terminieren der TM mit zwei Zuständen realisieren.\\
+Zudem wird eine Wartezeit pro step der TM festgelegt, da bei einer langsameren Simulation das Vorgehen der TM analysiert werden kann.\par
+
+\subsection*{Application}
+\paragraph*{}
+Die eigentliche Anwendung und deren Benutzung über die Kommandozeile werden durch die Klasse Application gekapselt. Dadurch können einzelne Flags für den Ablauf gesetzt werden und bei einem fehlerhaften Aufruf oder bei unzureichenden Argumenten kann ein Anwendungsbeispiel angezeigt werden. Dies erleichtert die Benutzung da keine GUI o.ä. vorhanden ist.
+
+\subsection*{Utils}
+\paragraph*{}
+Diese Klasse kapselt nur allgemeine Funktionen wie die Suche auf Arrays die von mehreren anderen Klassen benutzt wird.\par
+\section*{Dateiformat \ilc{.tur}}
+\paragraph*{}
+Der Versuch einen Konverter für Turingmaschinen, für einen bereits existierenden Simulator für TM's, zu entwerfen erwies sich als schwierig, da die verwendeten Konventionen und Notationen stark von den in der Vorlesung verwendeten abweichen. So wurde das Format \ilc{.tur} für das einfache Einlesen und Konvertieren von TM's konzipiert.\par
+
+\paragraph*{}
+\begin{center}
+Beispieldatei \texttt{equal01.tur}
+\end{center}
+\begin{tiny}
+\begin{tcolorbox}
+\begin{verbatim}
+states
+q0
+q1
+q2
+q3d
+q4
+q5a
+
+transitions
+q0 q0 0 0 L
+q0 q0 1 1 L
+q0 q1 # # R
+q0 q0 X X L
+q1 q2 0 X R
+q1 q4 1 X R
+q1 q1 X X R
+q1 q5a # # L
+q2 q0 0 0 R
+q2 q0 1 X L
+q2 q2 X X R
+q2 q3d # # R
+q4 q0 0 X L
+q4 q4 1 1 R
+q4 q4 X X R
+q4 q4 # # R
+
+symbols
+0 1 X #
+
+tape
+[ 0 ] 1 1 1 0 0
+
+description
+This TM evaluates if the given input contains an equal ammount
+of zeros and ones. 
+\end{verbatim}
+\end{tcolorbox}
+\end{tiny}
+\par
+
+\paragraph*{}
+Das Dateiformat besteht aus einer Auflistung aller in der TM vorkommenden Zustände, beginnend mit dem Startzustand, eingeleitet durch das flag \ilc{states}, getrennt durch Zeilenumbruch. Darauf folgt eine Liste der Übergänge, eingeleitet durch \ilc{transitions} und eine Zeile aller Symbole welcher das flag \ilc{symbols} voraus geht. Für die Simulation kann ebenfalls ein Band beschrieben werden, es besteht aus einer Aneinanderreihung von Symbolen, getrennt durch whitespace. Das Symbol, welches zu Beginn der Simulation unter dem Lesekopf sein soll, ist von eckigen Klammern umgeben, ebenfalls getrennt durch whitespace.\\
+Weitere Informationen über das Dateiformat lassen sich der Datei \ilc{FORMAT\_EXAMPLE.tur} entnehmen.\par
+
+\section*{Anwendung}
+\paragraph*{}
+Die fertige Anwendung lässt sich als \ilc{jar} wie folgt benutzen:\\
+\ilc{<.tur Datei> <delay in millisekunden>} (optional, ohne Verzögerung ist es jedoch schwer der Simulation zu folgen)\\
+\medskip
+Weitere Parameter die gesetzt werden können:\\
+\ilc{-c} konvertiert die TM in eine TM mit 2 Zuständen (vor der Simulation)\\
+\ilc{-p} speichert Simulation in einer .history Datei ab\\
+\ilc{-pd} speichert zudem Details wie aktueller Zustand und Übergang\\
+\ilc{-tex} Ausgabe der history Datei als .tex (um Komplexe Symbole lesbar zu machen)\\
+\ilc{-d} debug (genaurere Informationen des Ablaufs werden über st.out ausgegeben)
+
+\subsection*{Beispiel}
+\paragraph*{}
+Ein beispielhafter Aufruf sähe wie folgt aus:\par
+
+\begin{tcolorbox}
+\begin{verbatim}
+java -jar TM.jar tur/equal01.tur 200 -c -pd -tex
+\end{verbatim}
+\end{tcolorbox}
+
+\end{document}

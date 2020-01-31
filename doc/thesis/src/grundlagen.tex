@@ -185,27 +185,26 @@ The Burrows-Wheeler-Transformation is not a compression technique but rather a m
 }
 
 \par {
-As an example of the creation of $L$, given the input string $w = crabab$, $n = 6$, and the alphabet $\Sigma = \{a,b,c,r\}$ with $a \textless b \textless c \textless r $. Create a $N \times N$ matrix $M$ whose elements are characters, and with all cyclic rotations of $w$, which assembles the conjugacy class $[w]$ of word $w$. All rotations are sorted in lexicographical order, in this example, the index is $I = 4$ and the matrix $M$ is:
+As an example of the creation of $L$, given the input string $w = abcabr$, $n = 6$, and the alphabet $\Sigma = \{a,b,c,r\}$ with $a \textless b \textless c \textless r $. Create a $N \times N$ matrix $M$ whose elements are characters, and with all cyclic rotations of $w$, which assembles the conjugacy class $[w]$ of word $w$. All rotations are sorted in lexicographical order, in this example, the index is $I = 1$ and the matrix $M$ is:
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|l|l|l|l|l|l}
-		row 1 & a & b & a & b & c & r\\
+		row 1 & a & b & c & a & b & r\\
 		\hline
-		row 2 & a & b & c & r & a & b\\
+		row 2 & a & b & r & a & b & c\\
 		\hline
-		row 3 & b & a & b & c & r & a\\
+		row 3 & b & c & a & b & r & a\\
 		\hline
-		row 4 & b & c & r & a & b & a\\
+		row 4 & b & r & a & b & c & a\\
 		\hline
-		row 5 & c & r & a & b & a & b\\
+		row 5 & c & a & b & r & a & b\\
 		\hline
-		row 6 & r & a & b & a & b & c
-		\label{tab:t10 bwt-example}
+		row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
 	\end{tabular}
 	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
 \end{table}
-The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = rbaabc$ and $i = 5$. Obviously the string $L$ contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series. Also this depicts that the word $ababcr$ in row one of $M$ is a Lyndon word, because it is the smallest in its conjugacy class and $crabab$ is not.
+The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = rcaabb$ and $i = 1$. Obviously the string $L$ contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series. Also this depicts that the word w is coincidentally in row one of $M$ and is therefore a Lyndon word, because it is the smallest in its conjugacy class.
 }
 
 \subsection{Inverse Burrows-Wheeler-Transformation}
@@ -218,11 +217,11 @@ The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with char
 		word & word with position & sorted\\
 		\hline
 		r & (r,1) & (a,3) \\
-		b & (b,2) & (a,4) \\
-		a & (a,3) & (b,2) \\
-		a & (a,4) & (b,5) \\
-		b & (b,5) & (c,6) \\
-		c & (c,6) & (r,1)
+		c & (c,2) & (a,4) \\
+		a & (a,3) & (b,5) \\
+		a & (a,4) & (b,6) \\
+		b & (b,5) & (c,2) \\
+		b & (b,6) & (r,1)
  		\label{tab:t11 standard permutation}
  	\end{tabular}
  	\caption{Standard permutation generation of the word $L$}
@@ -232,16 +231,16 @@ The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with char
 This yields a standard permutation of:
 \begin{gather}  
 \pi_L = 
-\begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6\\ 3 & 4 & 2 & 5 & 6 & 1 \end{pmatrix}
+\begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6\\ 3 & 4 & 5 & 6 & 2 & 1 \end{pmatrix}
 \end{gather}
-Following $\pi^1_L(5)$ to $\pi^6_L(5)$ gives us a sequence of positions with $\pi_L(5)=6$ as a beginning, described by:
+Following $\pi^1_L(1)$ to $\pi^6_L(1)$ gives us a sequence of positions with $\pi_L(1)=3$ as a beginning, described by:
 \begin{gather} 
-6 \xrightarrow[]{\pi_L} 1 \xrightarrow[]{\pi_L} 3 \xrightarrow[]{\pi_L} 2 \xrightarrow[]{\pi_L} 4 \xrightarrow[]{\pi_L} 5
+3 \xrightarrow[]{\pi_L} 5 \xrightarrow[]{\pi_L} 2 \xrightarrow[]{\pi_L} 4 \xrightarrow[]{\pi_L} 6 \xrightarrow[]{\pi_L} 1 
 \end{gather}
 If this sequence is applied to the labeling function of the word $L$ it results in: 
 \begin{gather}  
-\lambda_L(6) \: \lambda_L(1) \: \lambda_L(3) \: \lambda_L(2) \: \lambda_L(4) \: \lambda_L(5)
-= crabab = w
+\lambda_L(3) \: \lambda_L(5) \: \lambda_L(2) \: \lambda_L(4) \: \lambda_L(6) \: \lambda_L(1)
+= abcabr = w
 \end{gather}
 This shows that it is possible to reconstruct the word $w$ given the transformation $BWT(w)=L$ and the index $i$.
 }
@@ -263,7 +262,7 @@ The current state of the art at the time of writing is depicted in the table bel
 			method & options &  size in bytes & compression & \textit{bps}\\
 			\hline
 			uncompressed & & 3,145,718 & 100.0\% & 8.00 \\
-			compress & & 1,250,382 & 40.4\% & 3.24 \\
+			compress 4.2.4 & & 1,250,382 & 40.4\% & 3.24 \\
 			gzip v1.10 & -9 & 1,021,720 & 32.4\% & 2.60\\
 			ZIP v3.0 &-9& 1,019,783 & 32.4\% & 2.59 \\
 			zstandard 1.4.2& --ultra-23 -long=30 & 887,004 & 28.1\% & 2.25\\

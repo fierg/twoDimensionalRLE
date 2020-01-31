@@ -1,0 +1,134 @@
+A2.4:
+log:
+
+ 
+svn log -v -r 2200:2213 
+------------------------------------------------------------------------
+r2200 | mungady | 2009-07-07 21:17:05 +0200 (Tue, 07 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/source/org/jfree/chart/demo/TimeSeriesChartDemo1.java
+   M /trunk/source/org/jfree/chart/plot/WaferMapPlot.java
+   M /trunk/source/org/jfree/chart/plot/XYPlot.java
+   M /trunk/source/org/jfree/data/time/TimePeriodValues.java
+   M /trunk/source/org/jfree/data/time/TimeSeries.java
+   M /trunk/source/org/jfree/data/time/TimeSeriesCollection.java
+   M /trunk/source/org/jfree/data/time/TimeSeriesTableModel.java
+   M /trunk/source/org/jfree/data/time/TimeTableXYDataset.java
+   M /trunk/source/org/jfree/data/xy/VectorSeries.java
+   M /trunk/source/org/jfree/data/xy/VectorSeriesCollection.java
+   M /trunk/source/org/jfree/data/xy/XIntervalSeriesCollection.java
+   M /trunk/source/org/jfree/data/xy/XYBarDataset.java
+   M /trunk/source/org/jfree/data/xy/XYDatasetTableModel.java
+   M /trunk/source/org/jfree/data/xy/XYIntervalSeriesCollection.java
+   M /trunk/source/org/jfree/data/xy/XYSeries.java
+
+Various updates.
+------------------------------------------------------------------------
+r2201 | mungady | 2009-07-07 21:26:50 +0200 (Tue, 07 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/source/org/jfree/data/gantt/XYTaskDataset.java
+   M /trunk/source/org/jfree/data/xy/XYSeriesCollection.java
+   M /trunk/source/org/jfree/data/xy/YIntervalSeriesCollection.java
+   M /trunk/tests/org/jfree/chart/axis/junit/LogAxisTests.java
+   M /trunk/tests/org/jfree/chart/axis/junit/NumberAxisTests.java
+   M /trunk/tests/org/jfree/chart/axis/junit/SubCategoryAxisTests.java
+   M /trunk/tests/org/jfree/chart/axis/junit/ValueAxisTests.java
+   M /trunk/tests/org/jfree/chart/junit/AreaChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/BarChart3DTests.java
+   M /trunk/tests/org/jfree/chart/junit/BarChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/ChartPanelTests.java
+   M /trunk/tests/org/jfree/chart/junit/GanttChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/JFreeChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/LineChart3DTests.java
+   M /trunk/tests/org/jfree/chart/junit/LineChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/PieChart3DTests.java
+   M /trunk/tests/org/jfree/chart/junit/PieChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/ScatterPlotTests.java
+   M /trunk/tests/org/jfree/chart/junit/StackedAreaChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/StackedBarChart3DTests.java
+   M /trunk/tests/org/jfree/chart/junit/StackedBarChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/TimeSeriesChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/WaterfallChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/XYAreaChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/XYBarChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/XYLineChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/XYStepAreaChartTests.java
+   M /trunk/tests/org/jfree/chart/junit/XYStepChartTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/CategoryPlotTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/MultiplePiePlotTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/PiePlot3DTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/PiePlotTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/XYPlotTests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/StackedXYAreaRenderer2Tests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/StackedXYAreaRendererTests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/StackedXYBarRendererTests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/StandardXYItemRendererTests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/XYBarRendererTests.java
+   M /trunk/tests/org/jfree/chart/renderer/xy/junit/XYLineAndShapeRendererTests.java
+   M /trunk/tests/org/jfree/data/general/junit/DefaultHeatMapDatasetTests.java
+   M /trunk/tests/org/jfree/data/general/junit/DefaultPieDatasetTests.java
+   M /trunk/tests/org/jfree/data/time/junit/TimePeriodValuesTests.java
+   M /trunk/tests/org/jfree/data/time/junit/TimeSeriesTests.java
+   M /trunk/tests/org/jfree/data/time/ohlc/junit/OHLCSeriesCollectionTests.java
+   M /trunk/tests/org/jfree/data/time/ohlc/junit/OHLCSeriesTests.java
+   M /trunk/tests/org/jfree/data/xy/junit/VectorSeriesTests.java
+   M /trunk/tests/org/jfree/data/xy/junit/XIntervalSeriesTests.java
+   M /trunk/tests/org/jfree/data/xy/junit/XYIntervalSeriesTests.java
+   M /trunk/tests/org/jfree/data/xy/junit/YIntervalSeriesTests.java
+
+Various updates.
+------------------------------------------------------------------------
+r2203 | mungady | 2009-07-07 22:13:36 +0200 (Tue, 07 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/source/org/jfree/chart/renderer/category/StackedBarRenderer3D.java
+   M /trunk/tests/org/jfree/chart/renderer/category/junit/StackedBarRenderer3DTests.java
+
+Synchronised with 1.0.x branch.
+------------------------------------------------------------------------
+r2205 | mungady | 2009-07-08 11:33:31 +0200 (Wed, 08 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/source/org/jfree/chart/plot/CategoryPlot.java
+   M /trunk/source/org/jfree/chart/plot/XYPlot.java
+   M /trunk/tests/org/jfree/chart/plot/junit/CategoryPlotTests.java
+   M /trunk/tests/org/jfree/chart/plot/junit/XYPlotTests.java
+
+Synchronised with 1.0.x branch.
+------------------------------------------------------------------------
+r2212 | mungady | 2009-07-15 14:23:45 +0200 (Wed, 15 Jul 2009) | 1 line
+Changed paths:
+   A /trunk/source/org/jfree/chart/annotations/AbstractAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/AbstractXYAnnotation.java
+   A /trunk/source/org/jfree/chart/annotations/Annotation.java
+   M /trunk/source/org/jfree/chart/annotations/CategoryAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/CategoryLineAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/CategoryPointerAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/CategoryTextAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/TextAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYBoxAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYDataImageAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYDrawableAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYImageAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYLineAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYPointerAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYPolygonAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYShapeAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYTextAnnotation.java
+   M /trunk/source/org/jfree/chart/annotations/XYTitleAnnotation.java
+   A /trunk/source/org/jfree/chart/event/AnnotationChangeEvent.java
+   A /trunk/source/org/jfree/chart/event/AnnotationChangeListener.java
+   M /trunk/source/org/jfree/chart/plot/CategoryPlot.java
+   M /trunk/source/org/jfree/chart/plot/Plot.java
+   M /trunk/source/org/jfree/chart/plot/XYPlot.java
+   A /trunk/source/org/jfree/chart/util/DefaultShadowGenerator.java
+   A /trunk/source/org/jfree/chart/util/ShadowGenerator.java
+
+Synchronised with 1.0.X branch.
+------------------------------------------------------------------------
+r2213 | mungady | 2009-07-15 14:25:10 +0200 (Wed, 15 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/tests/org/jfree/chart/plot/junit/CategoryPlotTests.java
+
+Synchronised with 1.0.X branch.
+------------------------------------------------------------------------
+

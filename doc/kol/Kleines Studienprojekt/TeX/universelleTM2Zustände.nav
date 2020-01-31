@@ -1,0 +1,75 @@
+\headcommand {\slideentry {0}{0}{1}{1/1}{}{0}}
+\headcommand {\beamer@framepages {1}{1}}
+\headcommand {\slideentry {0}{0}{2}{2/2}{}{0}}
+\headcommand {\beamer@framepages {2}{2}}
+\headcommand {\slideentry {0}{0}{3}{3/3}{}{0}}
+\headcommand {\beamer@framepages {3}{3}}
+\headcommand {\beamer@sectionpages {1}{3}}
+\headcommand {\beamer@subsectionpages {1}{3}}
+\headcommand {\sectionentry {1}{Einf\IeC {\"u}hrung}{4}{Einf\IeC {\"u}hrung}{0}}
+\headcommand {\slideentry {1}{0}{1}{4/4}{}{0}}
+\headcommand {\beamer@framepages {4}{4}}
+\headcommand {\beamer@sectionpages {4}{4}}
+\headcommand {\beamer@subsectionpages {4}{4}}
+\headcommand {\sectionentry {2}{Universelle Turingmaschinen}{5}{Universelle Turingmaschinen}{0}}
+\headcommand {\slideentry {2}{0}{1}{5/5}{}{0}}
+\headcommand {\beamer@framepages {5}{5}}
+\headcommand {\beamer@sectionpages {5}{5}}
+\headcommand {\beamer@subsectionpages {5}{5}}
+\headcommand {\sectionentry {3}{Turingaschine mit zwei Zust\IeC {\"a}nden}{6}{Turingaschine mit zwei Zust\IeC {\"a}nden}{0}}
+\headcommand {\slideentry {3}{0}{1}{6/6}{}{0}}
+\headcommand {\beamer@framepages {6}{6}}
+\headcommand {\slideentry {3}{0}{2}{7/11}{}{0}}
+\headcommand {\beamer@framepages {7}{11}}
+\headcommand {\slideentry {3}{0}{3}{12/12}{}{0}}
+\headcommand {\beamer@framepages {12}{12}}
+\headcommand {\beamer@sectionpages {6}{12}}
+\headcommand {\beamer@subsectionpages {6}{12}}
+\headcommand {\sectionentry {4}{Beispiel}{13}{Beispiel}{0}}
+\headcommand {\slideentry {4}{0}{1}{13/13}{}{0}}
+\headcommand {\beamer@framepages {13}{13}}
+\headcommand {\slideentry {4}{0}{2}{14/23}{}{0}}
+\headcommand {\beamer@framepages {14}{23}}
+\headcommand {\beamer@sectionpages {13}{23}}
+\headcommand {\beamer@subsectionpages {13}{23}}
+\headcommand {\sectionentry {5}{Unm\IeC {\"o}glichkeit einer universellen Turingmaschine mit einem Zustand}{24}{Unm\IeC {\"o}glichkeit einer universellen Turingmaschine mit einem Zustand}{0}}
+\headcommand {\slideentry {5}{0}{1}{24/26}{}{0}}
+\headcommand {\beamer@framepages {24}{26}}
+\headcommand {\slideentry {5}{0}{2}{27/33}{}{0}}
+\headcommand {\beamer@framepages {27}{33}}
+\headcommand {\slideentry {5}{0}{3}{34/36}{}{0}}
+\headcommand {\beamer@framepages {34}{36}}
+\headcommand {\slideentry {5}{0}{4}{37/39}{}{0}}
+\headcommand {\beamer@framepages {37}{39}}
+\headcommand {\slideentry {5}{0}{5}{40/50}{}{0}}
+\headcommand {\beamer@framepages {40}{50}}
+\headcommand {\beamer@sectionpages {24}{50}}
+\headcommand {\beamer@subsectionpages {24}{50}}
+\headcommand {\sectionentry {6}{Aquivalente Turingmaschine mit nur zwei Symbolen}{51}{Aquivalente Turingmaschine mit nur zwei Symbolen}{0}}
+\headcommand {\slideentry {6}{0}{1}{51/52}{}{0}}
+\headcommand {\beamer@framepages {51}{52}}
+\headcommand {\slideentry {6}{0}{2}{53/53}{}{0}}
+\headcommand {\beamer@framepages {53}{53}}
+\headcommand {\slideentry {6}{0}{3}{54/56}{}{0}}
+\headcommand {\beamer@framepages {54}{56}}
+\headcommand {\slideentry {6}{0}{4}{57/58}{}{0}}
+\headcommand {\beamer@framepages {57}{58}}
+\headcommand {\slideentry {6}{0}{5}{59/59}{}{0}}
+\headcommand {\beamer@framepages {59}{59}}
+\headcommand {\beamer@sectionpages {51}{59}}
+\headcommand {\beamer@subsectionpages {51}{59}}
+\headcommand {\sectionentry {7}{Fazit}{60}{Fazit}{0}}
+\headcommand {\slideentry {7}{0}{1}{60/61}{}{0}}
+\headcommand {\beamer@framepages {60}{61}}
+\headcommand {\slideentry {7}{0}{2}{62/63}{}{0}}
+\headcommand {\beamer@framepages {62}{63}}
+\headcommand {\beamer@sectionpages {60}{63}}
+\headcommand {\beamer@subsectionpages {60}{63}}
+\headcommand {\sectionentry {8}{Quellen}{64}{Quellen}{0}}
+\headcommand {\slideentry {8}{0}{1}{64/64}{}{0}}
+\headcommand {\beamer@framepages {64}{64}}
+\headcommand {\beamer@partpages {1}{64}}
+\headcommand {\beamer@subsectionpages {64}{64}}
+\headcommand {\beamer@sectionpages {64}{64}}
+\headcommand {\beamer@documentpages {64}}
+\headcommand {\gdef \inserttotalframenumber {23}}

@@ -1,0 +1,327 @@
+%\documentclass[12pt,a4paper,onecolumn]{beamer}
+
+\documentclass[10pt, xcolor=x11names]{beamer}
+\usecolortheme{seagull}
+\useoutertheme{infolines}
+\usefonttheme[onlymath]{serif}
+\setbeamertemplate{headline}[default]
+\setbeamertemplate{navigation symbols}{}
+\mode<beamer>{\setbeamertemplate{blocks}[rounded][shadow=true]}
+\setbeamercovered{transparent}
+\setbeamercolor{block body example}{fg=blue, bg=black!20}
+
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage[]{csquotes}
+
+\usepackage{amsmath}
+\usepackage{tikz, wasysym}
+\usepackage{graphicx}
+\usetikzlibrary{automata,positioning}
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+%\usepackage{makeidx}
+%\usepackage{graphicx}
+\author{Sven Fiergolla}
+\title[Kleines Studienprojekt]{Eine universelle Turingmaschine mit zwei Zuständen/Symbolen}
+\subtitle[short version]{Ein Paper von Claude E. Shannon}
+\date{\today}
+%\institute[Uni Trier]{Universität Trier}
+%\logo{\includegraphics[scale=.25]{unilogo.pdf}}
+
+\begin{document}
+	\frame{\maketitle}
+	%\tableofcontents
+
+
+
+	\section{Einführung}
+	\frame{\frametitle{Einführung}
+Formal definieren wir die Turingmaschine als Septupel $\mathbf{ M = (Q,\Sigma,\Gamma,q_0,\delta,\Square,F)} $
+ wobei:
+
+\begin{description}
+ \item $\mathbf{ Q = }$ die endliche Zustandsmenge
+ \item $\mathbf{ \Sigma = }$ das endliche Eingabealphabet
+ \item $\mathbf{ \Gamma = }$ das endliche Bandalphabet und es gilt $\mathbf{\Sigma\subset\Gamma}$
+ \item $\mathbf{ q_0 = }$ der Anfangszustand
+ \item $\mathbf{ \delta = }$ die (partielle) Überführungsfunktion
+ \item $\mathbf{ \square = }$ steht für das leere Feld (Blank)
+ \item $\mathbf{F = }$ die Menge der akzeptierenden Endzustände
+\end{description}	
+}
+
+\frame{\frametitle{Beislpiel}
+\includegraphics[scale=0.8]{TMKonzept.png}}
+	
+	\frame{\frametitle{Beispiel}
+	
+	\begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+   \node[state,initial] (0) {$q_0$};
+   \node[state] (1) [right=of 0] {$q_1$};
+   \node[state] (2) [right=of 1] {$q_2$};
+   \node[state] (3) [above=of 2] {$q_3$};
+   \node[state] (4) [right=of 3] {$q_4$};
+   % push this node further to the right
+   \node[state,accepting] (5) [right=3cm of 2] {$q_5$};
+
+   \path[->]
+    (0) edge                    node {$B\:B\:R$} (1)
+    (1) edge [loop above]       node {$\begin{matrix}0\:0\:R\\1\:1\:R\end{matrix}$} (1)
+    (1) edge [loop below]       node {$1\:1\:R$} (1)
+    (1) edge                    node {$E\:E\:L$} (2)
+    (2) edge [in=30, out=60, loop]       node {$*\:*\:L$} (2)
+    (2) edge                    node {$1\:*\:R$} (3)
+    (3) edge [loop above]       node {$*\:*\:R$} (3)
+    (3) edge                    node {$E\:E\:R$} (4)
+    (4) edge [loop above]       node {$0\:0\:R$} (4)
+    (4) edge [loop right]       node {$1\:1\:R$} (4)
+    (4) edge                    node {$\Box\:1\:L$} (5)
+    (5) edge [loop right]       node {$\begin{matrix}0\:0\:L\\1\:1\:L\end{matrix}$} (5)
+    (5) edge                    node {$E\:E\:L$} (2);
+\end{tikzpicture}
+	
+}
+	\section{universelle Turingmaschinen}
+	\frame{\frametitle{Universelle Turingmaschinen}
+		Formal ist eine universelle Turingmaschine eine Maschine $UTM$, die eine Eingabe $w|x$ liest. Das Wort $w$ ist hierbei eine  die Beschreibung einer Turingmaschine $M_{w}$, die zu einer bestimmten Funktion mit Eingabe $x$ die Ausgabe berechnet. $UTM$ simuliert also das Verhalten von $M_{w}$ mit Hilfe der Funktionsbeschreibung $w$ und der Eingabe $x$.
+	}
+	
+	
+	\section{Turingaschine mit zwei Zuständen}
+	\frame{\frametitle{Konstruktion}
+	Turingmaschine $A$: $ A_1,A_2,...,A_m \in$ $\Sigma_A$ die Symbole und $q_1,q_2,...q_n \in Q_A$ die Zustände der Maschine.
+	Maschine B besitzt:
+\begin{itemize}
+	\item elementare Symbolen von Maschine $A$:  $B_1,B_2,...,B_m \in \Sigma_B$
+	\item $m\cdot n \cdot 2 \cdot 2$ neue Symbole, welche Informationen über den Zustand und den Status der \textit{bouncing operation} speichern: $B_{m,n,x,y} \in \Sigma_B$
+	\begin{itemize}
+	\item $m =$ Symbole von $A, |\Sigma_A|$
+	\item $n =$ Zustände von $A, |Q_A|$
+	\item $x = +$ oder $-$ ob der Zustand des letzten Feldes in diese Feld übertragen wird oder aus diesem Feld stammt 
+	\item $y = R$ oder $L$  ob die Information in das rechte oder linke Feld übertragen wird.
+	 
+	\end{itemize}
+\end{itemize}	
+	 
+	 Insgesammt besitzt Maschine $B$ also $m+4mn$ Symbole.  
+	}
+	
+	\frame{\frametitle{Zustände}
+	Die Zustände von Maschine $B$ werden $\alpha$ und $\beta$ heißen.\\
+	\medskip
+	Um die Information des aktuellen Zustands nach bearbeiten eines Symbols in der nächsten Zelle zur Verfügung zu haben, auch wenn die $TM$ $B$ nur zwei Zustände hat, wird diese in den Symbolen gespeichert (Index $n$) und über die sogenannte \textit{bouncing operation} in die nächste Zelle übertragen.
+	}
+	
+	\frame{\frametitle{Übergänge}
+	\begin{center}
+	\begin{tabular}{c c|c||c|c|c}
+
+\textbf{Nr.}&\textbf{Symbol} & \textbf{Zustand $\Rightarrow$} & \textbf{Symbol} & \textbf{Zustand} &\textbf{Richtung} \\
+\hline
+(1) & $B_i$ & $\alpha$  & $B_{i,1,-,R}$  & $\alpha$ & $R$\\
+\hline
+(2) & $B_i$ & $\beta$  & $B_{i,1,-,L}$  & $\alpha$ & $L$\\
+\hline
+(3) & $B_{i,j,-,x}$ & $\alpha$ oder $\beta$  & $B_{i,(j+1),-,x}$  & $\alpha$ & $x\in \{ R,L \}$\\
+\hline
+(4) & $B_{i,j,+,x}$ & $\alpha$ oder $\beta$  & $B_{i,(j-1),+,x}$  & $\beta$ & $x\in \{ R,L \}$\\
+\hline
+(5) & $B_{i,1,+,x}$ & $\alpha$ oder $\beta$  & $B_i$  & $\alpha$ & $x\in \{ R,L \}$\\
+
+
+\end{tabular}
+\\
+\bigskip
+zusätzlich erhält Maschine $B$ für jeden Übergang in $A :$\\
+\bigskip
+(6) $\delta(A_i,q_j) \to (A_k,q_l,{R \atop L}) \Rightarrow \delta(B_{i,j,-,x},\alpha) \to (B_{k,l,+,{R \atop L} },{\beta \atop \alpha},{R \atop L})$\\
+
+
+\end{center}
+}
+\section{Beispiel}
+	\frame{\frametitle{Beispiel Maschine $A$}
+	\begin{center}
+	
+	
+	Maschine $A$:\\
+	\bigskip
+	$...|\underbrace{A_3}|A_{13}|...$
+	
+	\bigskip
+		\begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto]
+   
+   \node[state] (1) [right=of 0] {$q_7$};
+   \node[state] (2) [right=of 1] {$q_4$};
+   
+
+   \path[->]
+    (1) edge                    node {$A_3\:A_8\:R$} (2);
+
+\end{tikzpicture}
+
+
+
+\bigskip
+$...|A_8|\underbrace{A_{13}}|...$
+\end{center}
+	}
+	
+	
+	%TODO: nach und nach einblenden
+	\frame{\frametitle{Beispiel Maschine $B$}
+	\begin{tabular}{c||c c}
+	\textbf{Bandinhalt} & \textbf{Übergangsfunktion} & \textbf{Gleichung}\\ \hline
+	\\
+	$...|\underbrace{B_{3,7,-,x}}|B_{13}|...$ &
+	$\delta(B_{3,7,-,x},\alpha) = (B_{8,4,+,R},\beta,R)$ &  $(6)$\\ 
+	\hline
+	\pause $...|B_{8,4,+,R}|\underbrace{B_{13}}|...$ & $\delta(B_{13},\beta) = (B_{13,1,-,L},\alpha,L)$ & $(2)$\\
+	\hline
+	\pause $...|\underbrace{B_{8,4,+,R}}|B_{13,1,-,L}|...$ & $\delta(B_{8,4,+,R},\alpha) = (B_{8,3,+,R},\beta,R)$ & $(4)$\\
+	\hline
+	\pause $...|B_{8,3,+,R}|\underbrace{B_{13,1,-,L}}|...$ &$\delta(B_{13,1,-,L},\beta) = (B_{13,2,-,L},\alpha,L)$  & $(3)$\\
+	\hline
+	\pause $...|\underbrace{B_{8,3,+,R}}|B_{13,2,-,L}|...$ & $\delta(B_{8,3,+,R},\alpha) = (B_{8,2,+,R},\beta,R)$ & $(4)$\\
+	\hline
+	\pause $...|B_{8,2,+,R}|\underbrace{B_{13,2,-,L}}|...$ & $\delta(B_{13,2,-,L},\beta) = (B_{13,3,-,L},\alpha,L)$ & $(3)$\\
+	\hline
+	\pause $...|\underbrace{B_{8,2,+,R}}|B_{13,3,-,L}|...$ & $\delta(B_{8,2,+,R},\alpha) = (B_{8,1,+,R},\beta,R)$ & $(4)$\\
+	\hline
+	\pause $...|B_{8,1,+,R}|\underbrace{B_{13,3,-,L}}|...$ & $\delta(B_{13,3,-,L},\beta) = (B_{13,4,-,L},\alpha,L)$ & $(3)$\\
+	\hline
+	\pause $...|\underbrace{B_{8,1,+,R}}|B_{13,4,-,L}|...$ & $\delta(B_{8,1,+,R},\alpha) = (B_{8},\alpha,R)$ & $(5)$\\
+	\hline
+	$...|B_{8}|\underbrace{B_{13,4,-,L}}|B_{x}|...$ & $\dots$ & $(6)$\\
+	\end{tabular}
+	}
+	
+	\section{Unmöglichkeit einer universellen Turingmaschine mit einem Zustand}
+	\frame{\frametitle{$UTM$ mit nur einem Zustand unmöglich}
+	Beweis per () von Schannon:\\
+	Annahme: es existiert eine universelle Turingmaschine mit nur einem Zustand.\\
+	
+		\bigskip
+	\pause $\sqrt{2}$ ist eine berechenbare irrationale Zahl und kann von einer $TM$ berechnet werden. Dazu muss die $TM$ kontinuierlich die Ziffern von $\sqrt{2}$ schreiben.
+	
+	\bigskip
+	\pause $\sqrt{2}$ ist turingberechenbar $\Rightarrow$ eine $UTM$ kann $\sqrt{2}$ berechnen $\Rightarrow$ eine $TM$ mit einem Zustand kann $\sqrt{2}$ berechnen.
+	
+
+	}
+	
+	
+	\frame{\frametitle{$\sqrt{2}$ mit nur einem Zustand berechnen}
+	Fall $1:$ doppelt unendliches Band
+	\begin{itemize}
+	\visible<2->{ \item $1.1:$ Lesekopf liest $\Square \Rightarrow$ Lesekopf bleibt im $\Square$-Bereich}
+	\visible<3->{\item $1.2:$ Lesekopf verlässt $\Square$}
+	\begin{itemize}
+	\visible<4->{\item $1.2.1:$ Lesekopf verlässt $\Square$ nach Links}
+	\begin{itemize}
+	\visible<5->{\item $1.2.1.1$ linke unendliche Seite des Bandes wird nicht betreten}
+	\visible<6->{\item $1.2.1.2$ linke unendliche Seite des Bandes wird betreten}
+	\end{itemize}
+	\visible<7->{\item $1.2.2:$ Lesekopf verlässt $\Square$ nach Rechts}
+	\end{itemize}
+	\end{itemize}
+
+	%1.1
+	\only<2>{$1.1$ Die $TM$ wird nie mehr als ein $\Square$ der Eingabe verändern $\Rightarrow$ das Eingabeband ist nur auf einem endlichen Teil beschrieben $\Rightarrow$ das Band kann nach der Bearbeitung nicht $\sqrt{2}$ enthalten.}
+	
+	\only<5>{$1.2.1.1$ Die $TM$ betritt nur eine Seite des Bandes $\rightarrow$ wird in Fall $2$ behandelt}
+	
+	\only<6>{$1.2.1.2$ Die $TM$ geht unendlich weit nach Links $\Rightarrow$ linke Seite des Bandes wird mit konstantem Symbol beschrieben und rechte unendliche Seite des Bandes nie betreten $\Rightarrow$ Band kann nach der Bearbeitung nicht $\sqrt{2}$ enthalten.}
+	
+	\only<7>{$1.2.2$ analog zu $1.2.1$.}
+	}
+	
+	\frame{\frametitle{\textit{reflection number}}
+	Fall $2:$ einseitig unendliches Band\\
+	Annahe: Band ist rechts der Eingabe unendlich.\\
+	Beweishilfe: \enquote{\textit{reflection number}}\\
+	platziere den Lesekopf auf dem ersten $\Square$ nach der Eingabe:\\
+	\begin{itemize}
+	\item Lesekopf wird sich zur Eingabe hin bewegen
+	\item $||...|1|0|\underbrace{\Square}|\Square$ $\rightarrow$ 
+	$||...|1|\underbrace{0}|x|\Square$
+	\end{itemize}
+	wenn der Lesekopf die Eingabe betritt, platziere ihn wieder auf dem ersten $\Square$ 
+	
+	wie oft man die Lesekopf so platzieren kann, nennt man \textit{reflection number}, $R \in N$
+	}
+	
+	\frame{\frametitle{\textit{reflection number} für $\sqrt{2}$}
+	
+	platziere den Lesekopf am Anfang der Eingabe
+	\begin{itemize}
+	\item $||\underbrace{A_1}|A_2|...|A_m|\Square|\Square|...$
+	\end{itemize}
+	
+	der Lesekopf wird die Eingabe verlassen
+	\begin{itemize}
+	\item $||A_1|A_2|...|A_m|\underbrace{\Square}|\Square|...$
+	\end{itemize}	 
+	
+	platziere den Lesekopf wieder am Anfang
+	\begin{itemize}
+	\item $||\underbrace{A_1}|A_2|...|A_m|A_x|\Square|\Square|...$
+	\end{itemize}
+	
+	dies nennen wir die \textit{reflection number} für $\sqrt{2} =:S$ 
+	}
+	
+
+	
+		\frame{\frametitle{$\sqrt{2}$ mit nur einem Zustand berechnen}
+	Fall $2:$ einseitig unendliches Band\\
+
+	\begin{itemize}
+	\item $2.1$ $S<\infty$ und $S < R$
+	\visible<2->{\item $2.2$ $S=R=\infty$}
+	\begin{itemize}
+	\visible<3->{\item $2.2.1$ Lesekopf betritt nur endlichen Bereich des Bandes}
+	\visible<4->{\item $2.2.2$ beschränkter Teil des Bandes ändert sich unendlich oft}
+	\begin{itemize}
+	\visible<5->{\item $2.2.2.1$ Symbol in allen Zellen konstant}
+	\visible<6->{\item $2.2.2.2$ Symbole in den Zellen ändern sich endlos}
+	\end{itemize}
+	\end{itemize}
+	\visible<7->{\item $2.3$ $R<=S$}
+	\begin{itemize}
+	\visible<8->{\item $2.3.1$}
+	\visible<9->{\item $2.3.2$}
+	\begin{itemize}
+	\visible<10->{\item $2.3.2.1$}
+	\visible<11->{\item $2.3.2.2$}
+	\end{itemize}
+	\end{itemize}
+	\end{itemize}
+
+	\only<1>{$2.1$ nach einer endlichen Anzahl an Schritten ist der Lesekopf im Bereich der Eingabe \enquote{gefangen} $\Rightarrow$ Band ist nur auf endlichem Teil beschrieben. $\Rightarrow$ Band kann nicht $\sqrt{2}$ enthalten.}
+	\only<2>{$2.2$ Der Lesekopf kommt unendlich oft wieder zur Eingabe zurück. Der urprünglich leere Bereich des Bandes wird entweder beschränkt oder unbeschränkt weit beschrieben.}
+	\only<3>{$2.2.1$ nur endlicher Teil des Bandes beschrieben $\Rightarrow$ Band kann nicht $\sqrt{2}$ enthalten}
+	\only<4>{$2.2.2$ beschränkter Teil des Bandes ändert sich unendlich oft\\
+	Da die $TM$ nur über ein endliches Alphabet verfügt und nur einen Zustand hat, muss dass Symbol entweder in allen Zellen Konstant sein oder sich ständig ändern.}
+	\only<5>{$2.2.2.1$ Symbole in allen Zellen konstant $\Rightarrow$ kann nicht $\sqrt{2}$ beschreiben}
+	\only<6>{$2.2.2.2$ Symbole in allen Zellen ändern sich endlos $\Rightarrow$ kann nicht $\sqrt{2}$ beschreiben}
+	\only<7->{$2.3$ Lesekopf betritt ursprünglich unbeschriebenen Bereich des Bandes und bleibt dort\\}
+	\only<8>{$2.3.1$ Lesekopf verlässt erstes leere Feld nach Links $\Rightarrow$ Lesekopf auf endlichem Bereich des Bandes gefangen $\Rightarrow$ Band kann nicht $\sqrt{2}$ enthalten}
+	\only<9>{$2.3.2$ Lesekopf verlässt erstes leeres Feld $R$ mal nach rechts $\Rightarrow$ Lesekopf wird nicht zu erstem leeren Feld zurückkommen, da $R$ die \textit{reflection number} für $\Square$ ist}
+	\only<10>{$2.3.2.1$ unklar}
+	\only<11>{$2.3.2.2$ unklar}
+	%TODO : Fälle abklären!	
+	}
+	
+	\section{äquivalente TM mit nur zwei Symbolen}
+	\frame{\frametitle{äquivalente TM mit nur zwei Symbolen}
+		
+	
+	}
+	
+	
+	
+	
+	
+\end{document}

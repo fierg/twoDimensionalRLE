@@ -1,0 +1,34 @@
+states
+q0
+q1
+q2
+q3d
+q4
+q5a
+
+transitions
+q0 q0 0 0 L
+q0 q0 1 1 L
+q0 q1 # # R
+q0 q0 X X L
+q1 q2 0 X R
+q1 q4 1 X R
+q1 q1 X X R
+q1 q5a # # L
+q2 q0 0 0 R
+q2 q0 1 X L
+q2 q2 X X R
+q2 q3d # # R
+q4 q0 0 X L
+q4 q4 1 1 R
+q4 q4 X X R
+q4 q4 # # R
+
+symbols
+0 1 X #
+
+tape
+[ 0 ] 1 1 1 0 0
+
+description
+This TM evaluates if the given input contains an equal ammount of zeros and ones. 

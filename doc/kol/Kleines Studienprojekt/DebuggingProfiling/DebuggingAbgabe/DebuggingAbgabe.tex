@@ -1,0 +1,61 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsrefs}
+\usepackage{tikz, wasysym}
+\usetikzlibrary{automata,positioning}
+\usepackage[]{algorithm2e}
+\usepackage[]{csquotes}
+\usepackage{numberedblock}
+
+\title{Debugging}
+\date{\today}
+
+%TODOs: fix empfy last page
+%		fill placeholher
+
+\begin{document}
+\begin{center}
+\section*{Debugging}
+\end{center}
+\textbf{Sven Fiergolla 1252732}
+\section*{Aufgabe a)}
+\paragraph{}
+Erstes Starten der Anwendung wirft sofort \enquote{\textit{java.lang.ArithmeticException: / by zero}}. Betrachten der Methode \textit{computePi()} $\rightarrow$\\
+Anpassen der Zeile 16 zu: \\
+\begin{numVblock}
+piDividedBy4 += sign * (1 / (i + 1));
+\end{numVblock}
+entsprechend der Leibniz-Reihe zur Berechnung.\par
+\bigskip
+
+\paragraph{Debugging}
+Nun ist normales Debugging möglich. Aufruf mit Argument = 5 um erste Werte mit tatsächlichem Ergebnis zu vergleichen.\\
+k = 0, result = 1 $\checked$\\
+k = 1, result = 1 $\times$\\
+Breakpoint zu Beginn der Methode, Fehler in Zeile\\
+\begin{numVblock}
+piDividedBy4 += sign * (1 / (i + 1));
+\end{numVblock}
+da $i$ vom Typ int ist, wird in der 2. Iteration wo $i = 2$ ist, aus $\frac{1}{i + 1}$ = $\frac{1}{2 + 1}$ statt $\frac{1}{3}$ jedoch 0, da int keine Brüche fassen kann.\\
+$\rightarrow$ verändere i zum Typ double!\\
+\begin{numVblock}
+for (double i = 0; i <= iteration * 2; i += 2) {
+piDividedBy4 += sign * (1 / (i + 1));
+sign *= -1;
+}
+\end{numVblock}\paragraph{•}
+\paragraph{Weitere Anpassungen}
+Methodenname = computePi(), Funktion gibt jedoch $\frac{\pi}{4}$ zurück!\\
+\begin{numVblock}
+return piDividedBy4 * 4;
+\end{numVblock}
+\par
+\paragraph{}
+Eingabe von negativen Zahlen führt zu ungewünschtem Ergebnis, negative Interationen nicht möglich!\\
+Abfrage auf iteration \textgreater 0, sonst:\\
+\begin{numVblock}
+} else {
+throw new IllegalArgumentException()
+}
+\end{numVblock}\par
+\end{document}

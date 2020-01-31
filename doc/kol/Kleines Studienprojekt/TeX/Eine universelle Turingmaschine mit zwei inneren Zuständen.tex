@@ -1,0 +1,81 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+%\usepackage{amsrefs}
+\usepackage{amsmath,wasysym}
+\usepackage[]{csquotes}
+
+
+\author{Sven Fiergolla}
+\title{Universelle Turingmaschine mit zwei Zuständen/Symbolen}
+\date{\today}
+
+\begin{document}
+ 
+\maketitle
+%\pagebreak
+
+
+\section{Einführung}
+\subsection{Informelle Definition der Turingmaschine}
+
+%\includegraphics[scale=1]{TuringmaschineKonzept.png}
+Turingmaschinen (im folgenden Turingmaschine), benannt nach \textit{Alan M. Turing}, sind das allgemeine Modell der theoretischen Informatik.
+Sie bestehen aus einem \textit{unendlichen Band}, welches die Eingabe beinhaltet, einem \textit{Lese/Schreibkopf} welcher eine eindeutige Position auf dem Band hat und einem \textit{Steuerungselement}, häufig beschrieben durch eine (partielle) Übergangsfunktion.
+Die Turingmaschine arbeitet auf dem Band die Eingabe ab und befolgt dabei die Übergangsfunktion, sie terminiert sobald sie einen der Finalzustände erreicht und diesen nicht verlässt.
+
+
+
+\subsection{Formale Definition der Turingmaschine}
+Formal definieren wir die Turingmaschine als Septupel $\mathbf{ M = (Q,\Sigma,\Gamma,q_0,\delta,\Square,F)}$ wobei:
+
+
+\begin{description}
+
+
+ \item{ $\mathbf{ Q = }$ die endliche Zustandsmenge}
+ \item{ $\mathbf{ \Sigma = }$ das endliche Eingabealphabet}
+ \item $\mathbf{ \Gamma = }$ das endliche Bandalphabet und es gilt $\mathbf{\Sigma\subset\Gamma}$
+ \item $\mathbf{ q_0 = }$ der Anfangszustand
+ \item $\mathbf{ \delta = }$ die (partielle) Überführungsfunktion
+ \item $\mathbf{ \Square = }$ steht für das leere Feld (Blank)
+ \item $\mathbf{F = }$ die Menge der akzeptierenden Endzustände
+
+\end{description}
+
+ 
+
+\subsection{Universelle Turingmaschinen}
+
+
+
+In der obigen Definition ist das Programm fest in die Maschine eingebaut und kann nicht verändert werden. Kodiert man die Beschreibung einer Turingmaschine \textbf{A} als Zeichenkette, so kann man selbige einer anderen Turingmaschine als Eingabe übergeben.
+Eine universelle Turingmaschine bekommt nun eine Eingabe w und die kodierte Beschriebung der Turingmaschine \textbf{A}. Im wesentlichen handelt die UTuringmaschine nun wie Turingmaschine \textbf{A}, simuliert also das Verhalten von \textbf{A} auf w angewand.
+Eine Vergleichbare Idee liegt in fast allen heutigen Rechnerarchitekturen vor.
+
+Formal ist eine universelle Turingmaschine eine Maschine $UTM$, die eine Eingabe $  w \| x  $ liest. Das Wort w ist hierbei eine  die Beschreibung einer Turingmaschine $M_{w}$, die zu einer bestimmten Funktion mit Eingabe x die Ausgabe berechnet. $UTM$ simuliert also das Verhalten von $M_{w}$ mit Hilfe der Funktionsbeschreibung w und der Eingabe x.
+
+
+\section{Universelle TM mit nur zwei Zuständen}
+\subsection{Idee}
+
+Im folgenden wird die Umwandlung einer beliebigen Turingmaschine A in eine Turingmaschine B mit nur zwei inneren Zuständen beschrieben. Ist Turingmaschine A eine universelle Turingmaschine ist auch B universell, also folgt damit, dass auch die Konstruktion einer universellen Turingmaschine mit nur zwei Zuständen möglich ist.
+
+Aus einer beliebigen Turingmaschine A mit $\mathbf{|Q| = n}$ Zuständen sowie $\mathbf{|\Gamma| = m}$ Bandsymbolen, konstruieren wir eine Maschine B mit zwei Zuständen und höchstens $4mn + m$ Symbolen. Maschine B handelt im wesentlichen exakt wie Maschine A, überträgt die Informtion des aktuellen Zustandes jedoch über die Symbole des aktuellen und folgenden Bandsymbols, da diese Information auch in die nächste Zelle des Bands übertragen werden muss, die Maschine aber nur zwei Zustände hat.
+
+Wechselt die Turingmaschine A nach dem besuchen eines Feldes in den Zustand 4, wird diese Information über sogenannte \textit{\enquote{bouncing operations}}, also hin- und herspringen zwischen den beiden Feldern übertragen. Der gewünschte Zustand wird durch incrementieren und decrementieren der speziellen Symbole erreicht. Nach dem 4. Springen ist der neue Zustand in das Symbol des folgenden Feldes übertragen.
+
+\subsection{Konstruktion}
+
+Sei A Turingmaschine, $ A_1,A_2,...,A_m \in$ $\mathbf{\Sigma_A}$ die Symbole und $q_1,q_2,...q_n \in$ $\mathbf{Q_A}$ die Zustände der Maschine. Zusätzlich zu den elementaren Symbolen von Maschine A, welche in Maschine B $B_1,B_2,...,B_m \in \mathbf{\Sigma_B}$ heißen, besitzt Maschine B $4mn$ neue Symbole, welche Informationen über den Zustand und den Status der \textit{bouncing operation} speichern.
+Diese bezweichnen wir als $B_{m,n,x,y}$, wobei m für die Symbole, n für die Zustände steht, x = + oder - ob der Zustand des letzten Feldes in diese Feld übertragen wird oder aus diesem Feld stammt und y = R oder L ob die Information in das rechte oder linke Feld übertragen wird.  
+
+\section{TM mit einem Zustand niemals universell}
+
+\section{Universelle TM mit zwei Symbolen}
+
+\section{Fazit}
+
+
+
+
+\end{document}

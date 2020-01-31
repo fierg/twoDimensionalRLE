@@ -1,0 +1,66 @@
+//describes a Turing Machine as list of states and symbols and a table of transitions
+
+
+//list of all states, seperated by lines
+states
+
+//example
+q0 
+q1
+...
+
+//to mark a state as final, end its name with f
+//to mark a state as accept state, end its name with a
+//to mark a state as decline state, end its name with d
+
+
+//example
+q2f
+q3a
+...
+
+
+//list of all transitions, seperated by whitespace and split over lines
+transitions
+
+current_state	new_state	symbol_in	symbol_out	direction
+
+q0 		q0		0		0		L
+
+-----------
+
+//example
+q0 q0 1 1 L
+q0 q1 # # R
+q0 q0 X X L
+q1 q2 0 X R
+q1 q4 1 X R
+q1 q1 X X R
+q1 q5 # # L
+q2 q0 0 0 R
+q2 q0 1 1 L
+q2 q2 X X R
+q2 q3 # # R
+q4 q1 0 X L
+q4 q4 1 1 R
+q4 q4 X X R
+q4 q4 # # R
+
+
+//list of all symbols used by the machine, seperated by whitespace
+symbols
+//example
+0 1 X #
+
+
+
+//used for the turinginterpreter, unable to do so after transformation
+tape
+//example
+[0] 1 1 1 0 0
+
+
+//description of the TM, its action and way of solving its problem
+description
+//example
+This TM evaluates if a given String contains an equal ammount of zeros and ones.
