@@ -6,51 +6,46 @@
 \label{ch:Principles of compression}
 %% ==============================
 \par{
-Throughout this work a finite alphabet $\Sigma$ is assumed with a linear order $\leq$ over its elements. A word $w$ is a sequence $a_1,...,a_n$ of letters $a_i \in \Sigma$, $1 \leq i \leq n$. The set of all such sequences is denoted by $\Sigma^*$ which is the monoid over $\Sigma$, with concatenation as composition and with the empty word $\varepsilon$ as neutral element. The set $\Sigma^+ = \Sigma^*$ \textbackslash $\: \varepsilon$ consists of all non-empty words. Each word induces a labeling function $\lambda(w)$ as a labeled linear order where position $i$ of $w$ is labeled by $a_i \in \Sigma$ and we write $\lambda_w (i) = a_i$. If, for words $u, \: v$, $u = v$ or $u$ is lexicographically smaller than $v$ we write $u \leq v$ in the context of the order over the alphabet. We say that two words $u$, $v$ are conjugate if $u = st$ and $v = ts$ for some words $s$ and $t$ and $u$ and $v$ are cyclic shifts of one another. The ordered conjugacy class of a word $w \in \Sigma^n$ denoted as $[w] = (w_q,...,w_n)$ represents the lexicographically distinct ordered cyclic rotations of that word. A \emph{Lyndon word} is the unique minimal element within its conjugacy class. More formally, let $[w] = (w,w_2,...w_n)$, then $w \: \in \Sigma^+$ is a Lyndon word if $w<w_i$ for all $i \: \in \{2,...,n\}$.
+Throughout this work a finite alphabet $\Sigma$ is assumed with a linear order $\leq$ over its elements. A word $w$ is a sequence $a_1,...,a_n$ of letters $a_i \in \Sigma$, $1 \leq i \leq n$. The set of all such sequences is denoted by $\Sigma^*$ which is the monoid over $\Sigma$, with concatenation as composition and with the empty word $\varepsilon$ as neutral element. Supplementary the set $\Sigma^+ = \Sigma^*$ \textbackslash $\: \varepsilon$ consists of all non-empty words. Each word induces a labeling function $\lambda_w$ as a labeled linear order where position $i$ of $w$ is labeled by $a_i \in \Sigma$ and we write $\lambda_w (i) = a_i$. If, for words $u, \: v$, $u = v$ or $u$ is lexicographically smaller than $v$ we write $u \leq v$ in the context of the order over the alphabet. We say that two words $u$, $v$ are conjugate if $u = st$ and $v = ts$ for some words $s$ and $t$ and $u$ and $v$ are cyclic shifts of one another. The ordered conjugacy class of a word $w \in \Sigma^n$ denoted as $[w] = (w_1,...,w_n)$ represents the lexicographically distinct ordered cyclic rotations of that word. A \emph{Lyndon word} is the unique minimal element within its conjugacy class. More formally, let $[w] = (w,w_2,...w_n)$, then $w \: \in \Sigma^+$ is a Lyndon word if $w<w_i$ for all $i \: \in \{2,...,n\}$.
 }
 
 %% ==============================
-\section{Compression and Encoding fundamentals}
+\section{Compression and Encoding Fundamentals}
 %% ==============================
 \label{ch:Principles of compression:sec:Compression}
 \par{
-	The basic idea of compression is to remove redundancy in data, since all non random data contains redundant information. Pattern or structure identification and exploitation enables storing the original data in less space. Compression can be broken down into two broad categories: Lossless and lossy compression. Lossless compression makes it possible to reproduce the original data exactly while lossy compression allows the some degradation in the encoded data to gain even higher compression at the cost of losing some of the original information. To understand the applied methods, one first has to understand some basic principles of information theory like entropy and different approaches to compress different types of data with different encoding. We will also show the key differences between probability coding and dictionary coding.}
+	The basic idea of compression is to remove redundancy in data, since all non random data contains redundant information. Pattern or structure identification and exploitation enables storing the original data in less space. Compression can be broken down into two broad categories: Lossless and lossy compression. Lossless compression makes it possible to reproduce the original data exactly while lossy compression allows some degradation in the encoded data to gain even higher compression at the cost of losing some of the original information. To understand the applied methods, one first has to understand some basic principles of information theory like entropy and different approaches to compress different types of data with different encoding. We will also show the key differences between probability coding and dictionary coding.}
 
 \subsection{Information Theory and Entropy}
 \par{
-As Shannon described his analysis about the English language \cite{entropy}, he used the term entropy closely aligned with its definition in classical physics, where it is defined as the disorder of a system. Specifically speaking, it is assumed that a system has a set of states of which it can be in and it exists a probability distribution over those states. Shannon then defines the entropy as:
-\[
-H(S) = \sum_{s \in S} P(s) \: i(s)
-\]
-where $S$ describes all possible states, $P(s)$ is the likelihood of the system being in state $s$. So generally speaking it means that evenly distributed probabilities imply a higher entropy and vice versa.
-It also implies that, given a source of information $S$, its average information content per message from $S$ is also described by this formula.}
-
-\par{
-In addition to that, Shannon defined the term self information $i(s)$ as:
+As Shannon described his analysis about the English language \cite{entropy}, he used the term entropy closely aligned with its definition in classical physics, where it is defined as the disorder of a system. Specifically speaking, it is assumed that a system has a set of states $s$ of which it can be in and it exists a probability distribution over those states $P(s)$. Shannon defined the term self information $i(s)$ as:
 \[
 i(S) = log_{2} \: \frac{1}{P(s)}
 \]
-indicating that with higher probability of a state, less information can be contained. As an example, the statement \enquote{The criminal is smaller than 2 meters.} is very likely but doesn't contain much information, whereas the statement \enquote{The criminal is larger than 2 meters.} is not very likely but contains more information. With these definitions in mind, we can analyze some properties for the English language from an information theory point of view.
+where $S$ describes all possible states, $P(s_i)$ is the likelihood of the system being in state $s_i$, indicating that with higher probability of a state, less information can be contained. As an example, the statement \enquote{The criminal is smaller than 2 meters.} is very likely but doesn't contain much information, whereas the statement \enquote{The criminal is larger than 2 meters.} is not very likely but contains more information. In addition to that, Shannon then defines the entropy as:
+\[
+H(S) = \sum_{s \in S} P(s) \: i(s)
+\]
+ So generally speaking it means that evenly distributed probabilities imply a higher entropy and vice versa as seen in Table \ref{tab:t1:entropy} It also implies that, given a source of information $S$, its average information content per message from $S$ is also described by this formula. With these definitions in mind, we can analyze some properties for the English language from an information theory point of view.
+ \begin{table}[h]
+ 	\centering
+ 	\begin{tabular}{l|l|l|l|l|l|l}
+ 		& $P(a)$ & $P(b)$ & $P(c)$ & $P(d)$ & $P(e)$ & $H$ \\
+ 		\hline
+ 		1. & 0.2 & 0.2 & 0.2 & 0.2 & 0.2 & 2.322 \\
+ 		2. & 0.94 & 0.01 & 0.01 & 0.01 & 0.01 & 0.322
+ 	\end{tabular}
+  	\label{tab:t1:entropy}
+ 	\caption{Entropy in relation to the probability of symbols.}
+ \end{table}
 }
 
 \par{
-Combining those approaches, you will find that $\sum$ being a finite alphabet, and $P(s_i)$ describing the likelihood of $s_i$ and $i(s_i)$ its self information, $i(s_i)$ also describes the amount of bits needed for this symbol, therefore its $log_2$.
+Combining those approaches, you will find that $\Sigma$ being a finite alphabet, and $P(s_i)$ describing the likelihood of $s_i$ and $i(s_i)$ its self information, $i(s_i)$ also describes the amount of bits needed for this symbol.
 \[
-	H(\sum) = \sum_{i = 1}^{n} P(s_i) \: \cdot \: log_{2} \: \frac{1}{P(s_i) }
+	H(\Sigma) = \sum_{i = 1}^{n} P(s_i) \: \cdot \: log_{2} \: \frac{1}{P(s_i) }
 \]
-So the entropy 	also describes the theoretical amount of bits needed to persist a message from $\sum$, calculated in $bps$ as bits per symbol.
-
-\begin{table}
-	\centering
-\begin{tabular}[p]{l|l|l|l|l|l|r}
-	& $P(a)$ & $P(b)$ & $P(c)$ & $P(d)$ & $P(e)$ & $H$ \\
-	\hline
-	1. & 0.2 & 0.2 & 0.2 & 0.2 & 0.2 & 2.322 \\
-	2. & 0.94 & 0.01 & 0.01 & 0.01 & 0.01 & 0.322
-	\label{tab:heisetabelle}
-\end{tabular}
-	\caption{Entropy in relation to the Probability of Symbols}
-\end{table}
+So the entropy 	also describes the theoretical amount of bits needed to persist a message from $\Sigma$, calculated in $bps$ as bits per symbol.
 }
 \subsection{General Analysis}
 \par{
@@ -63,7 +58,7 @@ If we assume a 96 symbol alphabet and a uniform probability distribution, we fin
 
 \subsection{Probabilistic Coding}
 \par{
-The general idea behind Probability Coding is to analyze probabilities for messages and encode them in variable length bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding can be further distinguished into variable and fixed unique coding, which will represent each message with a bit string with an amount $n$ of bits $n \in N$, for example Huffman coding as type of prefix coding which will be explained in greater detail in Section \ref{ch:Principles of compression:sec:Huffman Coding}. In contrast to Huffman coding there is also arithmetic coding which can represent a set of messages as a single floating point number $q$ where $0.0 < q < 1.0$. By encoding them in nestend intervals in $[0,1]$ determined by a probability distribution, they can \enquote{fuse} messages together and need less space to represent a set of messages than encoding every message separately. Arithmetic coding is usually stronger than Huffman coding but also slower. In 2014 a newer probabilistic approach was produced by Jarek Duda called Asymmetric Numeral Systems (ANS) \cite{DBLP:journals/corr/Duda13}. This method encodes a string of symbols into a single natural number and combines the strength of arithmetic coding with the speed of Huffman coding.
+The general idea behind Probability Coding is to analyze probabilities for messages and encode them in variable length bit strings according to their probability. This way, messages that are more likely and will repeat more often can be encoded in a smaller bit string representation. The generation of those probability distributions is considered part of the analyzer module by the algorithm and will be discussed later on in Section \ref{ch:Conceptual Design}. Probability coding can be further distinguished into variable and fixed unique coding, which will represent each message with a bit string with an amount of $n$ bits $n \in \mathbb{N}$, for example Huffman coding as type of prefix coding which will be explained in greater detail in Section \ref{ch:Principles of compression:sec:Huffman Coding}. In contrast to Huffman coding there is also arithmetic coding which can represent a set of messages as a single floating point number $q$ where $0.0 < q < 1.0$. By encoding them in nestend intervals in $[0,1]$ determined by a probability distribution, they can \enquote{fuse} messages together and need less space to represent a set of messages than encoding every message separately. Arithmetic coding is usually stronger than Huffman coding but also slower. In 2014 a new probabilistic approach was produced by Jarek Duda called Asymmetric Numeral Systems (ANS) \cite{DBLP:journals/corr/Duda13}. This method encodes a string of symbols into a single natural number and combines the strength of arithmetic coding with the speed of Huffman coding.
 }
 
 \subsection{Dictionary Coding}
@@ -71,7 +66,7 @@ The general idea behind Probability Coding is to analyze probabilities for messa
 Dictionary Coding is best suited for data with a small amount of repeating patterns like a text containing repeated words. In this case it is very effective to save the patterns just once and refer to them if they are used later on in the text. If we know a lot about the text itself in advance, a static dictionary is sufficient but in general we want to compress an arbitrary text. This requires a more general approach as used by the well known LZ77 and LZ88 algorithms described by Jacob Ziv and Abraham Lempel \cite{lz}. They use a so called sliding window principle, a buffer moving across the input in the case of LZ77 or a dynamic dictionary in the implementation of LZ78. Both of them are still used in modified versions in real world applications as described in Section \ref{ch:Principles of compression:sec:SOTA}, although mostly implemented in newer variants or derivatives.
 }
 \par{
-The main difference between probabilistic coding and dictionary coding is, that the so far presented probability based methods like RLE or Huffman Coding are working on single characters or bytes whereas the dictionary based methods encode groups of characters of varying length. This is a clear advantage in terms of compression performance on every day data because of its repeating patterns most textual data has, as shown in Section \ref{ch:Analysis:sec:Initial Findings}, and has been overcome by sophisticated probabilistic methods like arithmetic coding or ASN.
+The main difference between probabilistic coding and dictionary coding is, that the so far presented probability based methods like RLE or Huffman Coding are working on single characters or bytes whereas the dictionary based methods encode groups of characters of varying length. This is a clear advantage in terms of compression performance on every day data because of its repeating patterns most textual data has, as shown in Section \ref{ch:Analysis:sec:Initial Findings}, and has been overcome by sophisticated probabilistic methods like arithmetic coding or ANS.
 }
 
 
@@ -89,18 +84,18 @@ Irreversible Compression or also called \enquote{Lossy Compression} is a type of
 	Run length coding might count as the simplest probability coding scheme that makes use of context and repeating occurrences as described in the Section \ref{ch:Introduction:sec:Motivation}. While the example made earlier was in textual representation, it is best suited and mostly used for pallet based bitmap images \cite{palette-image} such as fax transmissions or computer icons.
 }
 
-\subsection{The History}
+\subsection{History}
 \label{ch:Principles of compression:sec:Run Length Encoding:subSec:History}
 \par{
  The ITU-T T4 (Group 3) standard for Facsimile (fax) machines \cite{ITU} is still in force for all devices used over regular phone lines. Each transmission sends a black and white image, where each pixel is called a \textit{pel} and with a horizontal resolution of $8.05 \: \frac{pels}{mm}$ and the vertical resolution depending on the mode. To encode each sequence of black and white pixels, the T4 standard uses RLE to encode each sequence of black and white pixels and since there are only two values, only the run length itself has to be encoded. It is assumed that the first run is always a white run, so there is a dummy white pel at the beginning of each sequence. For example, the sequence $bbbbwwbbbbb$ can be encoded as 1,4,2,5 with the leading white dummy pixel.
 }
 \par{
-To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding (explained in Section \ref{ch:Principles of compression:sec:Huffman Coding}) can be used to code the sequence, since shorter run lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of the average run lengths counted, the T4 defined a set of static Huffman codes, using different codes for the black and white pixels. This way for example 20 consecutive white pels  are a white run with length 20 an so the message can be encoded and transmitted as the code-word \enquote{0001000}, requiring only 7 bit instead of 20, seen in row 6 column 2 in table \ref{tab:t1:static huffman codes}. Since a fax typically contains more white, the white runs are more frequent and thus get shorter code-words which is explained in greater detail in Section \ref{ch:Principles of compression:sec:Huffman Coding}. Since the appearance of text usually only needs a few consecutive black pels, short black runs of length 2 or 3 appear to be the most frequent seen runs so to save space they are encoded in the overall shortest codes. Runs of more than 64 have to be encoded in multiple Huffman codes, for example a run of 150 has to be encoded with the Huffman code of 128 followed by the code for 22.
+To further reduce the RLE encoded sequence, a probability coding procedure like Huffman coding (explained in Section \ref{ch:Principles of compression:sec:Huffman Coding}) can be used to code the sequence, since shorter run lengths are generally more common than very long runs, which is also done by the T4 standard. Based on a broad analysis of the average run lengths counted, the T4 defined a set of static Huffman codes, using different codes for the black and white pixels. This way for example 20 consecutive white pels  are a white run with length 20 and so the message can be encoded and transmitted as the code-word \enquote{0001000}, requiring only 7 bit instead of 20, seen in row 6 column 2 in Table \ref{tab:t1:static huffman codes}. Since a fax typically contains more white, the white runs are more frequent and thus get shorter code-words which is explained in greater detail in Section \ref{ch:Principles of compression:sec:Huffman Coding}. Since the appearance of text usually only needs a few consecutive black pels, short black runs of length 2 or 3 appear to be the most frequent seen runs so to save space they are encoded in the overall shortest codes. Runs of more than 64 have to be encoded in multiple Huffman codes, for example a run of 150 has to be encoded with the Huffman code of 128 followed by the code for 22.
 }
 \begin{table}
 	\centering
-	\begin{tabular}[p]{r|l|l}
-		run length &  white codeword & black codeword\\
+	\begin{tabular}[p]{r|c|c}
+		run length &  white run Huffman codes & black run Huffman code\\
 		\hline
 		0 &  00110101 & 0000110111\\
 		1 & 000111 & 010\\
@@ -114,7 +109,7 @@ To further reduce the RLE encoded sequence, a probability coding procedure like 
 		128+ & 10010 & 000011001000
 		\label{tab:t1:static huffman codes}
 	\end{tabular}
-	\caption{T4 static Huffman codes}
+	\caption{T4 static Huffman codes.}
 \end{table}
 \par{
 By combining RLE with a probabilistic approach, the compression ratio increases because we no longer have to encode a run of length 1 or 2 with a fixed size of bits each instead we can write a recognizable Huffman code of varying length, which will be explored in grater detail later on as well as the decoding of the shown Huffman codes.}
@@ -131,16 +126,15 @@ As mentioned in Section \ref{ch:Introduction:sec:Problem statement}, run length 
 Prefix codes make use of an untypical idea in computer science. Usually we deal with fixed length codes like 7 bit ASCII or 32 bit Integer representations which map each possible value into that fixed amount of bits. For compression it would be a benefit if we could write codes of variable length. The problem with these varying length codes is that as soon as they are part of a sequence, it becomes very hard to tell where one code word starts and finishes, resulting in ambiguous encoding. For example the set of codes $ C= \{(a,1),(b,01),(c,101),(d,011)\}$ and the encoded message is $1011$ do not generate distinct decodeable code words because there is no way to tell which message was encoded. From now on a code $C$ for a set of messages $S$ is considered to be in the form of $ C= \{(s_1,w_1),(s_2,w_2),...,(s_m,w_w)\}$.
 }
 \par{
-One way to address this problem is by adding extra stop symbols or encoding a length before each code but those just add additional data. Another approach is to use so called prefix codes and make no code which is prefix of another code, which makes them distinct and uniquely decodable. A Huffman coding is one way of generating a prefix code, which is a uniquely decodable. When no code is prefix of another one, it is always decodable and yields a unique result because once a matching code is read, no other longer could also match. Huffman codes have another property, as they are call
-optimal prefix codes. To understand this property we first have to define the average length $l_a$ of a code $C$ as 
+One way to address this problem is by adding extra stop symbols or encoding a length before each code but those just add additional data. Another approach is to use so called \emph{prefix codes} and make no code which is prefix of another code, which makes them distinct and uniquely decodable. A Huffman coding is one way of generating a prefix code, which is uniquely decodable. When no code is prefix of another one, an encoded message is always decodable and yields a unique result because once a matching codeword is read, no other longer codeword could also match. Huffman codes have another property, as they are call optimal prefix codes. To understand this property we first have to define the average length $l_a$ of a code $C$ as:
 \[
 l_a(C) = \sum_{(s,w)\in C} \: p(s) \: l(w)
 \]
-We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no other prefix code for a given probability distribution that has a lower average length. The existence of a relation between the average length of a prefix code to the entropy of a set of messages can be shown by making use of the Kraft McMillan Inequality \cite{mcKillan}. For a uniquely decodeable code $C$ where $l(w)$ is the length of the code word $C$
+We say that a prefix code is optimal, if $l_a(C)$ is minimized, so there is no other prefix code for a given probability distribution that has a lower average length. The existence of a relation between the average length of a prefix code to the entropy of a set of messages can be shown by making use of the Kraft McMillan Inequality \cite{mcKillan}. For a uniquely decodeable code $C$ where $l(w)$ is the length of the code word $C$ we have:
 \[
 \sum_{(s,w)\in C} 2^{-l(w)} \leq 1
 \]
-And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm	 in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node with its frequency is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original as children, which is then added back to the list with the sum of their frequencies. This step is repeated while there are more than one nodes left in the queue. For our example the counts are a = 2, b = 1 and c = 5. So the first two nodes are b and a which are combined and become a new node, then this node is combined with c into another tree. This is resembled in figure \ref{fig:M1:example Huffman tree} with the tree leafs in green and the two generated trees in red with the combined frequency. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. Obviously the most frequent symbol is assigned the shortest code and all codes are prefix free. the For decoding it is required to persists the mapping as well.
+And it is also proven that the Huffman algorithm generates optimal prefix codes \cite{compressionIntroduction}. The algorithm	 in general is rather simple and the generation of the prefix codes will be demonstrated using an example. Assume we want to generate a prefix code for the message \enquote{accbccac}. To generate a Huffman tree, first all occurrences of source symbols are counted and then a leaf node, with its frequency, is added to a priority queue for every symbol. Then, the two nodes with the lowest frequency are removed from the list, combined into one node with the two original nodes as children and this combined node is then added back to the list with the sum of the child nodes frequencies. This step is repeated while there is more than one nodes left in the queue. For our example the counts are $a = 2$, $b = 1$ and $c = 5$. So the first two nodes are $b$ and $a$ which are combined and become a new node, then this node is combined with $c$ into another node. Since there is no further node, the last created node is the root node of the tree. This is resembled in Figure \ref{fig:M1:example Huffman tree} with the tree leaf nodes in green and the two generated nodes in red with the combined frequency. To get the actual mapping between a symbol and its code, simply follow the tree from its root to each symbol, the path from the root is its code. Obviously the most frequent symbol is assigned the shortest code and all codes are prefix free. For decoding it is required to persists the mapping as well.
 
 \begin{figure}[h]
 	\centering
@@ -160,18 +154,18 @@ every node/.style={fill=white,circle}]
 \path [->] (A) edge node {$0$} (B);
 \path [->] (B) edge node {$0$} (C);
 \path [->] (D) edge node {$1$} (B);
-\path [->] (C) edge node {$1$} (F);
+\path [->] (F) edge node {$1$} (C);
 
 \end{scope}
 \end{tikzpicture}
-	\caption{example Huffman Tree with 3 Leaf Nodes} \label{fig:M1:example Huffman tree}
+	\caption{Example Huffman tree with 3 leaf nodes.} \label{fig:M1:example Huffman tree}
 \end{figure}
 }
 \par{
-Decoding is very trivial due to the prefix codes used b this algorithm. Reading bit by bit one can always see if a code is matching one of the mapping and if not, another bit is read. As soon as the parsed content matches a mapped code, we can decode it to the original symbol because there can not be a longer matching mapping. Due to the implementation via a Priority queue, which needs $O(log \: n)$ time per insertion and a tree with $n$ leaves has $2n-1$ nodes let this algorithm perform in $O(n \: log \: n)$ time where $n$ is the number of symbols.
+Decoding is very trivial due to the prefix codes used by this algorithm. Reading bit by bit one can always see if a code matches one of the mappings and if not, another bit is read. As soon as the parsed content matches a mapped code, we can decode it to the original symbol because there cannot be a longer matching mapping. Due to the implementation via a priority queue, which needs $O(log \: n)$ time per insertion and a tree with $n$ leaves has $2n-1$ nodes let this algorithm perform in $O(n \: log \: n)$ time where $n$ is the number of symbols.
 }
 
-\section{Other methods}
+\section{Other Methods}
 \label{ch:Principles of compression:sec:Other}
 \par{
 There are other well known methods like Move-to-Front coding or arithmetic coding also applied in different compression algorithms with different methods and therefore their own pros and cons. But other than Huffman coding, no further probability coding approach will be discussed nor implemented in this scope. But its worth mentioning that real world applications are mostly combinations of methods, like Deflate\cite{deutsch1996rfc1951} which uses LZSS\cite{10.1145/322344.322346} (derivative of LZ77) and Huffman encoding or more recent ones like the PAQ family which is using a context mixing algorithm \cite{mahoney2009data}. Some combinations and PAQ implementations can be found in table \ref{tab:t20 stat of the art} where the state of the art compression methods and algorithms are discussed.
@@ -181,67 +175,66 @@ There are other well known methods like Move-to-Front coding or arithmetic codin
 \label{ch:Principles of compression:sec:Other:subSec:bwt}
 
 \par{
-The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a Transformation of a string $w$ of $n$ characters by forming the $n$ cyclic rotations of $w$, sorting them lexicographical, and extracting the last character of each of the rotations or in other words, the conjugacy class of $w$ which is $[w]$. Each rotation is induced by a right shift of the original word. The right-shift of a word $w=a_1 ... a_n$ is dented as $r(w) = a_na_1...a_{n-1}$ and the $i$-fold right shift $r^i(w)$ is defined inductively by $r^0(w) = w$ and $r^{i+1}(w) = r(r^i(w))) $ which is also defined for $i \grq n$ as $r^i(w)=r^j(w)$ where $j = i \: mod \: n$. The result of this transformation is a string $L$, consisting of these last characters of each sorted rotation. The basic algorithm also has to add special termination symbols or compute the index $I$ of the original string $S$ in the sorted list of rotations to be able to revert this transformation. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string $S$ given only $L$ and the Index $I$ \cite{Burrows-linear-time} and also a modified version, which is not depended on additional information, described in Section \ref{ch:Principles of compression:sec:Other:subSec:bwtscott}.
+The Burrows-Wheeler-Transformation is not a compression technique but rather a method to prepare text to increase its compression potential, described by M. Burrows and D. J. Wheeler \cite{Burrows94}. It is a transformation of a string $w$ of $n$ characters by forming the $n$ cyclic rotations of $w$, sorting them lexicographically, and extracting the last character of each of the rotations or in other words, the conjugacy class of $w$ which is $[w]$. Each rotation is induced by a right shift of the original word. The right shift of a word $w=a_1 ... a_n$ is denoted as $r(w) = a_na_1...a_{n-1}$ and the $i$-fold right shift $r^i(w)$ is defined inductively by $r^0(w) = w$ and $r^{i+1}(w) = r(r^i(w))) $ which is also defined for $n \leq i$ as $r^i(w)=r^j(w)$ where $j = i \: mod \: n$. The result of this transformation is a string $L$, consisting of these last characters of each sorted rotation. The basic algorithm also has to add special termination symbols or compute the index $I$ of the original string $S$ in the sorted list of rotations to be able to revert this transformation. Surprisingly, there is an efficient algorithm to invert the transformation back to the original string $S$ given only $L$ and the Index $I$ \cite{Burrows-linear-time} and also a modified version, which is not depended on additional information, described in Section \ref{ch:Principles of compression:sec:Other:subSec:bwtscott}.
 }
 
 \par {
-As an example of the creation of $L$, given the input string $w = crabab$, $n = 6$, and the alphabet $\Sigma = \{a,b,c,r\}$ with $a \textless b \textless c \textless r $. Create a $N \times N$ matrix $M$ whose elements are characters, and with all cyclic rotations of $w$, which assembles the conjugacy class $[w]$ of word $w$. All rotations are sorted in lexicographical order, in this example, the index is $I = 4$ and the matrix $M$ is:
+As an example of the creation of $L$, given the input string $w = abcabr$, $n = 6$, and the alphabet $\Sigma = \{a,b,c,r\}$ with $a \textless b \textless c \textless r $. Create a $n \times n$ matrix $M$ whose elements are characters, and with all cyclic rotations of $w$, which assembles the conjugacy class $[w]$ of word $w$. All rotations are sorted in lexicographical order, in this example, the index is $I = 1$ and the matrix $M$ is:
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{r|l|l|l|l|l|l}
-		row 1 & a & b & a & b & c & r\\
+		row 1 & a & b & c & a & b & r\\
 		\hline
-		row 2 & a & b & c & r & a & b\\
+		row 2 & a & b & r & a & b & c\\
 		\hline
-		row 3 & b & a & b & c & r & a\\
+		row 3 & b & c & a & b & r & a\\
 		\hline
-		row 4 & b & c & r & a & b & a\\
+		row 4 & b & r & a & b & c & a\\
 		\hline
-		row 5 & c & r & a & b & a & b\\
+		row 5 & c & a & b & r & a & b\\
 		\hline
-		row 6 & r & a & b & a & b & c
-		\label{tab:t10 bwt-example}
+		row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
 	\end{tabular}
-	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations)}
+	\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
 \end{table}
-The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = rbaabc$ and $i = 5$. Obviously the string $L$ contains consecutive identical characters, which results in better compressibility as shown in \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series. Also this depicts that the word $ababcr$ in row one of $M$ is a Lyndon word, because it is the smallest in its conjugacy class and $crabab$ is not.
+The resulting string $BWT(w)=L$ corresponds to the last column of $M$, with characters $M[0,n -1],\: \dots \: ,M[n - 1, n - 1]$. The output of the transformation is the pair $(L, i)$, in the example, $L = rcaabb$ and $i = 1$. Obviously, the string $L$ contains consecutive identical characters, which results in better compressibility as shown in Section \ref{ch:Analysis:sec:Improvements by Preprocessing:subSec:bwt}. Longer words with more identical characters in general tend to have more equal characters in series. Also this depicts that the word w is coincidentally in row one of $M$ and is therefore a Lyndon word, because it is the smallest in its conjugacy class.
 }
 
 \subsection{Inverse Burrows-Wheeler-Transformation}
 \label{ch:Principles of compression:sec:Other:subSec:bwtInverse}
 \par{
- The BWT is invertible and given $(L, i)$ where $i$ is the index of $w$ in $M(w)$ one can reconstruct the word $w$. There is a formal proof \cite{kufleitner2009bijective} available for this as well as the bijective variant described in the next Section. To abstract the idea of inverting the permutation using only $L$ and $i$ is described by the following process by carrying on with the example. We now reconstruct the original word from the pair $(L,i)$ by first calculating the standard permutation of $L$ by writing $L$ column-wise, add positions, and then sort the pairs lexicographically. Mapping each index with its sorted neighbor results in the standard permutation.  
+ The BWT is invertible and given $(L, i)$ where $i$ is the index of $w$ in $M(w)$ one can reconstruct the word $w$. There is a formal proof \cite{kufleitner2009bijective} available for this as well as the bijective variant described in the next section. To abstract the idea of inverting the permutation using only $L$ and $i$ is described by the following process by carrying on with the example. We now reconstruct the original word from the pair $(L,i)$ by first calculating the standard permutation of $L$ by writing $L$ column-wise, add positions, and then sort the pairs lexicographically. Mapping each index with its sorted neighbor results in the standard permutation.  
  \begin{table}[h]
  	\centering
  	\begin{tabular}{l|l|l}
 		word & word with position & sorted\\
 		\hline
 		r & (r,1) & (a,3) \\
-		b & (b,2) & (a,4) \\
-		a & (a,3) & (b,2) \\
-		a & (a,4) & (b,5) \\
-		b & (b,5) & (c,6) \\
-		c & (c,6) & (r,1)
+		c & (c,2) & (a,4) \\
+		a & (a,3) & (b,5) \\
+		a & (a,4) & (b,6) \\
+		b & (b,5) & (c,2) \\
+		b & (b,6) & (r,1)
  		\label{tab:t11 standard permutation}
  	\end{tabular}
- 	\caption{Standard permutation generation of the word $L$}
+ 	\caption{Standard permutation generation of the word $L$.}
  \end{table}
 }
 \par{
 This yields a standard permutation of:
 \begin{gather}  
 \pi_L = 
-\begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6\\ 3 & 4 & 2 & 5 & 6 & 1 \end{pmatrix}
+\begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6\\ 3 & 4 & 5 & 6 & 2 & 1 \end{pmatrix}
 \end{gather}
-Following $\pi^1_L(5)$ to $\pi^6_L(5)$ gives us a sequence of positions with $\pi_L(5)=6$ as a beginning, described by:
+Following $\pi^1_L(1)$ to $\pi^6_L(1)$ gives us a sequence of positions with $\pi_L(1)=3$ as a beginning, described by:
 \begin{gather} 
-6 \xrightarrow[]{\pi_L} 1 \xrightarrow[]{\pi_L} 3 \xrightarrow[]{\pi_L} 2 \xrightarrow[]{\pi_L} 4 \xrightarrow[]{\pi_L} 5
+3 \xrightarrow[]{\pi_L} 5 \xrightarrow[]{\pi_L} 2 \xrightarrow[]{\pi_L} 4 \xrightarrow[]{\pi_L} 6 \xrightarrow[]{\pi_L} 1 
 \end{gather}
 If this sequence is applied to the labeling function of the word $L$ it results in: 
 \begin{gather}  
-\lambda_L(6) \: \lambda_L(1) \: \lambda_L(3) \: \lambda_L(2) \: \lambda_L(4) \: \lambda_L(5)
-= crabab = w
+\lambda_L(3) \: \lambda_L(5) \: \lambda_L(2) \: \lambda_L(4) \: \lambda_L(6) \: \lambda_L(1)
+= abcabr = w
 \end{gather}
 This shows that it is possible to reconstruct the word $w$ given the transformation $BWT(w)=L$ and the index $i$.
 }
@@ -249,7 +242,7 @@ This shows that it is possible to reconstruct the word $w$ given the transformat
 \subsection{Bijective Burrows-Wheeler-Scott Transformation}
 \label{ch:Principles of compression:sec:Other:subSec:bwtscott}
 \par{
-Although, the bijective variant (abbreviated with BWTS, sometimes BBWT) is mostly used further on it its rather complicated because it maps a word $w$ with $l(w)$ to another word with equal length without any start or stop symbols and no additional index. It strongly relies on the Lyndon factorization, because calculating the BWT of a Lyndon word $v$ always returns 1 as index since we know that $v$ is always the first element in $M$. Then one can calculate the BWT over all Lyndon factors of the input data, without additional information needed, a proof for this is also mentioned in \cite{kufleitner2009bijective}. The bijective transform is generated by slitting the input into a sequence of Lyndon words. The Chen-Fox-Lyndon \cite{chenFoxlyndonTheorem} theorem states that such a factorization exists can found in linear time \cite{lyndonFactorLinearTime}. Afterwards all rotations of all words are sorted as in the Burrows–Wheeler-Transformation which results in a sequence of sorted strings. Again the final character of each string in this sorted list represents the transformation result. Decoding is also similar up until the last step of the inverse BWT. But instead of giving rotations of words, it instead gives rotations of Lyndon words , which are sorted into reverse order and then concatenated to get the original result.
+Although, the bijective variant (abbreviated with BWTS, sometimes BBWT) is mostly used further on. It its rather complicated because it maps a word $w$ with $l(w)$ to another word with equal length without any start or stop symbols and no additional index. It strongly relies on the Lyndon factorization, because calculating the BWT of a Lyndon word $v$ always returns 1 as index since we know that $v$ is always the first element in $M$. Then, one can calculate the BWT over all Lyndon factors of the input data, without additional information needed, a proof for this is also mentioned in \cite{kufleitner2009bijective}. The bijective transform is generated by slitting the input into a sequence of Lyndon words. The Chen-Fox-Lyndon \cite{chenFoxlyndonTheorem} theorem states that such a factorization exists and can be found in linear time \cite{lyndonFactorLinearTime}. Afterwards all rotations of all words are sorted as in the Burrows–Wheeler-Transformation which results in a sequence of sorted strings. Again, the final character of each string in this sorted list represents the transformation result. Decoding is also similar up to the last step of the inverse BWT. But instead of giving rotations of words, it gives rotations of Lyndon words , which are sorted into reverse order and then concatenated to get the original result.
 }
 
 %% ==============================
@@ -257,18 +250,18 @@ Although, the bijective variant (abbreviated with BWTS, sometimes BBWT) is mostl
 %% ==============================
 \label{ch:Principles of compression:sec:SOTA}
 \par{
-The current state of the art at the time of writing is depicted in the table below, all algorithms used highest possible compression scheme available. In general there is always a balance between compressed size and compression or decompression speed, where the faster algorithms use mostly some form of dictionary coding sometimes in combination with a Huffman coder to be able to output variable length codes. The more advanced ones like PPMd or ZPAQ use complex context modeling or context mixing approaches where they generate a probability distribution for the next symbol based on just read symbols. In general these complex methods achieve better compression at the expense of using more space or time. The currently modern and most used algorithms have been executed with the Calgary corpus and the results are shown in table \ref{tab:t20 stat of the art}, all files were processed separately. Algorithms like \textit{compress}, \textit{gzip} and \textit{ZIP} use a dictionary based method like LZ77 or some derivative and achieve reasonable compression at very fast rates. \textit{bzip2} and \textit{p7zip} use a Burrows-Wheeler-Transformation (described in \ref{ch:Principles of compression:sec:Other:subSec:bwt}) and then a combination of different techniques to improve performance. They sometimes even offer explicit choosing of a method, like \textit{7zip} which achieves even better compression when using an advanced probabilistic method called Prediction by partial matching, also implemented but with even better results by \textit{ZPAQ} which performs even better while still maintaining reasonable speeds. In the last decade methods like \textins{zstandard} developed by Facebook or \textit{brotli} developed by Google arose, mostly implementing ANS and other methods arose but they are either desired to be just faster or designed for a different task like \textit{brotli} for HTML and JSON compression and do not achieved best results on this corpus. In the context of the \href{http://prize.hutter1.net/}{hutter prize}, a competitive compression challenge, other advanced probabilistic methods were developed like \textit{paq8hp1} to \textit{paq8hp12}, a series of algorithms by Alexander Rhatushnyak \cite{mahoney2011large} who won the challenge. A more recent fork of \textit{paq8} from 2014 is the current leader, \textit{cmix}. It is still the best performing algorithm on this list and achieved by far the best results on the Calgary corpus at expense of almost 3 hours of computing and 32GB of needed ram, displayed in \ref{tab:t100benchmark}. Unfortunately it was not possible to run the paq8hp* variants due to an major bug in the only available releases. Most algorithms are available from the default repositories of your Linux distribution, or in the case of Fedora and CentOS, pre-installed with your operating system. The paq8hp* algorithms can be found on the Hutter price website and cmix is developed on \href{https://github.com/byronknoll/cmix}{github} \cite{cmix}.
+The current state of the art at the time of writing is depicted in the Table \ref{tab:t20 stat of the art}, all algorithms used highest possible compression scheme available. In general there is always a balance between compressed size and compression or decompression speed, where the faster algorithms use mostly some form of dictionary coding sometimes in combination with a Huffman coder to be able to output variable length codes. The more advanced ones like PPMd or ZPAQ use complex context modeling or context mixing approaches where they generate a probability distribution for the next symbol based on just read symbols. In general these complex methods achieve better compression at the expense of using more space or time. The currently modern and most used algorithms have been executed with the Calgary Corpus, all files were processed separately. Algorithms like \emph{compress}, \emph{gzip} and \emph{ZIP} use a dictionary based method like LZ77 or some derivative and achieve reasonable compression at very fast rates. \emph{bzip2} and \emph{p7zip} use a Burrows-Wheeler-Transformation (described in \ref{ch:Principles of compression:sec:Other:subSec:bwt}) and then a combination of different techniques to improve performance. They sometimes even offer explicit choosing of a method, like \emph{7zip} which achieves even better compression when using an advanced probabilistic method called \emph{prediction by partial matching (PPM)}, also implemented but with even better results by \emph{ZPAQ} which performs even better while still maintaining reasonable speeds. In the last decade methods like \emph{zstandard} developed by Facebook or \emph{brotli} developed by Google arose, mostly implementing ANS and other methods arose but they are either desired to be just faster or designed for a different task like \emph{brotli} for HTML and JSON compression and do not achieve best results on this Corpus. In the context of the \href{http://prize.hutter1.net/}{hutter prize}, a competitive compression challenge, other advanced probabilistic methods were developed like \emph{paq8hp1} to \emph{paq8hp12}, a series of algorithms by Alexander Rhatushnyak \cite{mahoney2011large} who won the challenge. A more recent fork of \emph{paq8} from 2014 is the current leader, \emph{cmix}. It is still the best performing algorithm on this list and achieved by far the best results on the Calgary Corpus at expense of almost 3 hours of computing and 32GB of needed ram, displayed in Section \ref{tab:t100benchmark}. Unfortunately it was not possible to run the paq8hp* variants due to an major bug in the only available releases. Most algorithms are available from the default repositories of your Linux distribution, or in the case of Fedora and CentOS, pre-installed with your operating system. The paq8hp* algorithms can be found on the Hutter price website and cmix is developed on \href{https://github.com/byronknoll/cmix}{github} \cite{cmix}.
 	\begin{table}[h]
 		\begin{tabular}{r|r|r|r|r}
 			method & options &  size in bytes & compression & \textit{bps}\\
 			\hline
 			uncompressed & & 3,145,718 & 100.0\% & 8.00 \\
-			compress & & 1,250,382 & 40.4\% & 3.24 \\
+			compress 4.2.4 & & 1,250,382 & 40.4\% & 3.24 \\
 			gzip v1.10 & -9 & 1,021,720 & 32.4\% & 2.60\\
 			ZIP v3.0 &-9& 1,019,783 & 32.4\% & 2.59 \\
 			zstandard 1.4.2& --ultra-23 -long=30 & 887,004 & 28.1\% & 2.25\\
 			bzip2 v1.0.8 & --best & 832,443 & 26.4\% & 2.11 \\
-			brotli & -q 11 -w 24 & 826,638 & 26.3\%& 2.10\\
+			brotli 1.0.7 & -q 11 -w 24 & 826,638 & 26.3\%& 2.10\\
 			p7zip 16.02 (deflate) & a -mx10 & 821,873 & 26.1\% & 2.08 \\
 			p7zip 16.02 (PPMd) & a -mm=ppmd o=32 & 763,067& 24.2\% & 1.93 \\
 			ZPAQ v7.15 & -m5 & 659,700 & 20.9\% & 1.67  \\
@@ -276,16 +269,16 @@ The current state of the art at the time of writing is depicted in the table bel
 			cmix v18 & -c -d & 554,983 & 17.6\% & 1.41 		
 		\end{tabular}
 				\label{tab:t20 stat of the art}
-			\caption{State of the Art compression ratios}
+			\caption{State of the art compression ratios on the Calgary Corpus.}
 	\end{table}
 }
 
 %% ==============================
-\section{Limits of compression}
+\section{Limits of Compression}
 %% ==============================
 \label{ch:Principles of compression:sec:Limits of Conpression}
 \par{
-All so far introduced methods and techniques work by removing redundant information but applied to random data without any structure or patterns they will fail to compress. This is explained by the Kolmogorov complexity\cite{kolmogorov} off a string $s$ which is the shortest possible program with $s$ as output. Consider the following two strings of equal length \textit{ababababab} and \textit{4c1j5b20fg}. While the first string can simply be denoted as $5 \times ab$, the other one has obviously no simple representation hence it has a higher Kolmogorov complexity. Using the pigeonhole principle it is also possible to trivially prove this by assuming $s$ is a binary string and $l(s) \: = \: n$. This implies $2^n$ possible string, all unequal. Assuming we can reduce all of them by 1 character, they only need $m = n - 1$ space and can only have $2^m$ possible unequal strings. This results in a contradiction because with lossless compression we need a distinct reverse operation and we cannot decode $2^{n-1}$ distinctly into $2^n$ strings. So to recap, no algorithm can compress all data of a given length, even by just one byte. If this was not true it would result in algorithm that could compress every string, so it could be applied recursively until any string has length 0. Therefore it is obvious that there exist some hard limits to compression.
+All so far introduced methods and techniques work by removing redundant information but applied to random data without any structure or patterns they will fail to compress. This is explained by the Kolmogorov complexity\cite{kolmogorov} off a string $s$ which is the shortest possible program with $s$ as output. Consider the following two strings of equal length \textit{ababababab} and \textit{4c1j5b20fg}. While the first string can simply be denoted as $5 \times ab$, the other one has obviously no simple representation hence it has a higher Kolmogorov complexity. Using the pigeonhole principle it is also possible to trivially prove this by assuming $s$ is a binary string and $l(s) \: = \: n$. This implies $2^n$ possible string, all unequal. Assuming we can reduce all of them by 1 character, they only need $m = n - 1$ space and can only have $2^m$ possible unequal strings. This results in a contradiction because with lossless compression we need a distinct reverse operation and we cannot decode $2^{n-1}$ distinctly into $2^n$ strings. So to recap, no algorithm can compress all data of a given length, even by just one byte. If this was not true it would result in algorithm that could compress every string, so it could be applied recursively until any string has length 0. Therefore, it is obvious that there exist some hard limits to compression.
 }
 %%% Local Variables: 
 %%% mode: latex

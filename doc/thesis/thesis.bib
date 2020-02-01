@@ -1,30 +1,38 @@
 
-@proceedings{fax-rle,
-	title = {International digital facsimile coding standards, Proceedings of the IEEE 68},
+@book{fax-rle,
+	title = {International digital facsimile coding standards},
+	publisher = {Proceedings of the IEEE 68},
 	year = 1980,
-	editor = {Roy Hunter and A. Harry Robinson},
+	author = {A. Harry Robinson and Roy Hunter},
 	pages = {854--867}
 }
-@TECHREPORT{Burrows94,
+@book{Burrows94,
 	author = {M. Burrows and D. J. Wheeler},
 	title = {A block-sorting lossless data compression algorithm},
-	institution = {Systems Research Center},
+	publisher = {Systems Research Center},
 	year = {1994}
 }
-@book{kolmogorov,
+@inbook{kolmogorov,
 	title={On tables of random numbers},
 	author={Kolmogorov, A. N.},
 	pages = {369–376},
 	year={1963},
-	institution = {Sankhyā Ser},
-	publisher={MR}
+	note = {Academy of Science USSR},
+	publisher={Sankhyā: The Indian Journal of Statistics, Series A}
+}
+@inbook{vsipek2019exploring,
+	title={Exploring Aspects of Polyglot High-Performance Virtual Machine GraalVM},
+	author={{\v{S}}ipek, Matija and Mihaljevi{\'c}, B and Radovan, A},
+	publisher={42nd International Convention on Information and Communication Technology, Electronics and Microelectronics (MIPRO)},
+	pages={1671--1676},
+	year={2019},
+	organization={IEEE}
 }
 
-@article{DBLP:journals/corr/Duda13,
+@book{DBLP:journals/corr/Duda13,
 	author    = {Jarek Duda},
-	title     = {Asymmetric numeral systems as close to capacity low state entropy
-	coders},
-	journal   = {CoRR},
+	title     = {Asymmetric numeral systems as close to capacity low state entropy coders},
+	publisher   = {The Computing Research Repository (CoRR)},
 	volume    = {abs/1311.2540},
 	year      = {2013},
 	url       = {http://arxiv.org/abs/1311.2540},
@@ -52,11 +60,10 @@
 	numpages = {61},
 	keywords = {text compression, entropy, Text indexing}
 }
-@article{DBLP:journals/corr/abs-1710-01896,
-	author    = {Johannes Fischer and
-	Florian Kurpicz},
+@inbook{DBLP:journals/corr/abs-1710-01896,
+	author    = {Johannes Fischer and Florian Kurpicz},
 	title     = {Dismantling DivSufSort},
-	journal   = {CoRR},
+	publisher    = {The Computing Research Repository (CoRR)},
 	volume    = {abs/1710.01896},
 	year      = {2017},
 	url       = {http://arxiv.org/abs/1710.01896},
@@ -66,11 +73,10 @@
 	biburl    = {https://dblp.org/rec/bib/journals/corr/abs-1710-01896},
 	bibsource = {dblp computer science bibliography, https://dblp.org}
 }
-@article{DBLP:journals/corr/abs-1201-3077,
-	author    = {Joseph Yossi Gil and
-	David Allen Scott},
+@inbook{DBLP:journals/corr/abs-1201-3077,
+	author    = {Joseph Yossi Gil and David Allen Scott},
 	title     = {A Bijective String Sorting Transform},
-	journal   = {CoRR},
+	publisher    = {The Computing Research Repository (CoRR)},
 	volume    = {abs/1201.3077},
 	year      = {2012},
 	url       = {http://arxiv.org/abs/1201.3077},
@@ -80,13 +86,11 @@
 	biburl    = {https://dblp.org/rec/bib/journals/corr/abs-1201-3077},
 	bibsource = {dblp computer science bibliography, https://dblp.org}
 }
-@INPROCEEDINGS{CalgaryCorpusCritic,
+@incollection{CalgaryCorpusCritic,
 	author={R. {Arnold} and T. {Bell}},
-	booktitle={Proceedings DCC '97. Data Compression Conference},
+	publisher={Data Compression Conference},
 	title={A corpus for the evaluation of lossless compression algorithms},
 	year={1997},
-	volume={},
-	number={},
 	pages={201-210},
 	keywords={data compression;digital storage;encoding;decoding;lossless compression algorithms;Calgary corpus;Internet;high capacity secondary storage;personal computers;compression methods testing;Canterbury corpus;encoding;compression methods performance;decoding;Compression algorithms;Entropy;Decoding;Computer science;Convergence;Encoding;Internet;Microcomputers;Testing},
 	doi={10.1109/DCC.1997.582019},
@@ -100,21 +104,19 @@
 	year={1987}
 }
 
-@InProceedings{Burrows-linear-time,
+@incollection{Burrows-linear-time,
 	author="Okanohara, Daisuke
 	and Sadakane, Kunihiko",
 	editor="Karlgren, Jussi
 	and Tarhio, Jorma
 	and Hyyr{\"o}, Heikki",
 	title="A Linear-Time Burrows-Wheeler Transform Using Induced Sorting",
-	booktitle="String Processing and Information Retrieval",
+	series="String Processing and Information Retrieval",
 	year="2009",
-	publisher="Springer Berlin Heidelberg",
+	publisher="Springer",
 	pages="90--101",
-	abstract="To compute Burrows-Wheeler Transform (BWT), one usually builds a suffix array (SA) first, and then obtains BWT using SA, which requires much redundant working space. In previous studies to compute BWT directly [5,12], one constructs BWT incrementally, which requires O(n logn) time where n is the length of the input text. We present an algorithm for computing BWT directly in linear time by modifying the suffix array construction algorithm based on induced sorting [15]. We show that the working space is O(n log$\sigma$loglog$\sigma$n) for any $\sigma$ where $\sigma$ is the alphabet size, which is the smallest among the known linear time algorithms.",
-	isbn="978-3-642-03784-9"
 }
-@InProceedings{rle-dna,
+@inbook{rle-dna,
 	author="Lehotay-K{\'e}ry, P{\'e}ter
 	and Kiss, Attila",
 	editor="Nguyen, Ngoc Thanh
@@ -122,13 +124,10 @@
 	and Hong, Tzung-Pei
 	and Trawi{\'{n}}ski, Bogdan",
 	title="GenPress: A Novel Dictionary Based Method to Compress DNA Data of Various Species",
-	booktitle="Intelligent Information and Database Systems",
+	series="Intelligent Information and Database Systems",
 	year="2019",
-	publisher="Springer International Publishing",
-	address="Cham",
+	publisher="Springer",
 	pages="385--394",
-	abstract="There can be a data boom in the near future, due to cheaper methods make possible for everyone to keep their own DNA on their own device or on a central medical cloud. With the development of sequencing methods, we are able to get the sequences of more and more species. However the size of the human genome is about 3 GB for each person. And for other species it can be more.",
-	isbn="978-3-030-14802-7"
 }
 
 
@@ -150,13 +149,12 @@
 	doi={10.1002/j.1538-7305.1951.tb01366.x},
 	month={Jan},}
 
-@article{lz,
+@inproceedings{lz,
 	author={J. {Ziv} and A. {Lempel}},
-	journal={IEEE Transactions on Information Theory},
+	publisher={IEEE Transactions on Information Theory 3},
 	title={A universal algorithm for sequential data compression},
 	year="1977",
 	volume="23",
-	number="3",
 	pages="337--343",
 	keywords={Sequential coding;Source coding},
 	doi={10.1109/TIT.1977.1055714},
@@ -171,28 +169,29 @@
 	pages={10-16}}
 
 @book{compressionIntroduction,
-	author={Guy E. {blelloch}},
+	author={{Guy} E. {Blelloch}},
 	title={Introduction to Data Compression},
 	publisher = {Computer Science Department Carnegie Mellon University},
 	year = {2013},
 	pages={13-15}}
 
-@article{mahoney2011large,
+@manual{mahoney2011large,
 	title={Large text compression benchmark},
 	author={Mahoney, Matt},
-	journal={URL: http://www.mattmahoney.net/text/text.html},
+	note={\url{http://www.mattmahoney.net/text/text.html}},
 	year={2011}
 }
-@misc{mahoney2009data,
+@manual{mahoney2009data,
 	title={Data compression programs},
 	author={Mahoney, Matt},
 	year={2009},
-	publisher={Overview over PAQ based compression software. http://mattmahoney. net/dc~…}
+	note={Overview over PAQ based compression software. \url{http://mattmahoney.net/dc/}},
+	
 }
-@article{kufleitner2009bijective,
+@inbook{kufleitner2009bijective,
 	title={On bijective variants of the Burrows-Wheeler transform},
 	author={Kufleitner, Manfred},
-	journal={arXiv preprint arXiv:0908.0239},
+	publisher={The Computing Research Repository (CoRR)},
 	year={2009}
 }
 
@@ -220,13 +219,13 @@
 	year	    = 1996
 }
 
-@misc{deutsch1996rfc1951,
+@manual{deutsch1996rfc1951,
 	title={RFC1951: DEFLATE compressed data format specification version 1.3},
 	author={Deutsch, Peter},
 	year={1996},
-	publisher={RFC Editor}	
+	note={RCF Edit.}	
 } 
- @article{10.1145/322344.322346,
+ @book{10.1145/322344.322346,
 author = {Storer, James A. and Szymanski, Thomas G.},
 title = {Data Compression via Textual Substitution},
 year = {1982},
@@ -260,23 +259,22 @@ numpages = {24}
 	MSC2010 = {20M05 20-02 20M35 05-02 68Q45 94B25 03D03 68R15},
 	Zbl = {0874.20040}
 }
-@ARTICLE{mcKillan,
+@book{mcKillan,
 	author={B. {McMillan}},
-	journal={IRE Transactions on Information Theory},
+	publisher={IRE Transactions on Information Theory 4},
 	title={Two inequalities implied by unique decipherability},
 	year={1956},
 	volume={2},
-	number={4},
 	pages={115-116},
 	keywords={Decoding;Information theory;Sufficient conditions;Information analysis;Information theory;Statistical analysis;Telephony},
 	doi={10.1109/TIT.1956.1056818},
 	ISSN={2168-2712},
 	month={December},}
 
-@Article{lyndonFactorLinearTime,
+@inbook{lyndonFactorLinearTime,
 	Author = {Jean Pierre {Duval}},
 	Title = {{Factorizing words over an ordered alphabet.}},
-	FJournal = {{Journal of Algorithms}},
+	series = {{Journal of Algorithms}},
 	Journal = {{J. Algorithms}},
 	ISSN = {0196-6774},
 	Volume = {4},
@@ -289,10 +287,10 @@ numpages = {24}
 }
 
 
-@article{rle-bio,
+@inbook{rle-bio,
  author = {A. Al-Okaily and B Almarri and S Al Yami and CH. Huang},
  title = {Toward a Better Compression for DNA Sequences Using Huffman Encoding},
- journal = { J Comput Biol.},
+ publisher = { J. Comput. Biol.},
  year = { 2017},
  volume = {24 },
  number = {4},
@@ -300,60 +298,41 @@ numpages = {24}
  doi = { 10.1089/cmb.2016.0151 },
 }
 
-@Misc{qosr,
- author  = {E. Crawley and R. Nair and B. Rajagopalan and H. Sandick},
- title   = {A Framework for QoS-based Routing in the Internet},
- howpublished = {RFC 2386 (Informational)},
- organization = {IETF},
- year    = 1998,
- month   = aug
-}
-
-@article{palette-image,
+@book{palette-image,
 	title={An introduction to computer images},
 	author={Dallwitz, MJ},
-	journal={TDWG Newsletter},
+	series={TDWG Newsletter 10},
 	volume={7},
-	number={10},
 	pages={2},
 	year={1992}
 }
-
-
-@Manual{TB98,
-  title =        {Technische Beschreibung f"ur System 4711},
-  author =       {Fred Stenz and Willi Weich and Dieter Drollig and 
-                  Kurt Klein and Guenter Ganz},
-  year =         1998
-}
-
 @Manual{ITU,
 	title =        {T.4 : Standardization of Group 3 facsimile terminals for document transmission},
-	author =       {International Telecommunication Union (ITU)},
+	author =       {{International Telecommunication Union}},
 	year =         2004
 }
 
 @misc{IoStreamsKotlin,
-	title = {IOStreams for Kotlin, library},
+	title = {{IOStreams for Kotlin, library}},
 	description ={IO Streaming library for Kotlin},
 	author = {Alexander Kornilov},
 	year = {2019},
 	version = {0.33},
-	journal = {Bitbucket},
+	publisher = {Bitbucket},
 	howpublished = {\url{https://bitbucket.org/akornilov/binary-streams/downloads/binary-streams.pdf}}
 }
 
 @misc{LibDivSufSort,
-	title = {LibDivSufSort, suffix sorting algorithm in C},
+	title = {LibDivSufSort, {suffix sorting algorithm in C}},
 	author = {Yuta Mori},
 	year = {2015},
 	version = {2.0.1},
 	journal = {GitHub repository},
-	howpublished = {\href{https://github.com/y-256/libdivsufsort}{github}}
+	howpublished = {\url{https://github.com/y-256/libdivsufsort}}
 }
 
 @misc{kanzi,
-	title = {Kanzi, State-of-the-art lossless data compression in Java},
+	title = {{Kanzi, State-of-the-art lossless data compression in Java}},
 	author = {flanglet},
 	year = {2019},
 	version = {1.6},
@@ -367,15 +346,15 @@ numpages = {24}
 	year = {2019},
 	version = {v18},
 	journal = {GitHub repository},
-	howpublished = {\href{https://github.com/byronknoll/cmix/releases}{github}}
+	howpublished = {\url{https://github.com/byronknoll/cmix/releases}}
 }
 
 
 
-@proceedings{rle-patent,
-	editor={A. Harry {Robinson} and C. {Cherry}},
-	journal={Proceedings of the IEEE},
-	title={Results of a prototype television bandwidth compression scheme, Proceedings of the IEEE 3},
+@book{rle-patent,
+	author={A. Harry {Robinson} and C. {Cherry}},
+	publisher={Proceedings of the IEEE 3},
+	title={Results of a prototype television bandwidth compression scheme},
 	year={1967},
 	volume={55},
 	pages={356-364},

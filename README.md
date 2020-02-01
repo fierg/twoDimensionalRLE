@@ -21,8 +21,8 @@ Usage:
  [action] [method] [preprocessing] -f [files...]
 
 ACTION:
--c 				 compress file (default)
--d 				 decompress file
+-c 		compress file (default)
+-d 		decompress file
 
 METHOD:
 -v #,#,#,#,#,#,#,#	 vertical reading (default), optional run lengths used on bit of significance 1 to 8 (N in range [2,32])
@@ -30,12 +30,12 @@ METHOD:
 -byte #N 		 byte wise reading (with N bits per RLE encoded number, default 3)
 
 PREPROCESSING:
--bwt 			 apply Burrows-Wheeler-Transformation during encoding
--map 			 apply Byte-mapping during encoding
--huf 			 encode with Huffman encoding
+-bwt                                                  apply Burrows-Wheeler-Transformation during encoding
+-map                                                apply Byte-mapping during encoding
+-huf 		 encode with Huffman encoding
 
 DEBUG:
--D 				 debug log level
+-D 		debug log level
 ```
 
 
