@@ -23,7 +23,6 @@
 \usepackage{wrapfig}
 \usepackage{pgfplots}
 \usepackage{outlines}
-\usepackage{readarray}
 
 
 %\usepackage{amsfonts}
@@ -40,49 +39,14 @@
 %\institute[Uni Trier]{Universität Trier}
 %\logo{\includegraphics[scale=.25]{unilogo.pdf}}
 
+%read the data to \dataA
+	
 
-\def\data{% the data
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 0 
-	0 1 1 1 0 0 1 0 
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 1 
-	0 1 1 0 0 0 0 1 
-}
-\readarray\data\dataA[6,8] %read the data to \dataA
-
-\def\data{% the data
-	0 1 0 0 1 1 0 0 
-	0 1 1 0 1 1 1 1 
-	0 1 1 1 0 0 1 0 
-	0 1 1 0 0 1 0 1 
-	0 1 1 0 1 1 0 1 
-	0 0 1 0 0 0 0 0 
-	0 1 1 0 1 0 0 1 
-	0 1 1 1 0 0 0 0 
-	0 1 1 1 0 0 1 1 
-	0 1 1 1 0 1 0 1 
-	0 1 1 0 1 1 0 1 
-	0 0 1 0 0 0 0 0 
-	0 1 1 0 0 1 0 0 
-	0 1 1 0 1 1 1 1 
-	0 1 1 0 1 1 0 0 
-	0 1 1 0 1 1 1 1 
-	0 1 1 1 0 0 1 0 
-	0 0 1 0 0 0 0 0 
-	0 1 1 1 0 0 1 1 
-	0 1 1 0 1 0 0 1 
-	0 1 1 1 0 1 0 0 
-	0 0 1 0 0 0 0 0 
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 1 1 0 1 
-	0 1 1 0 0 1 0 1 
-	0 1 1 1 0 1 0 0 
-	0 0 1 0 1 1 1 0  
-}
-\readarray\data\dataB[26,8]
 
 \begin{document}
+
+	
+	
 	\frame{\maketitle}
 	\frame{\frametitle{}
 	\tableofcontents
@@ -334,9 +298,71 @@ a^5b^6a^6b^2
 }
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
-	\scalardump\dataA
+		TODO: show 1d and 2d data
 	}
 
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	TODO: show byte remapping
+}
+
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+	\[
+		S = abcabr
+	\]
+		\only<1>{
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{r|l|l|l|l|l|l}
+					row 1 & a & b & c & a & b & r\\
+					\hline
+					row 2 & a & b & r & a & b & c\\
+					\hline
+					row 3 & b & c & a & b & r & a\\
+					\hline
+					row 4 & b & r & a & b & c & a\\
+					\hline
+					row 5 & c & a & b & r & a & b\\
+					\hline
+					row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
+				\end{tabular}
+				\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
+			\end{table}
+		}
+	\only<2>{
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{r|l|l|l|l|l|l}
+			row 1 & a & b & c & a & b & r\\
+			\hline
+			row 2 & a & b & r & a & b & c\\
+			\hline
+			row 3 & b & c & a & b & r & a\\
+			\hline
+			row 4 & b & r & a & b & c & a\\
+			\hline
+			row 5 & c & a & b & r & a & b\\
+			\hline
+			row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
+		\end{tabular}
+		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
+	\end{table}
+}
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
 
 \section{Implementation}
 \frame{\frametitle{Implementation}
