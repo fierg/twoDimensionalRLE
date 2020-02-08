@@ -23,6 +23,7 @@
 \usepackage{wrapfig}
 \usepackage{pgfplots}
 \usepackage{outlines}
+\usepackage{mathtools}
 
 
 %\usepackage{amsfonts}
@@ -121,7 +122,7 @@
 \end{outline}
 }
 
-\frame{\frametitle{Run Length Encoding}
+\frame{\frametitle{Run Length Encoding (RLE)}
 \[
 aaaaabbbbbbaaaaaabb
 \]
@@ -131,7 +132,7 @@ a^5b^6a^6b^2
 \]}
 }
 
-\frame{\frametitle{Run Length Encoding}
+\frame{\frametitle{Run Length Encoding (RLE)}
 	\[
 	aabaabbabbbababaabb
 	\]
@@ -141,9 +142,12 @@ a^5b^6a^6b^2
 		\]}
 }
 
-\frame{\frametitle{Run Length Encoding}
-	
-}
+\frame{\frametitle{Run Length Encoding (RLE)}
+	\begin{outline}
+		\1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
+		\visible<2->{\1 RLE is combined with Huffman Encoding into Modified Huffman Encoding.} 
+	\end{outline}
+	}
 
 \frame{\frametitle{Huffman Encoding}
 	\begin{figure}[h]
@@ -170,6 +174,36 @@ a^5b^6a^6b^2
 		\end{tikzpicture}
 		\caption{Example Huffman tree with 3 leaf nodes.} \label{fig:M1:example Huffman tree}
 	\end{figure}
+}
+
+\frame{\frametitle{Modified Huffman Encoding T.45}
+	\begin{table}
+		\centering
+		\begin{tabular}[p]{r|c|c}
+			run length &  white run Huffman codes & black run Huffman codes\\
+			\hline
+			0 &  00110101 & 0000110111\\
+			1 & 000111 & 010\\
+			2 & 0111 & 11\\
+			3 & 1000 & 10\\
+			4 & 1011 & 011\\
+			... &  & \\
+			20 & 0001000 & 00001101000\\
+			... & & \\
+			64+ & 11011 & 0000001111\\
+			128+ & 10010 & 000011001000
+			\label{tab:t1:static huffman codes}
+		\end{tabular}
+		\caption{T4 static Huffman codes.}
+	\end{table}
+	\only<2>{
+		\[
+		\underbrace{11111111111111111111}_{20} \rightarrow `00100`
+		\]}
+	\only<3->{
+		\[
+		0^{128} \rightarrow `10010` + `1011`
+		\]}
 }
 
 
@@ -301,10 +335,34 @@ a^5b^6a^6b^2
 	\includegraphics[height=\textheight, width=\textwidth]{g0902.png}
 }
 
-\frame{\frametitle{Preprocessing - Vertical interpretation}
-		TODO: show 1d and 2d data
+	\frame{\frametitle{Preprocessing - Vertical interpretation}
+		\[
+			S = abraca
+		\]
+		
+		0 1 1 0 0 0 0 1 
+		0 1 1 0 0 0 1 0 
+		0 1 1 1 0 0 1 0 
+		0 1 1 0 0 0 0 1 
+		0 1 1 0 0 0 1 1 
+		0 1 1 0 0 0 0 1 
 	}
 	
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+\begin{equation}
+\begin{multlined}
+	S = abraca\\
+		0 1 1 0 0 0 0 1 \\
+		0 1 1 0 0 0 1 0 \\
+		0 1 1 1 0 0 1 0 \\
+		0 1 1 0 0 0 0 1 \\
+		0 1 1 0 0 0 1 1 \\
+		0 1 1 0 0 0 0 1 \\
+\end{multlined}
+\end{equation}
+	
+	}
+
 \frame{\frametitle{Preprocessing - Vertical interpretation}
 	\begin{table}[H]
 		\centering
@@ -392,8 +450,33 @@ a^5b^6a^6b^2
 
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
-	TODO: show byte remapping
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
 }
+
+\frame{\frametitle{Preprocessing - Byte Remapping}
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 0 0 0 0 0 0 0 \\
+	0 0 0 0 0 0 0 1 \\
+	0 0 0 0 0 0 1 1 \\
+	0 0 0 0 0 0 0 0 \\
+	0 0 0 0 0 0 1 0 \\
+	0 0 0 0 0 0 0 0 \\
+	\end{multlined}
+	\end{equation}
+}
+
 
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
@@ -570,6 +653,12 @@ TODO
 }
 
 \frame{\frametitle{Preprocessing - inverse Burrows-Wheeler-Transformation}
+		 \[
+		 L = rcaabb
+		 \]
+		 \[
+		 i = 1
+		 \]
 	This yields a standard permutation of:
 	\begin{gather}  
 	\pi_L = 
@@ -774,11 +863,11 @@ TODO
 
 \section{Implementation}
 \frame{\frametitle{Implementation}
-	
+TODO	
 }
 \section{Evaluation and Discussion}
 \frame{\frametitle{Evaluation and Discussion}
-	
+TODO	
 }
 \frame{\frametitle{Evaluation and Discussion}
 		\begin{table}[h]
