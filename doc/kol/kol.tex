@@ -316,21 +316,23 @@ a^5b^6a^6b^2
 	\[
 		S = abcabr
 	\]
+	
 		\only<1>{
 			\begin{table}[h]
 				\centering
 				\begin{tabular}{r|l|l|l|l|l|l}
 					row 1 & a & b & c & a & b & r\\
 					\hline
-					row 2 & a & b & r & a & b & c\\
+					row 2 & r & a & b & c & a & b\\	
 					\hline
-					row 3 & b & c & a & b & r & a\\
+					row 3 & b & r & a & b & c & a\\
 					\hline
-					row 4 & b & r & a & b & c & a\\
+					row 4 & a & b & r & a & b & c\\
 					\hline
 					row 5 & c & a & b & r & a & b\\
 					\hline
-					row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
+					row 6 & b & c & a & b & r & a
+						\label{tab:t10 bwt-example1}
 				\end{tabular}
 				\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
 			\end{table}
@@ -349,9 +351,10 @@ a^5b^6a^6b^2
 			\hline
 			row 5 & c & a & b & r & a & b\\
 			\hline
-			row 6 & r & a & b & c & a & b		\label{tab:t10 bwt-example}
+			row 6 & r & a & b & c & a & b	
+			\label{tab:t10 bwt-example2}
 		\end{tabular}
-		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
+		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations, sorted).}
 	\end{table}
 }
 }
