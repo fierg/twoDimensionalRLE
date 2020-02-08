@@ -23,6 +23,7 @@
 \usepackage{wrapfig}
 \usepackage{pgfplots}
 \usepackage{outlines}
+\usepackage{readarray}
 
 
 %\usepackage{amsfonts}
@@ -38,6 +39,48 @@
 \date{14. Januar 2020}
 %\institute[Uni Trier]{Universität Trier}
 %\logo{\includegraphics[scale=.25]{unilogo.pdf}}
+
+
+\def\data{% the data
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 0 
+	0 1 1 1 0 0 1 0 
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 1 
+	0 1 1 0 0 0 0 1 
+}
+\readarray\data\dataA[6,8] %read the data to \dataA
+
+\def\data{% the data
+	0 1 0 0 1 1 0 0 
+	0 1 1 0 1 1 1 1 
+	0 1 1 1 0 0 1 0 
+	0 1 1 0 0 1 0 1 
+	0 1 1 0 1 1 0 1 
+	0 0 1 0 0 0 0 0 
+	0 1 1 0 1 0 0 1 
+	0 1 1 1 0 0 0 0 
+	0 1 1 1 0 0 1 1 
+	0 1 1 1 0 1 0 1 
+	0 1 1 0 1 1 0 1 
+	0 0 1 0 0 0 0 0 
+	0 1 1 0 0 1 0 0 
+	0 1 1 0 1 1 1 1 
+	0 1 1 0 1 1 0 0 
+	0 1 1 0 1 1 1 1 
+	0 1 1 1 0 0 1 0 
+	0 0 1 0 0 0 0 0 
+	0 1 1 1 0 0 1 1 
+	0 1 1 0 1 0 0 1 
+	0 1 1 1 0 1 0 0 
+	0 0 1 0 0 0 0 0 
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 1 1 0 1 
+	0 1 1 0 0 1 0 1 
+	0 1 1 1 0 1 0 0 
+	0 0 1 0 1 1 1 0  
+}
+\readarray\data\dataB[26,8]
 
 \begin{document}
 	\frame{\maketitle}
@@ -268,10 +311,31 @@ a^5b^6a^6b^2
 \end{itemize}
 }
 
-\frame{
-	
+\frame{\frametitle{Design - Preprocessing}
+	\begin{outline}
+		\1 Most files other than pallet based images do not contain long runs of identical bit values.
+		\visible<2->{\1 Files with long runs work really well with RLE.}
+		\medskip
+		\visible<3->{\1 Artificially creating runs on arbitrary data will improve the performance of RLE.}
+	\end{outline}	
 	}
+	
+\frame{\frametitle{Preprocessing}
+	\begin{outline}
+		\1 Vertical interpretation of the input
+		\visible<2->{\1 Dynamic byte remapping}
+		\visible<3->{\1 Burrows-Wheeler-Transformation}
+		\visible<4->{\1 Huffman Encoding of runs}
+	\end{outline}	
+}
 
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	\includegraphics[height=\textheight, width=\textwidth]{g0902.png}
+}
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	\scalardump\dataA
+	}
 
 
 \section{Implementation}
