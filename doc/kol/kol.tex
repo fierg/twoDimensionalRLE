@@ -39,7 +39,14 @@
 %\institute[Uni Trier]{Universität Trier}
 %\logo{\includegraphics[scale=.25]{unilogo.pdf}}
 
+%read the data to \dataA
+	
+
+
 \begin{document}
+
+	
+	
 	\frame{\maketitle}
 	\frame{\frametitle{}
 	\tableofcontents
@@ -197,10 +204,10 @@ a^5b^6a^6b^2
 
 \section{Design}
 \frame{\frametitle{Design}
-
+	
 }
-\section{Analysis}
-\frame{\frametitle{Analysis - Calgary Corpus}
+
+\frame{\frametitle{Design - Calgary Corpus}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{l|r|l}	
@@ -226,7 +233,7 @@ a^5b^6a^6b^2
 	\end{table}	
 }
 
-\frame{\frametitle{Analysis - Unmodified compression}
+\frame{\frametitle{Design - Unmodified compression}
 \begin{table}[h]
 	\centering
 	\begin{tabular}{l|r|r||r|r}
@@ -246,7 +253,119 @@ a^5b^6a^6b^2
 \end{table}
 }
 
+\frame{\frametitle{Design - Unmodified compression}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{r|r|r|r|r|r}	
+		file & size original & $\frac{bits}{\text{RLE number}}$ & size encoded & ratio in \% & \textit{bps}\\
+		\hline
+		pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
+		& & 3 & 235067 & 45.80 & 3.66\\
+		& & 4 & 165745 & 32.29 & 2.58\\
+		& & 5 & 126349 & 24.61 & 1.96\\
+		& & 6 & 106773 & 20.80 & 1.66\\
+		& & 7 & 100098 & 19.50 & 1.56\\
+		& & 8 & 101014 & 19.68 & 1.57\\		 
+	\end{tabular}
+	\caption{The file \textit{pic} with increasing bits per binary RLE encoded number.}
+	\label{tab:t40 The file pic with increasing bits per RLE encoded number}
+\end{table}	
+\begin{itemize}
+	\visible<2->{\item Byte-wise RLE achieves $27.2\%$ of its original size using 2.17 \textit{bps}.}
+\end{itemize}
+}
 
+\frame{\frametitle{Design - Preprocessing}
+	\begin{outline}
+		\1 Most files other than pallet based images do not contain long runs of identical bit values.
+		\visible<2->{\1 Files with long runs work really well with RLE.}
+		\medskip
+		\visible<3->{\1 Artificially creating runs on arbitrary data will improve the performance of RLE.}
+	\end{outline}	
+	}
+	
+\frame{\frametitle{Preprocessing}
+	\begin{outline}
+		\1 Vertical interpretation of the input
+		\visible<2->{\1 Dynamic byte remapping}
+		\visible<3->{\1 Burrows-Wheeler-Transformation}
+		\visible<4->{\1 Huffman Encoding of runs}
+	\end{outline}	
+}
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	\includegraphics[height=\textheight, width=\textwidth]{g0902.png}
+}
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+		TODO: show 1d and 2d data
+	}
+
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	TODO: show byte remapping
+}
+
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+	\[
+		S = abcabr
+	\]
+	
+		\only<1>{
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{r|l|l|l|l|l|l}
+					row 1 & a & b & c & a & b & r\\
+					\hline
+					row 2 & r & a & b & c & a & b\\	
+					\hline
+					row 3 & b & r & a & b & c & a\\
+					\hline
+					row 4 & a & b & r & a & b & c\\
+					\hline
+					row 5 & c & a & b & r & a & b\\
+					\hline
+					row 6 & b & c & a & b & r & a
+						\label{tab:t10 bwt-example1}
+				\end{tabular}
+				\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
+			\end{table}
+		}
+	\only<2>{
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{r|l|l|l|l|l|l}
+			row 1 & a & b & c & a & b & r\\
+			\hline
+			row 2 & a & b & r & a & b & c\\
+			\hline
+			row 3 & b & c & a & b & r & a\\
+			\hline
+			row 4 & b & r & a & b & c & a\\
+			\hline
+			row 5 & c & a & b & r & a & b\\
+			\hline
+			row 6 & r & a & b & c & a & b	
+			\label{tab:t10 bwt-example2}
+		\end{tabular}
+		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations, sorted).}
+	\end{table}
+}
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
+
+\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+	
+}
 
 \section{Implementation}
 \frame{\frametitle{Implementation}
