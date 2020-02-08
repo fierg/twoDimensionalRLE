@@ -197,10 +197,10 @@ a^5b^6a^6b^2
 
 \section{Design}
 \frame{\frametitle{Design}
-
+	
 }
-\section{Analysis}
-\frame{\frametitle{Analysis - Calgary Corpus}
+
+\frame{\frametitle{Design - Calgary Corpus}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{l|r|l}	
@@ -226,7 +226,7 @@ a^5b^6a^6b^2
 	\end{table}	
 }
 
-\frame{\frametitle{Analysis - Unmodified compression}
+\frame{\frametitle{Design - Unmodified compression}
 \begin{table}[h]
 	\centering
 	\begin{tabular}{l|r|r||r|r}
@@ -245,6 +245,32 @@ a^5b^6a^6b^2
 	\label{tab:t31 Byte-wise RLE on the Calgary Corpus}
 \end{table}
 }
+
+\frame{\frametitle{Design - Unmodified compression}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{r|r|r|r|r|r}	
+		file & size original & $\frac{bits}{\text{RLE number}}$ & size encoded & ratio in \% & \textit{bps}\\
+		\hline
+		pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
+		& & 3 & 235067 & 45.80 & 3.66\\
+		& & 4 & 165745 & 32.29 & 2.58\\
+		& & 5 & 126349 & 24.61 & 1.96\\
+		& & 6 & 106773 & 20.80 & 1.66\\
+		& & 7 & 100098 & 19.50 & 1.56\\
+		& & 8 & 101014 & 19.68 & 1.57\\		 
+	\end{tabular}
+	\caption{The file \textit{pic} with increasing bits per binary RLE encoded number.}
+	\label{tab:t40 The file pic with increasing bits per RLE encoded number}
+\end{table}	
+\begin{itemize}
+	\visible<2->{\item Byte-wise RLE achieves $27.2\%$ of its original size using 2.17 \textit{bps}.}
+\end{itemize}
+}
+
+\frame{
+	
+	}
 
 
 
