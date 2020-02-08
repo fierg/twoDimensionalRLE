@@ -1,1 +1,4 @@
-\beamer@slide {fig:M1:example Huffman tree}{9}
+\beamer@slide {fig:M1:example Huffman tree}{20}
+\beamer@slide {tab:t20 stat of the art}{26}
+\beamer@slide {tab:t05 The Calgary Corpus}{28}
+\beamer@slide {tab:t31 Byte-wise RLE on the Calgary Corpus}{29}
