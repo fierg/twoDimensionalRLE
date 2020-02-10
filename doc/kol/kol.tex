@@ -182,7 +182,7 @@
 \frame{\frametitle{Huffman Encoding}
 	\centering
 	$w = cacbcacc$\\
-	\visible<2->{$l_a{w} = 2 \:\:\: l_b{w} = 1 \:\:\: l_c{w} = 5$}
+	\visible<2->{$l_a(w) = 2 \:\:\: l_b(w) = 1 \:\:\: l_c(w) = 5$}
 	\visible<3->{
 	\begin{figure}[h]
 		\centering
@@ -570,6 +570,26 @@
 		\caption{Binary RLE on vertical interpreted data, fixed run lengths.}
 		\label{tab:t30 binary RLE on vertical interpreted data}
 	\end{table}
+}
+
+\frame{\frametitle{Preprocessing - Vertical interpretation}
+	\centering
+	8 bits per run
+	\begin{math}
+	\left\{
+	\left.
+	\begin{array}{l}
+0 1 1 0 0 0 0 1 \\
+0 1 1 0 0 0 1 0 \\
+0 1 1 1 0 0 1 0 \\
+0 1 1 0 0 0 0 1 \\
+0 1 1 0 0 0 1 1 \\
+0 1 1 0 0 0 0 1\\
+	\end{array}
+	\right \}
+	\right.
+	\end{math}
+	2 bits per run
 }
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
