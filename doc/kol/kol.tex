@@ -945,23 +945,74 @@ TODO
 		 \[
 		 i = 1
 		 \]
-		 \visible<2->{
+		 \only<2>{
 		 \begin{table}[h]
 		 	\centering
-		 	\begin{tabular}{l|l|l}
-		 		word & word with position & sorted\\
+		 	\begin{tabular}{l}
+		 		word \\
 		 		\hline
-		 		r & (r,1) & (a,3) \\
-		 		c & (c,2) & (a,4) \\
-		 		a & (a,3) & (b,5) \\
-		 		a & (a,4) & (b,6) \\
-		 		b & (b,5) & (c,2) \\
-		 		b & (b,6) & (r,1)
+		 		r  \\
+		 		c  \\
+		 		a \\
+		 		a  \\
+		 		b  \\
+		 		b 
 		 		\label{tab:t11 standard permutation}
 		 	\end{tabular}
 		 	\caption{Standard permutation generation of the word $L$.}
 		 \end{table}
 		}
+			 \only<3>{
+		\begin{table}[h]
+			\centering
+			\begin{tabular}{l|l}
+				word & word with position\\
+				\hline
+				r & (r,1) \\
+				c & (c,2)  \\
+				a & (a,3) \\
+				a & (a,4) \\
+				b & (b,5)  \\
+				b & (b,6) 
+				\label{tab:t11 standard permutation}
+			\end{tabular}
+			\caption{Standard permutation generation of the word $L$.}
+		\end{table}
+	}
+		 \only<4>{
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{l|l|l}
+			word & word with position & sorted\\
+			\hline
+			r & (r,1) & (a,3) \\
+			c & (c,2) & (a,4) \\
+			a & (a,3) & (b,5) \\
+			a & (a,4) & (b,6) \\
+			b & (b,5) & (c,2) \\
+			b & (b,6) & (r,1)
+			\label{tab:t11 standard permutation}
+		\end{tabular}
+		\caption{Standard permutation generation of the word $L$.}
+	\end{table}
+}
+	 \only<5>{
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{l|l|l|l}
+			word & word with position & sorted & $\pi^t_L$\\
+			\hline
+			r & (r,1) & (a,3) & 1 3\\
+			c & (c,2) & (a,4) & 2 4\\
+			a & (a,3) & (b,5) & 3 5\\
+			a & (a,4) & (b,6) & 4 6\\
+			b & (b,5) & (c,2) & 5 2\\
+			b & (b,6) & (r,1) & 6 1
+			\label{tab:t11 standard permutation}
+		\end{tabular}
+		\caption{Standard permutation generation of the word $L$.}
+	\end{table}
+}
 }
 
 \frame{\frametitle{Preprocessing - inverse Burrows-Wheeler-Transformation}
@@ -1271,6 +1322,7 @@ TODO
 }
 
 \frame{\frametitle{Implementation}
+	\centering
 	DEMO
 }
 
