@@ -1,22 +1,22 @@
-\beamer@slide {fig:M1:example Huffman tree}{22}
-\beamer@slide {tab:t1:static huffman codes}{25}
-\beamer@slide {tab:t20 stat of the art}{31}
-\beamer@slide {tab:t05 The Calgary Corpus}{33}
-\beamer@slide {tab:t31 Byte-wise RLE on the Calgary Corpus}{34}
-\beamer@slide {tab:t40 The file pic with increasing bits per RLE encoded number}{35}
-\beamer@slide {tab:t30 binary RLE on vertical interpreted data}{47}
-\beamer@slide {fig:2:Byte mapping and varying maximum run lengths}{48}
-\beamer@slide {tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}{49}
-\beamer@slide {fig:2:Byte mapping and varying maximum run lengths2}{52}
-\beamer@slide {tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and varying bits per run}{53}
-\beamer@slide {tab:t10 bwt-example1}{55}
-\beamer@slide {tab:t11 standard permutation}{58}
-\beamer@slide {tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}{63}
-\beamer@slide {tab:t12 Burrows Wheeler Transformation on byte wise RLE}{63}
-\beamer@slide {tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}{65}
-\beamer@slide {tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}{66}
-\beamer@slide {fig:3:Different run lengths with and without transformations}{67}
-\beamer@slide {tab:t5:Calgary Corpus encoded, all preprocessing steps, using bits per run: 4, 4,4, 4, 5, 7, 8, 10}{68}
-\beamer@slide {tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}{70}
-\beamer@slide {tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}{73}
-\beamer@slide {tab:t100benchmark}{74}
+\beamer@slide {fig:M1:example Huffman tree}{24}
+\beamer@slide {tab:t1:static huffman codes}{30}
+\beamer@slide {tab:t40 The file pic with increasing bits per RLE encoded number}{34}
+\beamer@slide {tab:t05 The Calgary Corpus}{36}
+\beamer@slide {tab:t31 Byte-wise RLE on the Calgary Corpus}{37}
+\beamer@slide {tab:t20 stat of the art}{52}
+\beamer@slide {tab:t30 binary RLE on vertical interpreted data}{70}
+\beamer@slide {fig:2:Byte mapping and varying maximum run lengths}{71}
+\beamer@slide {tab:t50:Calgary Corpus encoded, vertical encoding, using bits per run: (2, 2, 2, 2, 3, 4, 3, 7)}{72}
+\beamer@slide {fig:2:Byte mapping and varying maximum run lengths2}{75}
+\beamer@slide {tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and varying bits per run}{76}
+\beamer@slide {tab:t10 bwt-example1}{78}
+\beamer@slide {tab:t11 standard permutation}{81}
+\beamer@slide {tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}{86}
+\beamer@slide {tab:t12 Burrows Wheeler Transformation on byte wise RLE}{86}
+\beamer@slide {tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}{88}
+\beamer@slide {tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}{89}
+\beamer@slide {fig:3:Different run lengths with and without transformations}{90}
+\beamer@slide {tab:t5:Calgary Corpus encoded, all preprocessing steps, using bits per run: 4, 4,4, 4, 5, 7, 8, 10}{91}
+\beamer@slide {tab:t6:Calgary Corpus encoded, all preprocessing steps, using Huffman encoding for all counted runs}{93}
+\beamer@slide {tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}{96}
+\beamer@slide {tab:t100benchmark}{97}

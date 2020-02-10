@@ -24,6 +24,8 @@
 \usepackage{pgfplots}
 \usepackage{outlines}
 \usepackage{mathtools}
+\usepackage{xcolor}
+
 
 
 %\usepackage{amsfonts}
@@ -55,107 +57,139 @@
 
 
 
-\section{Introduction}	
-\frame{\frametitle{Introduction - A Bit of History}
-	  \begin{itemize}
-		\item rise of multimedia
-		\item rise of the World Wide Web
-		\item ever increasing data transfer
-	\end{itemize}
-
-\medskip 
-
-  \begin{itemize}
-	\visible<2->{  \item compress to save storage space \& to handle new types and volumes of data}
-\end{itemize}	
-}
-
-\frame{\frametitle{Introduction - The Situation Today}
-	\begin{itemize}
-		\item burst of sensors and IoT
-		\item massive and rapid increasing data transfer
-	\end{itemize}
-	
-	\medskip 
-	
-	\begin{itemize}
-		\visible<2->{  \item compress to lower transmission cost / time
-		\item compress to handle increasing resolution, fidelity, dynamic range
-		\item compression for cold archiving}
-	\end{itemize}	
-}
-
-\section{Basics}
-\frame{\frametitle{Basics of Compression}
-	\begin{itemize}
-		\item Non random data contains redundant information
-		\item Compression is about pattern or structure identification and exploitation
-		
-		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity)}
-	\end{itemize}	
-}
-
-\frame{\frametitle{Basics of Compression - Entropy Encoding}
-	\begin{itemize}
-		\item generating a probability model for the data
-		\item compute variable length codes
-		
-		\visible<2->{ \item low speed, high compression strength
-		\item recommended for poorly structured data}
-	\end{itemize}	
-}
-
-\frame{\frametitle{Basics of Compression - Entropy Encoding}
-\begin{outline}
-		\1 Huffman Encoding (1952)
-		\2 computes optimal length prefix-free codes for symbols acc. to their probabilities
-		\visible<2->{ \1 Run Length Encoding (1967) \2 computes runs of identical symbols}
-		\visible<3->{ \1 Arithmetic Encoding (1979) \2 encodes a message of symbols in a single rational number in [0,1]}
-		\visible<4->{\1 Asymmetric Numeral Systems (ANS) Encoding (2014) \2 encodes a message of symbols in a single natural number}
-\end{outline}
-}
-
+\section{Introduction}
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
-\1 employed in the transmission of analog television signals as far back as 1967
-\1 particularly well suited to palette-based bitmap images such as computer icons
-\end{outline}
+		\1 employed in the transmission of analog television signals as far back as 1967
+		\1 particularly well suited to palette-based bitmap images such as computer icons
+	\end{outline}
 }
 
 \frame{\frametitle{Run Length Encoding (RLE)}
-\[
-aaaaabbbbbbaaaaaabb
-\]
-\visible<2->{
-\[
-a^5b^6a^6b^2
-\]}
-}
-
-\frame{\frametitle{Run Length Encoding (RLE)}
+		assume $\Sigma = \{a,b\}$
 	\[
-	aabaabbabbbababaabb
+	aaaaabbbbbbaaaaaabb
 	\]
 	\visible<2->{
 		\[
-		a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2
+		a^5b^6a^6b^2
 		\]}
 }
+
+\frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
+	assume $\Sigma = \{a,b\}$
+	\only<1-2>{
+		\[
+		aabaabbabbbababaabb
+		\]
+		\visible<2->{
+			\[
+			a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2
+			\]}}
+	\only<3->{
+		\only<3-9>{
+		\[
+		a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2
+		\]}
+		\only<10>{\[
+			\overbrace{a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2}^{19 bit}
+			\]}
+		\visible<4->{
+			\medskip \\
+			assume $|\Sigma| = 2$ and runs start with $a$\\
+			\visible<5->{
+				set maximum run length to 3 ( $=2$ bits per run)\\
+				\medskip
+				\only<5>{
+					\[
+					212213111122
+					\]}
+				\only<6>{
+					\[
+					\underbrace{2}_{10}12213111122
+					\]
+				}
+				\only<7>{
+					\[
+					\underbrace{2}_{10}\underbrace{1}_{01}2213111122
+					\]
+				}
+				\only<8>{
+					\[
+					\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{2}_{10}213111122
+					\]
+				}
+				\only<9>{
+					\[
+					\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{2}_{10}\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{3}_{11}\underbrace{1}_{..}11122
+					\]
+}
+				\only<10->{
+	\[
+	\overbrace{\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{2}_{10}\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{3}_{11}\underbrace{1}_{..}11122}^{24 bit}
+	\]
+}}}}}
+
+\frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
+	assume $|\Sigma| = 2$ and runs start with $a$\\
+	set maximum run length to 3 ( $=2$ bits per run / per RLE number)\\
+	\visible<1>{
+		\[
+		b^1a^5b^2
+		\]
+	}
+	\visible<2>{
+		\[
+		\underbrace{b^1}_{00 + 01}a^5b^2
+		\]
+	}
+	\visible<3>{
+		\[
+		\underbrace{b^1}_{00 + 01} \: \: \underbrace{a^5}_{11 + 00 + 10}b^2
+		\]
+	}
+	
+	
+}
+
+\frame{\frametitle{Run Length Encoding (RLE) - byte wise RLE}
+	assume $|\Sigma| > 2$\\
+	set maximum run length to 4 ( $=2$ bits per run / per RLE number)\\
+	\visible<1>{
+		\[
+		b^1a^2c^3
+		\]
+	}
+	\visible<2>{
+		\[
+		\underbrace{b^1}_{01100010 + 00}a^2c^4
+		\]
+	}
+	\visible<3>{
+		\[
+		\underbrace{b^1}_{01100010 + 00} \: \: \: \underbrace{a^2}_{01100001 + 01} \: \: \: \underbrace{c^3}_{01100011 + 11}
+		\]
+	}}
 
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
 		\1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
-		\visible<2->{\1 RLE is combined with Huffman Encoding into Modified Huffman Encoding.} 
+		\visible<2->{\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.}
 	\end{outline}
-	}
+}
+
 
 \frame{\frametitle{Huffman Encoding}
+	\centering
+	$w = cacbcacc$\\
+	\visible<2->{$l_a{w} = 2 \:\:\: l_b{w} = 1 \:\:\: l_c{w} = 5$}
+	\visible<3->{
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}
 		\begin{scope}[every node/.style={circle,thick,draw=red}]
-		\visible<2->{\node (B) at (1.25,2) {3};}
-		\visible<3->{\node (C) at (2.5,4) {8};}
+		\visible<4->{\node (B) at (1.25,2) {3};}
+		\visible<5->{\node (C) at (2.5,4) {8};}
 		\end{scope}
 		\begin{scope}[every node/.style={circle,thick,draw=green}]
 		\node (A) at (0,0) {a,2};
@@ -165,15 +199,17 @@ a^5b^6a^6b^2
 		
 		\begin{scope}[>={Stealth[black]},
 		every node/.style={fill=white,circle}]
-		\visible<2->{\path [->] (A) edge node {$0$} (B);}
-		\visible<3->{\path [->] (B) edge node {$0$} (C);}
-		\visible<2->{\path [->] (D) edge node {$1$} (B);}
-		\visible<3->{\path [->] (F) edge node {$1$} (C);}
+		\visible<4->{\path [->] (A) edge node {$0$} (B);}
+		\visible<5->{\path [->] (B) edge node {$0$} (C);}
+		\visible<4->{\path [->] (D) edge node {$1$} (B);}
+		\visible<5->{\path [->] (F) edge node {$1$} (C);}
 		
 		\end{scope}
 		\end{tikzpicture}
 		\caption{Example Huffman tree with 3 leaf nodes.} \label{fig:M1:example Huffman tree}
 	\end{figure}
+}
+\visible<6->{$a = 00 \:\:\: b = 01 \:\:\: c = 1$}
 }
 
 \frame{\frametitle{Modified Huffman Encoding T.45}
@@ -206,6 +242,120 @@ a^5b^6a^6b^2
 		\]}
 }
 
+\frame{\frametitle{Run Length Encoding (RLE)}
+	\begin{outline}
+		\1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
+		\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.
+		\1 RLE is also used for bitmap images or DNA sequence encoding.
+	\end{outline}
+}
+
+\frame{\frametitle{Run Length Encoding (RLE)}
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{r|r|r|r|r|r}	
+			file & size original & $\frac{bits}{\text{RLE number}}$ & size encoded & ratio in \% & \textit{bps}\\
+			\hline
+			pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
+			& & 3 & 235067 & 45.80 & 3.66\\
+			& & 4 & 165745 & 32.29 & 2.58\\
+			& & 5 & 126349 & 24.61 & 1.96\\
+			& & 6 & 106773 & 20.80 & 1.66\\
+			& & 7 & 100098 & 19.50 & 1.56\\
+			& & 8 & 101014 & 19.68 & 1.57\\		 
+		\end{tabular}
+		\caption{The file \textit{pic} with increasing bits per binary RLE encoded number.}
+		\label{tab:t40 The file pic with increasing bits per RLE encoded number}
+	\end{table}	
+	\begin{itemize}
+		\visible<2->{\item Byte-wise RLE achieves $27.2\%$ of its original size using 2.17 \textit{bps} with 6 bits per run.}
+	\end{itemize}
+}
+
+\frame{\frametitle{Calgary Corpus}
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{l|r|l}	
+			file & size & description\\
+			\hline
+			bib & 111261 & ASCII text - 725 bibliographic references\\
+			book1 & 768771 & unformatted ASCII text\\
+			book2 & 610856 & ASCII text in UNIX \enquote{troff} format\\
+			geo & 102400 & 32 bit numbers in IBM floating point format\\
+			news & 377109 & ASCII text - USENET batch file on a variety of topics\\
+			obj1 & 21504 & VAX executable program \\
+			obj2 & 246814 &	Macintosh executable program \\
+			paper1 & 53161 & UNIX \enquote{troff} format \\
+			paper2 & 82199 & UNIX \enquote{troff} format \\
+			pic & 513216 & 1728 x 2376 bitmap image\\
+			progc & 39611 & Source code in C \\
+			progl & 71646 &  Source code in Lisp\\
+			progp & 49379 & Source code in Pascal\\
+			trans & 93695 & ASCII and control characters\\	 
+		\end{tabular}
+		\caption{The Calgary Corpus.}
+		\label{tab:t05 The Calgary Corpus}
+	\end{table}	
+}
+
+
+\frame{\frametitle{RLE - Unmodified compression on the Calgary Corpus}
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{l|r|r||r|r}
+			bits per rle number & \multicolumn{2}{c}{byte-wise RLE} & \multicolumn{2}{c}{binary RLE} \\
+			&  ratio in \% & \textit{bps} & ratio in \% & \textit{bps}\\
+			\hline
+			8 & 165 & 13.20 & 329 & 26.38\\
+			7 & 154 & 12.38 & 288 & 23.11\\
+			6 & 144 & 11.57 & 248 & 19.87 \\
+			5 & 134 & 10.77 & 208 & 16.66\\
+			4 & 125 & 10.00 & 168 & 13.51\\
+			3 & 116 & 9.29 & 131 & 10.50\\
+			2 & 109 & 8.74 & 104 & 8.36
+		\end{tabular}
+		\caption{Byte-wise and binary RLE on the Calgary Corpus.}
+		\label{tab:t31 Byte-wise RLE on the Calgary Corpus}
+	\end{table}
+}
+
+\frame{\frametitle{Findings}
+	\begin{outline}
+		\1 Files with long runs work really well with RLE.
+		\visible<2->{\1 Most files other than pallet based images do not contain long runs of identical bit values.}
+		\medskip
+		\visible<3->{\1 Artificially creating runs on arbitrary data will improve the performance of RLE.}
+	\end{outline}	
+}
+
+\section{Basics}
+\frame{\frametitle{Basics of Compression}
+	\begin{itemize}
+		\item Non random data contains redundant information
+		\item Compression is about pattern or structure identification and exploitation
+		
+		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity)}
+	\end{itemize}	
+}
+
+\frame{\frametitle{Basics of Compression - Entropy Encoding}
+	\begin{itemize}
+		\item generating a probability model for the data
+		\item compute variable length codes	
+		\visible<2->{ \item low speed, high compression strength
+		\item recommended for poorly structured data}
+	\end{itemize}	
+}
+
+\frame{\frametitle{Basics of Compression - Entropy Encoding}
+\begin{outline}
+		\1 Huffman Encoding (1952)
+		\2 computes optimal length prefix-free codes for symbols acc. to their probabilities
+		\visible<2->{ \1 Run Length Encoding (1967) \2 computes runs of identical symbols}
+		\visible<3->{ \1 Arithmetic Encoding (1979) \2 encodes a message of symbols in a single rational number in [0,1]}
+		\visible<4->{\1 Asymmetric Numeral Systems (ANS) Encoding (2014) \2 encodes a message of symbols in a single natural number}
+\end{outline}
+}
 
 \frame{\frametitle{Basics of Compression - Dictionary Encoding}
 	\begin{outline}
@@ -241,88 +391,7 @@ a^5b^6a^6b^2
 
 
 \section{Design}
-\frame{\frametitle{Design}
-	
-}
-
-\frame{\frametitle{Design - Calgary Corpus}
-	\begin{table}[H]
-		\centering
-		\begin{tabular}{l|r|l}	
-			file & size & description\\
-			\hline
-			bib & 111261 & ASCII text - 725 bibliographic references\\
-			book1 & 768771 & unformatted ASCII text\\
-			book2 & 610856 & ASCII text in UNIX \enquote{troff} format\\
-			geo & 102400 & 32 bit numbers in IBM floating point format\\
-			news & 377109 & ASCII text - USENET batch file on a variety of topics\\
-			obj1 & 21504 & VAX executable program \\
-			obj2 & 246814 &	Macintosh executable program \\
-			paper1 & 53161 & UNIX \enquote{troff} format \\
-			paper2 & 82199 & UNIX \enquote{troff} format \\
-			pic & 513216 & 1728 x 2376 bitmap image\\
-			progc & 39611 & Source code in C \\
-			progl & 71646 &  Source code in Lisp\\
-			progp & 49379 & Source code in Pascal\\
-			trans & 93695 & ASCII and control characters\\	 
-		\end{tabular}
-		\caption{The Calgary Corpus.}
-		\label{tab:t05 The Calgary Corpus}
-	\end{table}	
-}
-
-\frame{\frametitle{Design - Unmodified compression}
-\begin{table}[h]
-	\centering
-	\begin{tabular}{l|r|r||r|r}
-		bits per rle number & \multicolumn{2}{c}{byte-wise RLE} & \multicolumn{2}{c}{binary RLE} \\
-		 &  ratio in \% & \textit{bps} & ratio in \% & \textit{bps}\\
-		\hline
-		8 & 165 & 13.20 & 329 & 26.38\\
-		7 & 154 & 12.38 & 288 & 23.11\\
-		6 & 144 & 11.57 & 248 & 19.87 \\
-		5 & 134 & 10.77 & 208 & 16.66\\
-		4 & 125 & 10.00 & 168 & 13.51\\
-		3 & 116 & 9.29 & 131 & 10.50\\
-		2 & 109 & 8.74 & 104 & 8.36
-	\end{tabular}
-	\caption{Byte-wise and binary RLE on the Calgary Corpus.}
-	\label{tab:t31 Byte-wise RLE on the Calgary Corpus}
-\end{table}
-}
-
-\frame{\frametitle{Design - Unmodified compression}
-\begin{table}[H]
-	\centering
-	\begin{tabular}{r|r|r|r|r|r}	
-		file & size original & $\frac{bits}{\text{RLE number}}$ & size encoded & ratio in \% & \textit{bps}\\
-		\hline
-		pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
-		& & 3 & 235067 & 45.80 & 3.66\\
-		& & 4 & 165745 & 32.29 & 2.58\\
-		& & 5 & 126349 & 24.61 & 1.96\\
-		& & 6 & 106773 & 20.80 & 1.66\\
-		& & 7 & 100098 & 19.50 & 1.56\\
-		& & 8 & 101014 & 19.68 & 1.57\\		 
-	\end{tabular}
-	\caption{The file \textit{pic} with increasing bits per binary RLE encoded number.}
-	\label{tab:t40 The file pic with increasing bits per RLE encoded number}
-\end{table}	
-\begin{itemize}
-	\visible<2->{\item Byte-wise RLE achieves $27.2\%$ of its original size using 2.17 \textit{bps}.}
-\end{itemize}
-}
-
 \frame{\frametitle{Design - Preprocessing}
-	\begin{outline}
-		\1 Most files other than pallet based images do not contain long runs of identical bit values.
-		\visible<2->{\1 Files with long runs work really well with RLE.}
-		\medskip
-		\visible<3->{\1 Artificially creating runs on arbitrary data will improve the performance of RLE.}
-	\end{outline}	
-	}
-	
-\frame{\frametitle{Preprocessing}
 	\begin{outline}
 		\1 Vertical interpretation of the input
 		\visible<2->{\1 Dynamic byte remapping}
@@ -339,20 +408,47 @@ a^5b^6a^6b^2
 		\[
 			S = abraca
 		\]
-		
-		0 1 1 0 0 0 0 1 
+		\only<1>{
+		\textcolor{red}{0} 1 1 0 0 0 0 1 
 		0 1 1 0 0 0 1 0 
 		0 1 1 1 0 0 1 0 
 		0 1 1 0 0 0 0 1 
 		0 1 1 0 0 0 1 1 
 		0 1 1 0 0 0 0 1 
 	}
+		\only<2>{
+	0 \textcolor{red}{1} 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 0 
+	0 1 1 1 0 0 1 0 
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 1 
+	0 1 1 0 0 0 0 1 
+}
+		\only<3>{
+	0 1 \textcolor{red}{1} 0 0 0 0 1 
+	0 1 1 0 0 0 1 0 
+	0 1 1 1 0 0 1 0 
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 1 
+	0 1 1 0 0 0 0 1 
+}
+		\only<4>{
+	0 1 1 \textcolor{red}{0} 0 0 0 1 
+	0 1 1 0 0 0 1 0 
+	0 1 1 1 0 0 1 0 
+	0 1 1 0 0 0 0 1 
+	0 1 1 0 0 0 1 1 
+	0 1 1 0 0 0 0 1 
+}
+
+}
 	
 \frame{\frametitle{Preprocessing - Vertical interpretation}
+	\only<1>{
 \begin{equation}
 \begin{multlined}
 	S = abraca\\
-		0 1 1 0 0 0 0 1 \\
+		\textcolor{red}{0} 1 1 0 0 0 0 1 \\
 		0 1 1 0 0 0 1 0 \\
 		0 1 1 1 0 0 1 0 \\
 		0 1 1 0 0 0 0 1 \\
@@ -360,8 +456,102 @@ a^5b^6a^6b^2
 		0 1 1 0 0 0 0 1 \\
 \end{multlined}
 \end{equation}
-	
-	}
+}
+	\only<2>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+	\only<3>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	\textcolor{red}{0} 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+	\only<4>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	\textcolor{red}{0} 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+	\only<5>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+	\only<6>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+	\only<7>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 \textcolor{red}{1} 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+	\only<8>{
+	\begin{equation}
+	\begin{multlined}
+	S = abraca\\
+	0 1 1 0 0 0 0 1 \\
+	0 \textcolor{red}{1} 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}}
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
 	\begin{table}[H]
