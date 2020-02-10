@@ -20,11 +20,14 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows}
 \usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
 \usepackage{wrapfig}
 \usepackage{pgfplots}
 \usepackage{outlines}
 \usepackage{mathtools}
 \usepackage{xcolor}
+
+
 
 
 
@@ -181,6 +184,7 @@
 
 \frame{\frametitle{Huffman Encoding}
 	\centering
+	$\Sigma = \{a,b,c\}$\\
 	$w = cacbcacc$\\
 	\visible<2->{$l_a(w) = 2 \:\:\: l_b(w) = 1 \:\:\: l_c(w) = 5$}
 	\visible<3->{
@@ -698,6 +702,31 @@
 \end{table}
 }
 
+\frame{\frametitle{Preprocessing}
+	\begin{columns}
+		\begin{column}{0.40\textwidth}
+			Current preprocessing steps:
+		\end{column}
+		\begin{column}{0.60\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq1) [draw] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+}
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
 	\centering
@@ -754,8 +783,11 @@ w = abraca\\
 \underbrace{0 0 0 0 0 0}_{} 0 1\\
 \end{array}
 \end{math}
-}}
+\begin{outline}
+	\1 increased average run length on bits of higher significance
+\end{outline}
 
+}}
 
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
@@ -791,7 +823,7 @@ w = abraca\\
 		coordinates {
 			(22223436,103.3)(22223437,102.6)(22223438,102.3)(22223439,102.25)(22233578,95)(22233579,94.9)(222335710,95)
 		};
-		\legend{without byte mapping,with byte mapping}
+		\legend{vertical encoding,with byte mapping}
 		\end{axis}
 		\end{tikzpicture}
 		%}
@@ -828,6 +860,7 @@ w = abraca\\
 	\label{tab:t43 Calgary Corpus encoded with vertical reading, byte remapping and varying bits per run}
 \end{table}	
 }
+
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
 TODO	
 }
@@ -958,49 +991,69 @@ TODO
 }
 
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
-\begin{table}[h]
-	\centering
-	\begin{tabular}{r|r|r}	
-		bits per rle number & ratio in \% & \textit{bps}\\
-		\hline
-		3 & 95.41 & 7.63\\
-		2 & 91.39 & 7.31 \\
-	\end{tabular}
-	\caption{Initial Burrows-Wheeler-Transformation implementation on byte wise RLE.}
-	\label{tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}
-\end{table}	
-
-\visible<2->{
-\begin{table}[h]
-	\centering
-	\begin{tabular}{r|r|r}	
-		bits per rle number & ratio in \% & \textit{bps}\\
-		\hline
-		3 & 91.62 & 7.33\\
-		2 & 89.46 & 7.15
-	\end{tabular}
-	\caption{Original Burrows-Wheeler-Transformation on byte wise RLE.}
-	\label{tab:t12 Burrows Wheeler Transformation on byte wise RLE}
-\end{table}}
-}
-
-\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
+		\begin{columns}
+		\begin{column}{0.6\textwidth}
+\only<2-3>{
+\visible<2-3>{
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{r|r|r}	
 			bits per rle number & ratio in \% & \textit{bps}\\
 			\hline
-			8 & 74.42 & 5.95\\
-			7 & 69.90 & 5.59\\
-			6 & 65.58 & 5.24\\
-			5 & 61.71 & 4.93\\
-			4 & 58.98 & 4.71\\
-			3 & 59.18 & 4.73\\
-			2 & 67.69 & 5.41
+			3 & 95.41 & 7.63\\
+			2 & 91.39 & 7.31 \\
 		\end{tabular}
-		\caption{Modified Burrows Wheeler Transformation on byte wise RLE.}
-		\label{tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}
-	\end{table}	
+		\caption{Initial Burrows-Wheeler-Transformation implementation on byte wise RLE.}
+		\label{tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}
+\end{table}}
+\visible<3-3>{
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{r|r|r}	
+			bits per rle number & ratio in \% & \textit{bps}\\
+			\hline
+			3 & 91.62 & 7.33\\
+			2 & 89.46 & 7.15
+		\end{tabular}
+		\caption{Original Burrows-Wheeler-Transformation on byte wise RLE.}
+		\label{tab:t12 Burrows Wheeler Transformation on byte wise RLE}
+\end{table}}}
+\only<4->{
+	\begin{table}[h]
+	\centering
+	\begin{tabular}{r|r|r}	
+		bits per rle number & ratio in \% & \textit{bps}\\
+		\hline
+		8 & 74.42 & 5.95\\
+		7 & 69.90 & 5.59\\
+		6 & 65.58 & 5.24\\
+		5 & 61.71 & 4.93\\
+		4 & 58.98 & 4.71\\
+		3 & 59.18 & 4.73\\
+		2 & 67.69 & 5.41
+	\end{tabular}
+	\caption{Sophisticated Burrows-Wheeler-Transformation on byte wise RLE.}
+	\label{tab:t13 Modified Burrows Wheeler Transformation on byte wise RLE}
+\end{table}	
+}		
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+				\node (pq3) [dashed,below=of pq0] {Byte-wise Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq0) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
@@ -1029,6 +1082,36 @@ TODO
 	\caption{Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler- Transformation with 4 bit per run.}
 	\label{tab:t14:Calgary Corpus encoded with byte wise RLE after a Burrows-Wheeler-Transformation}
 \end{table}	
+}
+
+
+\frame{\frametitle{Preprocessing}
+	\begin{columns}
+		\begin{column}{0.40\textwidth}
+			Current preprocessing steps:
+			
+		\end{column}
+		\begin{column}{0.60\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+				\node (pq1) [draw,below=of pq0] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3)
+				(pq0) edge  (pq1);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
@@ -1069,7 +1152,7 @@ TODO
 	coordinates {
 		(22223437,98.8)(22333458,86.1 )(22233579,85.3)(44444668,71.2)(44444679,70.3)(44445788,69.6)(444457810,69.4)
 	};
-	\legend{no preprocessing,byte mapping,byte mapping \& BWT}
+	\legend{no preprocessing,byte mapping,byte mapping \& BWTS}
 	\end{axis}
 	\end{tikzpicture}
 	%}
@@ -1109,7 +1192,34 @@ TODO
 }
 
 \frame{\frametitle{Preprocessing - Huffman Encoding RLE runs}
-	
+		\begin{columns}
+			\begin{column}{0.40\textwidth}
+				Current preprocessing steps:
+				
+			\end{column}
+			\begin{column}{0.60\textwidth}
+				\begin{center}
+					\begin{tikzpicture}[
+					every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+						draw=cyan, semithick,
+						text width=0.8\linewidth,
+						align=center}
+					]
+					\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+					\node (pq1) [below=of pq0] {Byte Remapping};
+					\node (pq2) [below=of pq1] {Vertical Interpretation};
+					\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+					\node (pq4) [below=of pq3] {Huffman Encoding of the RLE runs};
+					%
+					\path[->,thick,cyan]
+					(pq1) edge  (pq2)
+					(pq2) edge  (pq3)
+					(pq3) edge  (pq4)
+					(pq0) edge  (pq1);
+					\end{tikzpicture}
+				\end{center}
+			\end{column}
+		\end{columns}
 }
 
 \frame{\frametitle{Preprocessing - Huffman Encoding RLE runs}
@@ -1142,11 +1252,134 @@ TODO
 
 \section{Implementation}
 \frame{\frametitle{Implementation}
-TODO	
+	\begin{outline}
+		\1 written in Kotlin
+		\visible<2->{
+			\1 used libraries:
+			\2 Kotlin Binary Streams (IOStreams for Kotlin)
+			\visible<3->{
+			\2 LibDivSufSort (from Kanzi)
+			\visible<4->{
+			\2 miscellaneous 
+			\3 google/guava, junit5, staticlog ...
+	}}}
+\end{outline}
 }
+
+\frame{\frametitle{Implementation}
+	TODO show file structure
+}
+
+\frame{\frametitle{Implementation}
+	DEMO
+}
+
 \section{Evaluation and Discussion}
 \frame{\frametitle{Evaluation and Discussion}
-TODO	
+	\only<1>{
+	\begin{columns}
+		\begin{column}{0.30\textwidth}
+			Efficiency with current preprocessing steps:\\\medskip$112\%$
+		\end{column}
+		\begin{column}{0.70\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq2) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+	}
+\only<2>{
+	\begin{columns}
+		\begin{column}{0.30\textwidth}
+			Efficiency with current preprocessing steps:\\\medskip$94\%$
+		\end{column}
+		\begin{column}{0.70\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq1) [below=of pq0] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+}
+\only<3>{
+	\begin{columns}
+		\begin{column}{0.30\textwidth}
+			Efficiency with current preprocessing steps:\\\medskip$69\%$
+		\end{column}
+		\begin{column}{0.70\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+				\node (pq1) [below=of pq0] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3)
+				(pq0) edge  (pq1);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+}
+\only<4>{
+	\begin{columns}
+		\begin{column}{0.30\textwidth}
+			Efficiency with current preprocessing steps:\\\medskip$39\%$
+		\end{column}
+		\begin{column}{0.70\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+				\node (pq1) [below=of pq0] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				\node (pq4) [below=of pq3] {Huffman Encoding of the RLE runs};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3)
+				(pq3) edge  (pq4)
+				(pq0) edge  (pq1);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+}
 }
 \frame{\frametitle{Evaluation and Discussion}
 		\begin{table}[h]
@@ -1168,7 +1401,7 @@ TODO
 				\hline
 				all files & 2814880 & 867322 & 30.81 & 2.46
 			\end{tabular}
-			\caption{Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs.}
+			\caption{Canterbury encoded, all preprocessing steps, using Huffman Encoding for all counted runs.}
 			\label{tab:t100:Canterbury encoded, all preprocessing steps, using Huffman encoding for all counted runs}
 		\end{table}
 }
@@ -1190,7 +1423,7 @@ TODO
 				p7zip 16.02 (PPMd) &  763,067& 24.2\% & 1.93 & 0.345s & 0.282s\\
 				ZPAQ v7.15 & 659.700 & 20.9\% & 1.67 & 7.452s & 7.735s\\
 				paq8hp* & - & - & - & - & -\\ 
-				cmix v18 & 554,983 & 17.6\% & 1.41 & >3h & >2h		
+				cmix v18 & 554,983 & 17.6\% & 1.41 & $>$3h & $>$2h		
 			\end{tabular}
 			\label{tab:t100benchmark}
 			\caption{Benchmark on the Calgary Corpus.}
