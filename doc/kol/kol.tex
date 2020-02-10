@@ -548,10 +548,10 @@
 	0 1 1 1 0 0 1 0 \\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 1 \\
-	0 1 1 0 0 0 0 1 \\
 	\end{multlined}
 	\end{equation}
-}}
+}
+}
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
 	\begin{table}[H]
@@ -573,11 +573,27 @@
 }
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
+	\[
+		S = abraca
+	\]
+	\only<1>{
 	\centering
-	8 bits per run
 	\begin{math}
+\begin{array}{l}
+0 1 1 0 0 0 0 1 \\
+0 1 1 0 0 0 1 0 \\
+0 1 1 1 0 0 1 0 \\
+0 1 1 0 0 0 0 1 \\
+0 1 1 0 0 0 1 1 \\
+0 1 1 0 0 0 0 1\\
+\end{array}
+\end{math}
+}              
+\only<2>{
+	\centering
+	\begin{math}
+	\text{8 bit per run}
 	\left\{
-	\left.
 	\begin{array}{l}
 0 1 1 0 0 0 0 1 \\
 0 1 1 0 0 0 1 0 \\
@@ -586,11 +602,39 @@
 0 1 1 0 0 0 1 1 \\
 0 1 1 0 0 0 0 1\\
 	\end{array}
-	\right \}
 	\right.
 	\end{math}
-	2 bits per run
 }
+\only<3>{
+	\centering
+	\begin{math}
+	\text{8 bit per run}
+	\left\{
+	\begin{array}{l}
+	\left.
+	\begin{array}{l}
+	0 1 1 0 0 0 0 1 \\
+	\end{array}
+	\right \} 	\text{2 bits per run}\\
+	\left.
+	\begin{array}{l}
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	\end{array}
+	\right \} 	\text{2 bits per run}\\
+	\left.
+	\begin{array}{l}
+	0 1 1 0 0 0 0 1\\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1\\
+	\end{array}
+	\right \} 	\text{2 bits per run}\\
+	\end{array}
+	\right.
+	\end{math}
+}
+}
+
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
 \begin{figure}[h]
@@ -660,8 +704,9 @@
 
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
-	\begin{equation}
-	\begin{multlined}
+	\centering
+	\begin{math}
+\begin{array}{l}
 	S = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
@@ -669,13 +714,14 @@
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 1 \\
 	0 1 1 0 0 0 0 1 \\
-	\end{multlined}
-	\end{equation}
+\end{array}
+\end{math}
 }
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
-	\begin{equation}
-	\begin{multlined}
+	\centering
+	\begin{math}
+\begin{array}{l}
 	S = abraca\\
 	0 0 0 0 0 0 0 0 \\
 	0 0 0 0 0 0 0 1 \\
@@ -683,8 +729,8 @@
 	0 0 0 0 0 0 0 0 \\
 	0 0 0 0 0 0 1 0 \\
 	0 0 0 0 0 0 0 0 \\
-	\end{multlined}
-	\end{equation}
+\end{array}
+\end{math}
 }
 
 
