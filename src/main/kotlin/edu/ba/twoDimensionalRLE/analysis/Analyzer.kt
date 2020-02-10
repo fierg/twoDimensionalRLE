@@ -33,7 +33,7 @@ import java.io.File
 import java.nio.file.Files
 
 @ExperimentalUnsignedTypes
-class Analyzer {
+class Analyzer(DEBUGLOG: Boolean = false) {
     private var log = Log.kotlinInstance()
     private val encodingOccurrenceMap = mutableMapOf<Int, Int>()
     private val byteOccurrenceMap = mutableMapOf<Byte, Int>()
@@ -45,6 +45,7 @@ class Analyzer {
             line(date("yyyy-MM-dd HH:mm:ss"), space, level, text("/"), tag, space(2), message, space(2))
         }
         if (!DEBUG) log.logLevel = LogLevel.INFO
+        if (DEBUGLOG) log.logLevel = LogLevel.DEBUG
     }
 
     fun printMappingToFile(outputFile: File) {

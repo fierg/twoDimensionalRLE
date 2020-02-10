@@ -67,16 +67,14 @@ open class Application {
                 exitProcess(0)
             }
 
-            if (map.containsKey("-m"))
 
-
-                if (map.containsKey("-c") && map.containsKey("-d")) {
-                    println("Invalid arguments -c and -d!")
-                    printUsage()
-                    exitProcess(1)
-                } else if (map.containsKey("-d")) {
-                    decompress = true
-                }
+            if (map.containsKey("-c") && map.containsKey("-d")) {
+                println("Invalid arguments -c and -d!")
+                printUsage()
+                exitProcess(1)
+            } else if (map.containsKey("-d")) {
+                decompress = true
+            }
 
             if (map.containsKey("-v")) vertBitRLEset = true
             if (map.containsKey("-bin")) binaryRle = true
@@ -96,7 +94,8 @@ open class Application {
                     val bitsToUseMatches =
                         Regex("(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)").find(bitsToUse)
                     for (i in 0..7) {
-                        if (bitsToUseMatches!!.groupValues[i + 1].toInt() in 2..32) userBitsTousemap[i] = bitsToUseMatches!!.groupValues[i + 1].toInt() else {
+                        if (bitsToUseMatches!!.groupValues[i + 1].toInt() in 2..32) userBitsTousemap[i] =
+                            bitsToUseMatches.groupValues[i + 1].toInt() else {
                             println("bit per run has to bin range [2,32]!")
                             printUsage()
                             exitProcess(1)
