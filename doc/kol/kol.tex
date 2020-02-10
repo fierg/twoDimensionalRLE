@@ -406,7 +406,7 @@
 
 	\frame{\frametitle{Preprocessing - Vertical interpretation}
 		\[
-			S = abraca
+			w = abraca
 		\]
 		\only<1>{
 		\textcolor{red}{0} 1 1 0 0 0 0 1 
@@ -414,7 +414,6 @@
 		0 1 1 1 0 0 1 0 
 		0 1 1 0 0 0 0 1 
 		0 1 1 0 0 0 1 1 
-		0 1 1 0 0 0 0 1 
 	}
 		\only<2>{
 	0 \textcolor{red}{1} 1 0 0 0 0 1 
@@ -422,7 +421,6 @@
 	0 1 1 1 0 0 1 0 
 	0 1 1 0 0 0 0 1 
 	0 1 1 0 0 0 1 1 
-	0 1 1 0 0 0 0 1 
 }
 		\only<3>{
 	0 1 \textcolor{red}{1} 0 0 0 0 1 
@@ -430,7 +428,6 @@
 	0 1 1 1 0 0 1 0 
 	0 1 1 0 0 0 0 1 
 	0 1 1 0 0 0 1 1 
-	0 1 1 0 0 0 0 1 
 }
 		\only<4>{
 	0 1 1 \textcolor{red}{0} 0 0 0 1 
@@ -438,7 +435,6 @@
 	0 1 1 1 0 0 1 0 
 	0 1 1 0 0 0 0 1 
 	0 1 1 0 0 0 1 1 
-	0 1 1 0 0 0 0 1 
 }
 
 }
@@ -447,7 +443,7 @@
 	\only<1>{
 \begin{equation}
 \begin{multlined}
-	S = abraca\\
+	w = abraca\\
 		\textcolor{red}{0} 1 1 0 0 0 0 1 \\
 		0 1 1 0 0 0 1 0 \\
 		0 1 1 1 0 0 1 0 \\
@@ -460,7 +456,7 @@
 	\only<2>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	\textcolor{red}{0} 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -474,7 +470,7 @@
 	\only<3>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	\textcolor{red}{0} 1 1 1 0 0 1 0 \\
@@ -488,7 +484,7 @@
 	\only<4>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -501,7 +497,7 @@
 	\only<5>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -515,7 +511,7 @@
 	\only<6>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -528,7 +524,7 @@
 	\only<7>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 \textcolor{red}{1} 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -542,7 +538,7 @@
 	\only<8>{
 	\begin{equation}
 	\begin{multlined}
-	S = abraca\\
+	w = abraca\\
 	0 1 1 0 0 0 0 1 \\
 	0 \textcolor{red}{1} 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
@@ -574,7 +570,7 @@
 
 \frame{\frametitle{Preprocessing - Vertical interpretation}
 	\[
-		S = abraca
+		w = abraca
 	\]
 	\only<1>{
 	\centering
@@ -707,31 +703,58 @@
 	\centering
 	\begin{math}
 \begin{array}{l}
-	S = abraca\\
+	w = abracab 	\medskip \\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 0 \\
 	0 1 1 1 0 0 1 0 \\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 1 \\
 	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
 \end{array}
 \end{math}
+\visible<2->{
+	\[
+	l_a(w)=3 \:\:\: l_b(w)=2 \:\:\: l_c(w)=1 \:\:\: l_r(w)=1
+	\]
+}
+\visible<3->{Mapping:
+\[
+a = 0x00 \:\:\: b = 0x01 \:\:\: c = 0x02 \:\:\: r = 0x03
+\]
+}
 }
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
 	\centering
+	\only<1>{
 	\begin{math}
 \begin{array}{l}
-	S = abraca\\
+	w = abraca\\
 	0 0 0 0 0 0 0 0 \\
 	0 0 0 0 0 0 0 1 \\
 	0 0 0 0 0 0 1 1 \\
 	0 0 0 0 0 0 0 0 \\
 	0 0 0 0 0 0 1 0 \\
 	0 0 0 0 0 0 0 0 \\
+	0 0 0 0 0 0 0 1 \\
 \end{array}
 \end{math}
 }
+\only<2>{
+	\begin{math}
+\begin{array}{l}
+w = abraca\\
+0 0 0 0 0 0 0 0 \\
+0 0 0 0 0 0 0 1 \\
+0 0 0 0 0 0 1 1 \\
+0 0 0 0 0 0 0 0 \\
+0 0 0 0 0 0 1 0 \\
+0 0 0 0 0 0 0 0 \\
+\underbrace{0 0 0 0 0 0}_{} 0 1\\
+\end{array}
+\end{math}
+}}
 
 
 
@@ -943,7 +966,7 @@ TODO
 		3 & 95.41 & 7.63\\
 		2 & 91.39 & 7.31 \\
 	\end{tabular}
-	\caption{Initial BWT implementation on byte wise RLE.}
+	\caption{Initial Burrows-Wheeler-Transformation implementation on byte wise RLE.}
 	\label{tab:t11 Simple Burrows Wheeler Transformation on byte wise RLE}
 \end{table}	
 
@@ -956,7 +979,7 @@ TODO
 		3 & 91.62 & 7.33\\
 		2 & 89.46 & 7.15
 	\end{tabular}
-	\caption{Burrows Wheeler Transformation on byte wise RLE.}
+	\caption{Original Burrows-Wheeler-Transformation on byte wise RLE.}
 	\label{tab:t12 Burrows Wheeler Transformation on byte wise RLE}
 \end{table}}
 }
