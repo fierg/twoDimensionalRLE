@@ -1,12 +1,12 @@
 \documentclass[10pt, xcolor=x11names]{beamer}
-\usecolortheme{seagull}
+%\usecolortheme{seagull}
 \useoutertheme{infolines}
 \usefonttheme[onlymath]{serif}
 \setbeamertemplate{headline}[default]
 \setbeamertemplate{navigation symbols}{}
 \mode<beamer>{\setbeamertemplate{blocks}[rounded][shadow=true]}
 \setbeamercovered{transparent}
-\setbeamercolor{block body example}{fg=blue, bg=black!20}
+%\setbeamercolor{block body example}{fg=blue, bg=black!20}
 
 \usepackage[utf8]{inputenc}
 \usepackage[]{csquotes}
@@ -67,17 +67,55 @@
 		\1 particularly well suited to palette-based bitmap images such as computer icons
 	\end{outline}
 }
-
-\frame{\frametitle{Run Length Encoding (RLE)}
-		assume $\Sigma = \{a,b\}$
-	\[
-	aaaaabbbbbbaaaaaabb
-	\]
-	\visible<2->{
+\frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
+	assume $\Sigma = \{a,b\}$
+	\only<1-2>{
 		\[
-		a^5b^6a^6b^2
-		\]}
-}
+			aaaaabbbbbbaaaaaa
+		\]
+		\visible<2->{
+			\[
+			a^5b^6a^6
+			\]}}
+	\only<3->{
+		\only<3-8>{
+			\[
+			a^5b^6a^6
+			\]}
+		\only<9>{\[
+			\overbrace{a^5b^6a^6}^{17 \:\:\: bit}
+			\]}
+		\visible<4->{
+			\medskip \\
+			assume $|\Sigma| = 2$ and runs start with $a$\\
+			\visible<5->{
+				set maximum run length to 7 ( $=3$ bits per run)\\
+				\medskip
+				\only<5>{
+					\[
+					566
+					\]}
+				\only<6>{
+					\[
+					\underbrace{5}_{101}66
+					\]
+				}
+				\only<7>{
+					\[
+					\underbrace{5}_{101}\underbrace{6}_{01}
+					\]
+				}
+				\only<8>{
+					\[
+					\underbrace{5}_{101}\underbrace{6}_{110}\underbrace{6}_{110}
+					\]
+				}
+			
+				\only<9->{
+					\[
+					\overbrace{\underbrace{5}_{101}\underbrace{6}_{110}\underbrace{6}_{110}}^{9 \:\:\: bit}
+					\]
+}}}}}
 
 \frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
 	assume $\Sigma = \{a,b\}$
@@ -95,7 +133,7 @@
 		a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2
 		\]}
 		\only<10>{\[
-			\overbrace{a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2}^{19 bit}
+			\overbrace{a^2b^1a^2b^2a^1b^3a^1b^1a^1b^1a^2b^2}^{19 \:\:\: bit}
 			\]}
 		\visible<4->{
 			\medskip \\
@@ -129,24 +167,24 @@
 }
 				\only<10->{
 	\[
-	\overbrace{\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{2}_{10}\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{3}_{11}\underbrace{1}_{..}11122}^{24 bit}
+	\overbrace{\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{2}_{10}\underbrace{2}_{10}\underbrace{1}_{01}\underbrace{3}_{11}\underbrace{1}_{..}11122}^{24 \:\:\: bit}
 	\]
 }}}}}
 
 \frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
 	assume $|\Sigma| = 2$ and runs start with $a$\\
 	set maximum run length to 3 ( $=2$ bits per run / per RLE number)\\
-	\visible<1>{
+	\only<1>{
 		\[
 		b^1a^5b^2
 		\]
 	}
-	\visible<2>{
+	\only<2>{
 		\[
 		\underbrace{b^1}_{00 + 01}a^5b^2
 		\]
 	}
-	\visible<3>{
+	\only<3>{
 		\[
 		\underbrace{b^1}_{00 + 01} \: \: \underbrace{a^5}_{11 + 00 + 10}b^2
 		\]
@@ -156,19 +194,21 @@
 }
 
 \frame{\frametitle{Run Length Encoding (RLE) - byte wise RLE}
-	assume $|\Sigma| > 2$\\
+	\only<2>{
+	assume $|\Sigma| = 2^8$\\
 	set maximum run length to 4 ( $=2$ bits per run / per RLE number)\\
-	\visible<1>{
+}
+	\only<3>{
 		\[
 		b^1a^2c^3
 		\]
 	}
-	\visible<2>{
+	\only<4>{
 		\[
 		\underbrace{b^1}_{01100010 + 00}a^2c^4
 		\]
 	}
-	\visible<3>{
+	\only<5>{
 		\[
 		\underbrace{b^1}_{01100010 + 00} \: \: \: \underbrace{a^2}_{01100001 + 01} \: \: \: \underbrace{c^3}_{01100011 + 11}
 		\]
@@ -548,6 +588,7 @@
 	0 1 1 1 0 0 1 0 \\
 	0 1 1 0 0 0 0 1 \\
 	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
 	\end{multlined}
 	\end{equation}
 }
@@ -590,22 +631,6 @@
 \end{math}
 }              
 \only<2>{
-	\centering
-	\begin{math}
-	\text{8 bit per run}
-	\left\{
-	\begin{array}{l}
-0 1 1 0 0 0 0 1 \\
-0 1 1 0 0 0 1 0 \\
-0 1 1 1 0 0 1 0 \\
-0 1 1 0 0 0 0 1 \\
-0 1 1 0 0 0 1 1 \\
-0 1 1 0 0 0 0 1\\
-	\end{array}
-	\right.
-	\end{math}
-}
-\only<3>{
 	\centering
 	\begin{math}
 	\text{8 bit per run}
@@ -703,6 +728,29 @@
 }
 
 \frame{\frametitle{Preprocessing}
+	\only<1>{
+	\begin{columns}
+		\begin{column}{0.40\textwidth}
+			Current preprocessing steps:
+		\end{column}
+		\begin{column}{0.60\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq2) [] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq2) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}}
+\only<2>{
 	\begin{columns}
 		\begin{column}{0.40\textwidth}
 			Current preprocessing steps:
@@ -720,12 +768,12 @@
 				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
 				%
 				\path[->,thick,cyan]
-				(pq1) edge  (pq2)
-				(pq2) edge  (pq3);
+				(pq2) edge  (pq3)
+				(pq1) edge  (pq2);
 				\end{tikzpicture}
 			\end{center}
 		\end{column}
-	\end{columns}
+\end{columns}}
 }
 
 \frame{\frametitle{Preprocessing - Byte Remapping}
@@ -817,7 +865,7 @@ w = abraca\\
 		ybar]
 		\addplot[color=blue,fill]
 		coordinates {
-			(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)(22233578,100)(22233579,102)(222335710,106)
+			(22223436,112.55)(22223437,112.4)(22223438,112.6)(22223439,113)(22233578,113)(22233579,115)(222335710,116)
 		};
 		\addplot[color=red,fill]
 		coordinates {
@@ -862,15 +910,12 @@ w = abraca\\
 }
 
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
-TODO	
-}
-\frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
 	
 	\[
 		S = abcabr
 	\]
 	
-		\only<1>{
+		\only<2>{
 			\begin{table}[h]
 				\centering
 				\begin{tabular}{r|l|l|l|l|l|l}
@@ -890,7 +935,7 @@ TODO
 				\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
 			\end{table}
 		}
-	\only<2>{
+	\only<3>{
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{r|l|l|l|l|l|l}
@@ -910,7 +955,7 @@ TODO
 		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations, sorted).}
 	\end{table}
 }
-	\only<3>{
+	\only<4>{
 		\begin{table}[h]
 			\centering
 			\begin{tabular}{r|l|l|l|l|l|l}
@@ -949,7 +994,7 @@ TODO
 		 \begin{table}[h]
 		 	\centering
 		 	\begin{tabular}{l}
-		 		word \\
+		 		word $L$\\
 		 		\hline
 		 		r  \\
 		 		c  \\
@@ -966,7 +1011,7 @@ TODO
 		\begin{table}[h]
 			\centering
 			\begin{tabular}{l|l}
-				word & word with position\\
+				word $L$& word with position\\
 				\hline
 				r & (r,1) \\
 				c & (c,2)  \\
@@ -983,7 +1028,7 @@ TODO
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{l|l|l}
-			word & word with position & sorted\\
+			word $L$ & word with position & sorted\\
 			\hline
 			r & (r,1) & (a,3) \\
 			c & (c,2) & (a,4) \\
@@ -1000,7 +1045,7 @@ TODO
 	\begin{table}[h]
 		\centering
 		\begin{tabular}{l|l|l|l}
-			word & word with position & sorted & $\pi^t_L$\\
+			word $L$ & word with position & sorted & $\pi^t_L$\\
 			\hline
 			r & (r,1) & (a,3) & 1 3\\
 			c & (c,2) & (a,4) & 2 4\\
@@ -1137,6 +1182,33 @@ TODO
 
 
 \frame{\frametitle{Preprocessing}
+	\only<1>{
+	\begin{columns}
+		\begin{column}{0.40\textwidth}
+			Current preprocessing steps:
+			
+		\end{column}
+		\begin{column}{0.60\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq1) [draw] {Byte Remapping};
+				\node (pq2) [below=of pq1] {Vertical Interpretation};
+				\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq1) edge  (pq2)
+				(pq2) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}}
+
+\only<2>{
 	\begin{columns}
 		\begin{column}{0.40\textwidth}
 			Current preprocessing steps:
@@ -1162,7 +1234,7 @@ TODO
 				\end{tikzpicture}
 			\end{center}
 		\end{column}
-	\end{columns}
+\end{columns}}
 }
 
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
@@ -1243,6 +1315,34 @@ TODO
 }
 
 \frame{\frametitle{Preprocessing - Huffman Encoding RLE runs}
+	\only<1>{
+		\begin{columns}
+			\begin{column}{0.40\textwidth}
+				Current preprocessing steps:
+				
+			\end{column}
+			\begin{column}{0.60\textwidth}
+				\begin{center}
+					\begin{tikzpicture}[
+					every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+						draw=cyan, semithick,
+						text width=0.8\linewidth,
+						align=center}
+					]
+					\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+					\node (pq1) [draw,below=of pq0] {Byte Remapping};
+					\node (pq2) [below=of pq1] {Vertical Interpretation};
+					\node (pq3) [dashed,below=of pq2] {Run Length Encoding};
+					%
+					\path[->,thick,cyan]
+					(pq1) edge  (pq2)
+					(pq2) edge  (pq3)
+					(pq0) edge  (pq1);
+					\end{tikzpicture}
+				\end{center}
+			\end{column}
+	\end{columns}}
+	\only<2>{
 		\begin{columns}
 			\begin{column}{0.40\textwidth}
 				Current preprocessing steps:
@@ -1271,7 +1371,7 @@ TODO
 				\end{center}
 			\end{column}
 		\end{columns}
-}
+}}
 
 \frame{\frametitle{Preprocessing - Huffman Encoding RLE runs}
 		\begin{table}[H]
@@ -1317,8 +1417,209 @@ TODO
 \end{outline}
 }
 
-\frame{\frametitle{Implementation}
-	TODO show file structure
+\frame{\frametitle{Implementation - Encoding}
+	\begin{columns}
+		\begin{column}{0.4\textwidth}
+\only<1>{\\
+	current bit = 0\\
+	run = 1\\}
+\only<2>{\\
+	current bit = 0\\
+	run = 2\\}
+\only<3>{\\
+	current bit = 0\\
+	run = 3\\}
+\only<4>{\\
+current bit = 0\\
+run = 4 \\}
+\only<5>{\\
+current bit = 0\\
+run = 5\\}
+\only<6>{\\
+current bit = 0\\
+run = 6\\}
+\only<7>{\\
+	current bit = 0\\
+	run = 0\\
+	result = \{[6]\}}
+\only<8>{\\
+	current bit = 0\\
+	run = 0\\
+	result = \{[6],[0]\}}
+\only<9>{\\
+	current bit = 1\\
+	run = 1\\
+	result = \{[6],[0]\}}
+\only<10>{\\
+	current bit = 1\\
+	run = 2\\
+	result = \{[6],[0]\}}
+\only<11>{\\
+	current bit = 1\\
+	run = 3\\
+	result = \{[6],[0,6],[0,6],[2,1,3],[6],[6],[1,2,1,1,1],[0,1,2,3]\}}
+\only<12->{\\
+	current bit = 1\\
+	run = 3\\
+	result = \{[6],[0,6],[0,6],[2,1,3],[6],[6],[1,2,1,1,1],[0,1,2,3]\}\\
+	\medskip
+	\begin{tabular}{r|r}
+	run & amount\\
+	\hline
+	6 & 5\\
+	1 & 4\\
+	2 & 3 \\
+	0 & 3\\
+	3 & 2\\
+	\end{tabular}
+}
+\end{column}
+\begin{column}{0.6\textwidth}
+\begin{center}
+
+
+	\only<1>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	\textcolor{red}{0} 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+\only<2>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+\only<3>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	\textcolor{red}{0} 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+\only<4>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	\textcolor{red}{0} 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+\only<5>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+\only<6-7>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	\textcolor{red}{0} 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+\only<8-9>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 \textcolor{red}{1} 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+
+\only<10>{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 \textcolor{red}{1} 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 1 \\
+	\end{multlined}
+	\end{equation}
+}
+\only<11->{
+	\begin{equation}
+	\begin{multlined}
+	\\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 0 \\
+	0 1 1 1 0 0 1 0 \\
+	0 1 1 0 0 0 0 1 \\
+	0 1 1 0 0 0 1 1 \\
+	0 1 1 0 0 0 0 \textcolor{red}{1} \\
+	\end{multlined}
+	\end{equation}
+}
+\end{center}
+\end{column}
+\end{columns}
+}
+
+\frame{\frametitle{Implementation - Encoding}
+	\centering
+	\only<1>{
+	\includegraphics[height=.8\textheight, width=.4\textwidth]{filestruct1.png}}
+
+\only<2>{
+	\includegraphics[height=.8\textheight, width=.4\textwidth]{filestruct2.png}}
+
+\only<3>{
+	\includegraphics[height=.8\textheight, width=.4\textwidth]{filestruct3.png}}
+
+\only<4>{
+	\includegraphics[height=.8\textheight, width=.4\textwidth]{filestruct4.png}}
+
+\only<5>{
+	\includegraphics[height=.8\textheight, width=.4\textwidth]{filestruct5.png}}
 }
 
 \frame{\frametitle{Implementation}
@@ -1331,7 +1632,7 @@ TODO
 	\only<1>{
 	\begin{columns}
 		\begin{column}{0.30\textwidth}
-			Efficiency with current preprocessing steps:\\\medskip$112\%$
+			Efficiency with current preprocessing steps:\\\medskip$\approx112\%$
 		\end{column}
 		\begin{column}{0.70\textwidth}
 			\begin{center}
@@ -1354,7 +1655,7 @@ TODO
 \only<2>{
 	\begin{columns}
 		\begin{column}{0.30\textwidth}
-			Efficiency with current preprocessing steps:\\\medskip$94\%$
+			Efficiency with current preprocessing steps:\\\medskip$\approx94\%$
 		\end{column}
 		\begin{column}{0.70\textwidth}
 			\begin{center}
@@ -1379,7 +1680,7 @@ TODO
 \only<3>{
 	\begin{columns}
 		\begin{column}{0.30\textwidth}
-			Efficiency with current preprocessing steps:\\\medskip$69\%$
+			Efficiency with current preprocessing steps:\\\medskip$\approx69\%$
 		\end{column}
 		\begin{column}{0.70\textwidth}
 			\begin{center}
@@ -1406,7 +1707,30 @@ TODO
 \only<4>{
 	\begin{columns}
 		\begin{column}{0.30\textwidth}
-			Efficiency with current preprocessing steps:\\\medskip$39\%$
+			Efficiency with current preprocessing steps:\\\medskip$\approx58\%$
+		\end{column}
+		\begin{column}{0.70\textwidth}
+			\begin{center}
+				\begin{tikzpicture}[
+				every node/.style = {shape=rectangle,% is not necessary, default node's shape is rectangle
+					draw=cyan, semithick,
+					text width=0.8\linewidth,
+					align=center}
+				]
+				\node (pq0) [draw] {Burrows-Wheeler-Transformation};
+				\node (pq3) [dashed,below=of pq0] {Byte-wise Run Length Encoding};
+				%
+				\path[->,thick,cyan]
+				(pq0) edge  (pq3);
+				\end{tikzpicture}
+			\end{center}
+		\end{column}
+	\end{columns}
+}
+\only<5>{
+	\begin{columns}
+		\begin{column}{0.30\textwidth}
+			Efficiency with current preprocessing steps:\\\medskip$\approx39\%$
 		\end{column}
 		\begin{column}{0.70\textwidth}
 			\begin{center}
