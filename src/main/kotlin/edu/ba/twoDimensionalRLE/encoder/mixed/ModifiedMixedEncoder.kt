@@ -36,7 +36,7 @@ import java.io.File
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
-class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
+class ModifiedMixedEncoder(val DEBUGLOG: Boolean = false) : Encoder {
 
     private val DEBUG = false
     private val log = Log.kotlinInstance()
@@ -49,7 +49,6 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
         }
         if (!DEBUG) log.logLevel = LogLevel.INFO
         if (DEBUGLOG) log.logLevel = LogLevel.DEBUG
-
     }
 
     fun encodeInternal(
@@ -81,7 +80,7 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
         if (applyBurrowsWheelerTransformation) log.info("Encoding with a Burrows Wheeler Transformation as preprocessing.")
         if (applyHuffmanEncoding) log.info("Encoding with huffman encoding instead of fixed size.")
 
-        val analyzer = Analyzer()
+        val analyzer = Analyzer(DEBUGLOG)
         val bwts = BWTSWrapper()
         var mappedFile: String? = null
         var transformedFile: String? = null
@@ -129,7 +128,7 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
                 }
 
                 if (applyHuffmanEncoding) {
-                    val huff = HuffmanEncoder(DEBUG)
+                    val huff = HuffmanEncoder(DEBUGLOG)
                     huff.encodeLineMapsToStream(lineMaps, streamOut, bitsPerRunMap.values.max()!!)
                 }
 
@@ -177,7 +176,7 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
         applyHuffmanEncoding: Boolean?,
         bitsPerRLENumberMap: Map<Int, Int>
     ) {
-        val analyzer = Analyzer()
+        val analyzer = Analyzer(DEBUGLOG)
         val bwts = BWTSWrapper()
 
         var mapping = emptyMap<Byte, Byte>()
@@ -196,7 +195,7 @@ class ModifiedMixedEncoder(DEBUGLOG: Boolean = false) : Encoder {
             }
 
             if (applyHuffmanEncoding == true) {
-                val huffDecoder = HuffmanEncoder(DEBUG)
+                val huffDecoder = HuffmanEncoder(DEBUGLOG)
                 val expectedMappingSize = huffDecoder.parseCurrentHeader(streamIn, defaultZerosAfterHeadder, log)
                 val huffmanMapping = huffDecoder.parseHuffmanMappingFromStream(streamIn, expectedMappingSize, log)
                 val decodedRuns =
