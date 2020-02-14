@@ -27,10 +27,6 @@
 \usepackage{mathtools}
 \usepackage{xcolor}
 
-
-
-
-
 %\usepackage{amsfonts}
 %\usepackage{amssymb}
 %\usepackage{makeidx}
@@ -63,8 +59,8 @@
 \section{Introduction}
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
-		\1 employed in the transmission of analog television signals as far back as 1967
-		\1 particularly well suited to palette-based bitmap images such as computer icons
+		\1 Employed in the transmission of analog television signals as far back as 1967 \cite{rle-patent}
+		\1 Particularly well suited to palette-based bitmap images such as computer icons
 	\end{outline}
 }
 \frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
@@ -102,7 +98,7 @@
 				}
 				\only<7>{
 					\[
-					\underbrace{5}_{101}\underbrace{6}_{01}
+					\underbrace{5}_{101}\underbrace{6}_{110}6
 					\]
 				}
 				\only<8>{
@@ -214,13 +210,14 @@
 		\]
 	}}
 
+
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
-		\1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
-		\visible<2->{\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.}
+		\1 Used for bitmap images or DNA sequence encoding \cite{rle-dna} \cite{rle-bio}.
+		\visible<2->{ \1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45 \cite{fax-rle}.
+		\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.}
 	\end{outline}
 }
-
 
 \frame{\frametitle{Huffman Encoding}
 	\centering
@@ -278,27 +275,19 @@
 	\end{table}
 	\only<2>{
 		\[
-		\underbrace{11111111111111111111}_{20} \rightarrow `00100`
+		\underbrace{1111}_{2} \rightarrow `11`
 		\]}
 	\only<3->{
 		\[
-		0^{128} \rightarrow `10010` + `1011`
+		0^{132} \rightarrow `10010` + `1011`
 		\]}
-}
-
-\frame{\frametitle{Run Length Encoding (RLE)}
-	\begin{outline}
-		\1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
-		\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.
-		\1 RLE is also used for bitmap images or DNA sequence encoding.
-	\end{outline}
 }
 
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{table}[H]
 		\centering
 		\begin{tabular}{r|r|r|r|r|r}	
-			file & size original & $\frac{bits}{\text{RLE number}}$ & size encoded & ratio in \% & \textit{bps}\\
+			file & size original & bits per run & size encoded & ratio in \% & \textit{bps}\\
 			\hline
 			pic & 513216 & 2 & 350292 & 68.25 & 5.46 \\
 			& & 3 & 235067 & 45.80 & 3.66\\
@@ -308,7 +297,7 @@
 			& & 7 & 100098 & 19.50 & 1.56\\
 			& & 8 & 101014 & 19.68 & 1.57\\		 
 		\end{tabular}
-		\caption{The file \textit{pic} with increasing bits per binary RLE encoded number.}
+		\caption{The bitmap image file \textit{pic} with increasing bits per binary RLE encoded number.}
 		\label{tab:t40 The file pic with increasing bits per RLE encoded number}
 	\end{table}	
 	\begin{itemize}
@@ -378,7 +367,7 @@
 		\item Non random data contains redundant information
 		\item Compression is about pattern or structure identification and exploitation
 		
-		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity)}
+		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity \cite{kolmogorov})}
 	\end{itemize}	
 }
 
@@ -437,10 +426,10 @@
 \section{Design}
 \frame{\frametitle{Design - Preprocessing}
 	\begin{outline}
-		\1 Vertical interpretation of the input
+		\1 Vertical interpretation
 		\visible<2->{\1 Dynamic byte remapping}
 		\visible<3->{\1 Burrows-Wheeler-Transformation}
-		\visible<4->{\1 Huffman Encoding of runs}
+		\visible<4->{\1 Huffman Encoding of RLE runs}
 	\end{outline}	
 }
 
@@ -448,39 +437,14 @@
 	\includegraphics[height=\textheight, width=\textwidth]{g0902.png}
 }
 
-	\frame{\frametitle{Preprocessing - Vertical interpretation}
+\frame{\frametitle{Preprocessing - Vertical interpretation}
 		\[
 			w = abraca
 		\]
-		\only<1>{
-		\textcolor{red}{0} 1 1 0 0 0 0 1 
-		0 1 1 0 0 0 1 0 
-		0 1 1 1 0 0 1 0 
-		0 1 1 0 0 0 0 1 
-		0 1 1 0 0 0 1 1 
-	}
-		\only<2>{
-	0 \textcolor{red}{1} 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 0 
-	0 1 1 1 0 0 1 0 
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 1 
-}
-		\only<3>{
-	0 1 \textcolor{red}{1} 0 0 0 0 1 
-	0 1 1 0 0 0 1 0 
-	0 1 1 1 0 0 1 0 
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 1 
-}
-		\only<4>{
-	0 1 1 \textcolor{red}{0} 0 0 0 1 
-	0 1 1 0 0 0 1 0 
-	0 1 1 1 0 0 1 0 
-	0 1 1 0 0 0 0 1 
-	0 1 1 0 0 0 1 1 
-}
-
+	\only<1>{\textcolor{red}{0} 1 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+	\only<2>{0 \textcolor{red}{1} 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+	\only<3>{0 1 \textcolor{red}{1} 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+	\only<4>{0 1 1 \textcolor{red}{0} 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
 }
 	
 \frame{\frametitle{Preprocessing - Vertical interpretation}
@@ -912,24 +876,24 @@ w = abraca\\
 \frame{\frametitle{Preprocessing - Burrows-Wheeler-Transformation}
 	
 	\[
-		S = abcabr
+		w = abcabr
 	\]
 	
 		\only<2>{
 			\begin{table}[h]
 				\centering
-				\begin{tabular}{r|l|l|l|l|l|l}
-					row 1 & a & b & c & a & b & r\\
+				\begin{tabular}{l|l|l|l|l|l}
+					 a & b & c & a & b & r\\
 					\hline
-					row 2 & r & a & b & c & a & b\\	
+					r & a & b & c & a & b\\	
 					\hline
-					row 3 & b & r & a & b & c & a\\
+					b & r & a & b & c & a\\
 					\hline
-					row 4 & a & b & r & a & b & c\\
+					a & b & r & a & b & c\\
 					\hline
-					row 5 & c & a & b & r & a & b\\
+					c & a & b & r & a & b\\
 					\hline
-					row 6 & b & c & a & b & r & a
+					b & c & a & b & r & a
 						\label{tab:t10 bwt-example1}
 				\end{tabular}
 				\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations).}
@@ -938,18 +902,18 @@ w = abraca\\
 	\only<3>{
 	\begin{table}[h]
 		\centering
-		\begin{tabular}{r|l|l|l|l|l|l}
-			row 1 & a & b & c & a & b & r\\
+		\begin{tabular}{l|l|l|l|l|l}
+			a & b & c & a & b & r\\
 			\hline
-			row 2 & a & b & r & a & b & c\\
+			a & b & r & a & b & c\\
 			\hline
-			row 3 & b & c & a & b & r & a\\
+			b & c & a & b & r & a\\
 			\hline
-			row 4 & b & r & a & b & c & a\\
+			b & r & a & b & c & a\\
 			\hline
-			row 5 & c & a & b & r & a & b\\
+			c & a & b & r & a & b\\
 			\hline
-			row 6 & r & a & b & c & a & b	
+			r & a & b & c & a & b	
 			\label{tab:t10 bwt-example2}
 		\end{tabular}
 		\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations, sorted).}
@@ -958,18 +922,18 @@ w = abraca\\
 	\only<4>{
 		\begin{table}[h]
 			\centering
-			\begin{tabular}{r|l|l|l|l|l|l}
-				row 1 & a & b & c & a & b & \textcolor{red}{r}\\
+			\begin{tabular}{l|l|l|l|l|l}
+				a & b & c & a & b & \textcolor{red}{r}\\
 				\hline
-				row 2 & a & b & r & a & b &  \textcolor{red}{c}\\
+				a & b & r & a & b &  \textcolor{red}{c}\\
 				\hline
-				row 3 & b & c & a & b & r &  \textcolor{red}{a}\\
+				b & c & a & b & r &  \textcolor{red}{a}\\
 				\hline
-				row 4 & b & r & a & b & c &  \textcolor{red}{a}\\
+				b & r & a & b & c &  \textcolor{red}{a}\\
 				\hline
-				row 5 & c & a & b & r & a &  \textcolor{red}{b}\\
+				c & a & b & r & a &  \textcolor{red}{b}\\
 				\hline
-				row 6 & r & a & b & c & a &  \textcolor{red}{b}
+				r & a & b & c & a &  \textcolor{red}{b}
 				\label{tab:t10 bwt-example3}
 			\end{tabular}
 			\caption{Burrows Wheeler Transformation Matrix (all cyclic rotations, sorted).}
@@ -1805,4 +1769,11 @@ run = 6\\}
 			\caption{Benchmark on the Calgary Corpus.}
 		\end{table}
 }
+
+\begin{frame}[allowframebreaks]
+	\frametitle{References}
+	\bibliographystyle{cpc}
+	\bibliography{kol.bib}
+\end{frame}
+
 \end{document}
