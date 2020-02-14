@@ -273,11 +273,11 @@
 		\end{tabular}
 		\caption{T4 static Huffman codes.}
 	\end{table}
-	\only<2>{
+	\visible<2->{
 		\[
-		\underbrace{1111}_{2} \rightarrow `11`
+		1^2 \rightarrow `11`
 		\]}
-	\only<3->{
+	\visible<3->{
 		\[
 		0^{132} \rightarrow `10010` + `1011`
 		\]}
@@ -373,29 +373,29 @@
 
 \frame{\frametitle{Basics of Compression - Entropy Encoding}
 	\begin{itemize}
-		\item generating a probability model for the data
-		\item compute variable length codes	
-		\visible<2->{ \item low speed, high compression strength
-		\item recommended for poorly structured data}
+		\item Generating a probability model for the data
+		\item Compute variable length codes	
+		\visible<2->{ \item Low speed, high compression strength
+		\item Recommended for poorly structured data}
 	\end{itemize}	
 }
 
 \frame{\frametitle{Basics of Compression - Entropy Encoding}
 \begin{outline}
 		\1 Huffman Encoding (1952)
-		\2 computes optimal length prefix-free codes for symbols acc. to their probabilities
-		\visible<2->{ \1 Run Length Encoding (1967) \2 computes runs of identical symbols}
-		\visible<3->{ \1 Arithmetic Encoding (1979) \2 encodes a message of symbols in a single rational number in [0,1]}
-		\visible<4->{\1 Asymmetric Numeral Systems (ANS) Encoding (2014) \2 encodes a message of symbols in a single natural number}
+		\2 Computes optimal length prefix-free codes for symbols acc. to their probabilities
+		\visible<2->{ \1 Run Length Encoding (1967) \2 Computes runs of identical symbols}
+		\visible<3->{ \1 Arithmetic Encoding (1979) \2 Encodes a message of symbols in a single rational number in [0,1]}
+		\visible<4->{\1 Asymmetric Numeral Systems (ANS) Encoding (2014) \2 Encodes a message of symbols in a single natural number}
 \end{outline}
 }
 
 \frame{\frametitle{Basics of Compression - Dictionary Encoding}
 	\begin{outline}
-		\1 maintain a dictionary of strings for either a \emph{sliding window} or the whole data
-		\2 replace later occurrence with reference position an length
+		\1 Maintain a dictionary of strings for either a \emph{sliding window} or the whole data
+		\2 Replace later occurrence with reference position an length
 		\visible<2->{ \1 High speed, moderate compression strength}
-		\visible<3->{ \1 Famous Lempel-Ziv methods LZ77 and LZ78 (1977/78) \2 many derivatives, some still used today}
+		\visible<3->{ \1 Famous Lempel-Ziv methods LZ77 and LZ78 (1977/78) \2 Many derivatives, some still used today}
 	\end{outline}
 }
 
@@ -441,10 +441,10 @@
 		\[
 			w = abraca
 		\]
-	\only<1>{\textcolor{red}{0} 1 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
-	\only<2>{0 \textcolor{red}{1} 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
-	\only<3>{0 1 \textcolor{red}{1} 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
-	\only<4>{0 1 1 \textcolor{red}{0} 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+\only<1>{\textcolor{red}{0} 1 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+\only<2>{0 \textcolor{red}{1} 1 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+\only<3>{0 1 \textcolor{red}{1} 0 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
+\only<4>{0 1 1 \textcolor{red}{0} 0 0 0 1 0 1 1 0 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 0 0 0 1 0 1 1 0 0 0 1 1}
 }
 	
 \frame{\frametitle{Preprocessing - Vertical interpretation}
