@@ -27,10 +27,6 @@
 \usepackage{mathtools}
 \usepackage{xcolor}
 
-
-
-
-
 %\usepackage{amsfonts}
 %\usepackage{amssymb}
 %\usepackage{makeidx}
@@ -63,8 +59,8 @@
 \section{Introduction}
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
-		\1 employed in the transmission of analog television signals as far back as 1967
-		\1 particularly well suited to palette-based bitmap images such as computer icons
+		\1 Employed in the transmission of analog television signals as far back as 1967 \cite{rle-patent}
+		\1 Particularly well suited to palette-based bitmap images such as computer icons
 	\end{outline}
 }
 \frame{\frametitle{Run Length Encoding (RLE) - binary RLE}
@@ -217,8 +213,8 @@
 
 \frame{\frametitle{Run Length Encoding (RLE)}
 	\begin{outline}
-		\1 used for bitmap images or DNA sequence encoding.
-		\visible<2->{ \1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45.
+		\1 Used for bitmap images or DNA sequence encoding \cite{rle-dna} \cite{rle-bio}.
+		\visible<2->{ \1 The International Telecommunication Union describes the standard to encode fax transmissions, known as T.45 \cite{fax-rle}.
 		\2 RLE is combined with Huffman Encoding into \emph{Modified Huffman Encoding}.}
 	\end{outline}
 }
@@ -371,7 +367,7 @@
 		\item Non random data contains redundant information
 		\item Compression is about pattern or structure identification and exploitation
 		
-		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity)}
+		\visible<2->{  \item No algorithm can compress all possible data of a given length, even by one byte (Kolmogorov Complexity \cite{kolmogorov})}
 	\end{itemize}	
 }
 
@@ -1773,4 +1769,11 @@ run = 6\\}
 			\caption{Benchmark on the Calgary Corpus.}
 		\end{table}
 }
+
+\begin{frame}[allowframebreaks]
+	\frametitle{References}
+	\bibliographystyle{cpc}
+	\bibliography{kol.bib}
+\end{frame}
+
 \end{document}

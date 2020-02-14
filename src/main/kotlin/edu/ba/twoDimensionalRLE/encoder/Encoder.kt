@@ -3,7 +3,6 @@ package edu.ba.twoDimensionalRLE.encoder
 import de.jupf.staticlog.core.Logger
 import edu.ba.twoDimensionalRLE.extensions.writeInvertedToBinaryStream
 import loggersoft.kotlin.streams.BitStream
-import java.text.ParseException
 import kotlin.math.ceil
 import kotlin.math.log2
 
@@ -115,9 +114,12 @@ interface Encoder {
 
     fun decodeBitPositionOfRunMap(
         streamOut: BitStream,
-        countMap: Map<Int, List<Int>>
+        countMap: Map<Int, List<Int>>,
+        log: Logger
     ) {
         countMap.toSortedMap().forEach { (bitPosition, rleNumberList) ->
+            log.debug("decoding bits of significance ")
+
             streamOut.position = 0
             var currentBit = false
 
@@ -232,7 +234,6 @@ interface Encoder {
             huffmanMapping[currentPrefix] = byteToMap
         }
         log.debug("Parsed ${huffmanMapping.size} mappings from encoded file.")
-        log.debug("Huffman dictionary found: $huffmanMapping")
         return huffmanMapping
     }
 

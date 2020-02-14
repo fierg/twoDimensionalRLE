@@ -213,7 +213,7 @@ class ModifiedMixedEncoder(val DEBUGLOG: Boolean = false) : Encoder {
 
                 BitStream(File(decodedFile).openBinaryStream(false)).use { streamOut ->
                     log.debug("decoding all runs to file...")
-                    decodeBitPositionOfRunMap(streamOut, runMap)
+                    decodeBitPositionOfRunMap(streamOut, runMap, log)
                 }
 
             } else {
@@ -241,7 +241,8 @@ class ModifiedMixedEncoder(val DEBUGLOG: Boolean = false) : Encoder {
                 log.debug("Applying bijective Burrows Wheeler Transformation to file...")
                 bwts.invert(File(if (applyByteMapping) mappedFile else decodedFile), File(outputFile))
             }
-            if (applyBurrowsWheelerTransformation xor applyByteMapping) File(decodedFile).delete()
+            if (applyBurrowsWheelerTransformation xor applyByteMapping)
+                File(decodedFile).delete()
             if (applyBurrowsWheelerTransformation && applyByteMapping) {
                 File(decodedFile).delete()
                 File(mappedFile).delete()
